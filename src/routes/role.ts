@@ -1,51 +1,50 @@
-const { UserController } = require("../controller/UserController");
+const { RolesController } = require("../controller/RolesControler");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
 const validationResult = require("../utils/validations/validation-error");
-const UserValidation = require("../utils/validations/user/user-validation");
-const signupValidationEdit = require("../utils/validations/user/user-validation-edit");
+const roleValidation = require("../utils/validations/roles/role-validation");
 
 export const Routes = [
   {
     method: "get",
     route: "/list",
-    controller: UserController,
+    controller: RolesController,
     action: "all",
     validationField: "",
   },
   {
     method: "get",
     route: "/list/:id",
-    controller: UserController,
+    controller: RolesController,
     action: "one",
     validationField: "",
   },
   {
     method: "post",
     route: "/create",
-    controller: UserController,
+    controller: RolesController,
     action: "create",
-    validationField: UserValidation,
+    validationField: roleValidation,
   },
   {
     method: "put",
     route: "/update",
-    controller: UserController,
+    controller: RolesController,
     action: "update",
-    validationField: signupValidationEdit,
+    validationField: roleValidation,
   },
   {
     method: "delete",
     route: "/delete/:id",
-    controller: UserController,
+    controller: RolesController,
     action: "remove",
     validationField: "",
   },
   {
     method: "post",
     route: "/login",
-    controller: UserController,
+    controller: RolesController,
     action: "login",
     validationField: "",
   },

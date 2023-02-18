@@ -10,4 +10,13 @@ module.exports = {
   userListFailed: "User Listed Failed",
   userDeleteSuccess: "User Deleted Success",
   userDeleteFailed: "User Deleted Failed",
+  roleCreatedSuccessfully: "Role Created Successfully",
+  roleCreatedFailed: "Role Created Failed",
+  roleListedSuccess: "Role Listed Successfully",
+  roleListedFailed: "Role Listed Failed",
+  roleNotFound: "No Roles Found",
+  roleDeleteSuccess: "Successfully Deleted",
+  roleDeleteFailed: " Roles Delete Failed",
+  roleUpdatedFailed: " Roles Update Failed",
+  roleUpdatedSuccess: " Roles Update Success",
 };

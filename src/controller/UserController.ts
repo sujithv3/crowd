@@ -1,13 +1,13 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { User } from "../entity/User";
+import { Users } from "../entity/Users";
 const { genPass, verifyPass } = require("../utils/password");
 const { genToken } = require("../utils/jsonwebtoken");
 const responseMessage = require("../configs/response");
 const msg = require("../configs/message");
 
 export class UserController {
-  private userRepository = AppDataSource.getRepository(User);
+  private userRepository = AppDataSource.getRepository(Users);
 
   //   list all users
   async all(request: Request, response: Response, next: NextFunction) {
@@ -67,9 +67,12 @@ export class UserController {
       const {
         first_name,
         last_name,
-        email,
+        email_id,
+        profile,
+        contact_number,
         password,
-        user_role,
+        deactivate_reason,
+        role,
         is_active = true,
       } = request.body;
 
@@ -77,14 +80,18 @@ export class UserController {
       const encrypt_password: string = genPass(password);
 
       // create user
-      this.userRepository.save({
+      await this.userRepository.save({
         first_name,
         last_name,
-        email,
+        email_id,
+        profile,
+        contact_number,
         password: encrypt_password,
-        user_role,
+        deactivate_reason,
+        role,
         is_active,
-        create_at: new Date(),
+        created_date: new Date(),
+        updated_date: new Date(),
       });
       return responseMessage.responseMessage(
         true,
@@ -96,6 +103,45 @@ export class UserController {
         false,
         400,
         msg.user_create_failed,
+        err
+      );
+    }
+  }
+  //   create user
+  async update(request: Request, response: Response, next: NextFunction) {
+    try {
+      const {
+        id,
+        first_name,
+        last_name,
+        email_id,
+        profile,
+        contact_number,
+
+        deactivate_reason,
+        role,
+        is_active = true,
+      } = request.body;
+
+      // create user
+      this.userRepository.save({
+        id,
+        first_name,
+        last_name,
+        email_id,
+        profile,
+        contact_number,
+        deactivate_reason,
+        role,
+        is_active,
+        updated_date: new Date(),
+      });
+      return responseMessage.responseMessage(true, 200, msg.userUpdateSuccess);
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userUpdateFailed,
         err
       );
     }
@@ -120,12 +166,12 @@ export class UserController {
 
   //   login user
   async login(request: Request, response: Response, next: NextFunction) {
-    const { email, password } = request.body;
-
+    const { email_id, password } = request.body;
+    console.log(request.header);
     // find user
 
     let user = await this.userRepository.findOneBy({
-      email,
+      email_id,
     });
     if (!user) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);

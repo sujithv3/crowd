@@ -5,6 +5,7 @@ const cors = require("cors");
 require("dotenv").config({ path: __dirname + "/.env" });
 import { AppDataSource } from "./data-source";
 const user = require("./routes/user");
+const role = require("./routes/role");
 
 // mysql database connection initialize
 
@@ -33,3 +34,4 @@ app.listen(process.env.SERVER_URL, () => {
 
 // routes
 app.use("/api/user", user);
+app.use("/api/role", role);
