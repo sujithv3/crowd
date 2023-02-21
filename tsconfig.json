@@ -8,8 +8,11 @@
       "module": "commonjs",
       "moduleResolution": "node",
       "outDir": "./build",
-      "emitDecoratorMetadata": true,
+      "forceConsistentCasingInFileNames": true, 
+      "strictPropertyInitialization": false,
       "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+   
       "sourceMap": true
    }
 }

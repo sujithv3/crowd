@@ -49,6 +49,27 @@ export const Routes = [
     action: "login",
     validationField: "",
   },
+  {
+    method: "post",
+    route: "/change-password",
+    controller: UserController,
+    action: "changePassword",
+    validationField: "",
+  },
+  {
+    method: "post",
+    route: "/forget-password",
+    controller: UserController,
+    action: "ForgetPassword",
+    validationField: "",
+  },
+  {
+    method: "post",
+    route: "/create-password/:id/:token",
+    controller: UserController,
+    action: "createPassword",
+    validationField: "",
+  },
 ];
 
 // function routes

@@ -164,6 +164,8 @@ export class Campaigns {
   @Column("boolean")
   is_active: boolean;
 
-  @Column("boolean")
+  @Column({
+    default: false,
+  })
   is_deleted: boolean;
 }

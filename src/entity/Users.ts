@@ -74,6 +74,8 @@ export class Users {
   @Column("boolean")
   is_active: boolean;
 
-  // @Column("boolean")
-  // is_deleted: boolean;
+  @Column({
+    default: false,
+  })
+  is_deleted: boolean;
 }

@@ -17,11 +17,7 @@ AppDataSource.initialize()
 
 // create express app
 const app = express();
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
