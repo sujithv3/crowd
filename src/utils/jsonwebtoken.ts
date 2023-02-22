@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const jwtDecode = require("jwt-decode");
 const msg = require("../configs/message");
 const response = require("../configs/response");
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 module.exports = {
   genToken(data: any) {
     return jwt.sign(
@@ -13,15 +13,18 @@ module.exports = {
       { expiresIn: "5 days" }
     );
   },
-  verify: async (req: Request, res: Response, next: Function) => {
+  verify: async (req: any, res: Response, next: NextFunction) => {
     try {
-      if (!req.headers.authorization) {
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
         return res
           .status(412)
           .send(response.responseMessage(false, 402, msg.user_login_required));
       }
-      let token = req.headers.authorization.slice(7);
-      const verify = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+      const verify = jwt.verify(req.cookies.token, process.env.JWT_SECRET_KEY);
       if (!verify) {
         return res
           .status(402)

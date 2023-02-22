@@ -1,57 +1,49 @@
-const { RolesController } = require("../controller/RolesControler");
+const { categoryController } = require("../controller/category");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
 const validationResult = require("../utils/validations/validation-error");
-const roleValidation = require("../utils/validations/roles/role-validation");
+const categoryCreateValidation = require("../utils/validations/category/create");
+const categoryUpdateValidationEdit = require("../utils/validations/category/update");
 const JWT = require("../utils/jsonwebtoken");
-
 export const Routes = [
+  {
+    method: "post",
+    route: "/create",
+    controller: categoryController,
+    action: "create",
+    validationField: categoryCreateValidation,
+    isLogin: true,
+  },
   {
     method: "get",
     route: "/list",
-    controller: RolesController,
+    controller: categoryController,
     action: "all",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
   {
     method: "get",
     route: "/list/:id",
-    controller: RolesController,
+    controller: categoryController,
     action: "one",
     validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "post",
-    route: "/create",
-    controller: RolesController,
-    action: "create",
-    validationField: roleValidation,
     isLogin: true,
   },
   {
     method: "put",
     route: "/update",
-    controller: RolesController,
+    controller: categoryController,
     action: "update",
-    validationField: roleValidation,
+    validationField: categoryUpdateValidationEdit,
     isLogin: true,
   },
   {
     method: "delete",
     route: "/delete/:id",
-    controller: RolesController,
+    controller: categoryController,
     action: "remove",
-    validationField: "",
-    isLogin: true,
-  },
-  {
-    method: "post",
-    route: "/login",
-    controller: RolesController,
-    action: "login",
     validationField: "",
     isLogin: true,
   },

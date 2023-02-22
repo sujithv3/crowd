@@ -4,6 +4,7 @@ module.exports = {
   user_already_exist: "Account Already Exist",
   user_login_required: "Login Is Required",
   user_login_success: "Login Successfully",
+  user_log_out_success: "Logout Successfully",
   user_not_found: "User Not Found",
   userCreationFailed: "Invalid Credential ",
   userListSuccess: "User Listed Successfully",
@@ -27,4 +28,14 @@ module.exports = {
   createPasswordFailed: "Create Password Failed",
   createPasswordSuccess: "Create Password Success",
   createPasswordInvalidToken: "link has expired",
+  // category
+  categoryCreateSuccess: "Category Create Success",
+  categoryCreateFailed: "Category Create Failed",
+  categoryListFailed: "Category List Failed",
+  categoryListSuccess: "Category List Success",
+  categoryNotFound: "Category Not Found",
+  categoryUpdateSuccess: "Category Update Success",
+  categoryUpdateFailed: "Category Update Failed",
+  categoryDeleteSuccess: "Category Delete  Success",
+  categoryDeleteFailed: "Category  Delete Failed",
 };

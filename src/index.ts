@@ -6,6 +6,8 @@ require("dotenv").config({ path: __dirname + "/.env" });
 import { AppDataSource } from "./data-source";
 const user = require("./routes/user");
 const role = require("./routes/role");
+const campaigns = require("./routes/campaigns");
+const category = require("./routes/category");
 
 // mysql database connection initialize
 
@@ -17,7 +19,12 @@ AppDataSource.initialize()
 
 // create express app
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: true,
+  })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -31,3 +38,5 @@ app.listen(process.env.SERVER_URL, () => {
 // routes
 app.use("/api/user", user);
 app.use("/api/role", role);
+app.use("/api/campaigns", campaigns);
+app.use("/api/category", category);

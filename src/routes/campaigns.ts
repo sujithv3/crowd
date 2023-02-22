@@ -5,14 +5,16 @@ import { Request, Response } from "express";
 const validationResult = require("../utils/validations/validation-error");
 const UserValidation = require("../utils/validations/user/user-validation");
 const signupValidationEdit = require("../utils/validations/user/user-validation-edit");
-const loginValidationEdit = require("../utils/validations/user/login");
-const {
-  changePasswordValidation,
-  createPasswordValidation,
-  forgetPasswordValidation,
-} = require("../utils/validations/user/change-password");
 const JWT = require("../utils/jsonwebtoken");
 export const Routes = [
+  {
+    method: "post",
+    route: "/create",
+    controller: UserController,
+    action: "create",
+    validationField: UserValidation,
+    isLogin: true,
+  },
   {
     method: "get",
     route: "/list",
@@ -27,14 +29,6 @@ export const Routes = [
     controller: UserController,
     action: "one",
     validationField: "",
-    isLogin: true,
-  },
-  {
-    method: "post",
-    route: "/create",
-    controller: UserController,
-    action: "create",
-    validationField: UserValidation,
     isLogin: false,
   },
   {
@@ -43,7 +37,7 @@ export const Routes = [
     controller: UserController,
     action: "update",
     validationField: signupValidationEdit,
-    isLogin: true,
+    isLogin: false,
   },
   {
     method: "delete",
@@ -51,46 +45,6 @@ export const Routes = [
     controller: UserController,
     action: "remove",
     validationField: "",
-    isLogin: true,
-  },
-  {
-    method: "post",
-    route: "/login",
-    controller: UserController,
-    action: "login",
-    validationField: loginValidationEdit,
-    isLogin: false,
-  },
-  {
-    method: "post",
-    route: "/logout",
-    controller: UserController,
-    action: "logOut",
-    validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "post",
-    route: "/change-password",
-    controller: UserController,
-    action: "changePassword",
-    validationField: changePasswordValidation,
-    isLogin: true,
-  },
-  {
-    method: "post",
-    route: "/forget-password",
-    controller: UserController,
-    action: "ForgetPassword",
-    validationField: forgetPasswordValidation,
-    isLogin: false,
-  },
-  {
-    method: "post",
-    route: "/create-password/:id/:token",
-    controller: UserController,
-    action: "createPassword",
-    validationField: createPasswordValidation,
     isLogin: false,
   },
 ];

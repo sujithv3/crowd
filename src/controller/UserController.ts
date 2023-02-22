@@ -102,7 +102,7 @@ export class UserController {
         contact_number,
         password: encrypt_password,
         deactivate_reason,
-        role_id,
+        role: role_id,
         is_active,
         created_date: new Date(),
         updated_date: new Date(),
@@ -181,19 +181,19 @@ export class UserController {
 
   //   login user
   async login(request: Request, response: Response, next: NextFunction) {
-    const { email_id, password } = request.body;
-    // console.log(request.headers);
+    const { email, password } = request.body;
     // find user
 
     let user = await this.userRepository.find({
       where: {
-        email_id,
+        email_id: email,
         is_active: true,
       },
       relations: {
         role: true,
       },
     });
+
     if (user.length === 0) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);
     }
@@ -211,12 +211,27 @@ export class UserController {
     // generate jwt token
     delete user[0].password;
     const jwtToken: string = genToken(user);
-    response.cookie("token", jwtToken, { maxAge: 900000, httpOnly: true });
+    response.cookie("token", jwtToken, {
+      maxAge: 900000,
+      sameSite: true,
+    });
     return responseMessage.responseWithToken(
       true,
       200,
       msg.user_login_success,
       jwtToken
+    );
+  }
+
+  // log out
+  async logOut(request: Request, response: Response, next: NextFunction) {
+    // clear cookie
+
+    response.clearCookie("token");
+    return responseMessage.responseWithToken(
+      true,
+      200,
+      msg.user_log_out_success
     );
   }
 

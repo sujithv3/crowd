@@ -15,9 +15,9 @@ const signupValidation = [
   body("email_id").isEmail().notEmpty().withMessage("email is required"),
   body("password")
     .isString()
-    .isLength({ min: 6 })
+    .isLength({ min: 8 })
     .withMessage("must be at least 6 chars long")
-    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i")
+    .matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/)
     .withMessage(
       "Password should be combination of one uppercase , one lower case, one special char, one digit and min 8 , max 20 char long"
     ),
