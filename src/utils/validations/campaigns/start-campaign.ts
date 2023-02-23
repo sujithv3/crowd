@@ -13,8 +13,8 @@ const startCampaignValidation = [
     .withMessage("must be string")
     .notEmpty()
     .withMessage("location is required")
-    .isIn(["business", "individual"])
-    .withMessage("Fruit does contain invalid value"),
+    .isIn(["BUSINESS", "INDIVIDUAL"])
+    .withMessage(" invalid value"),
   body("tax_location")
     .isInt()
     .withMessage("must be number")

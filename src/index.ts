@@ -8,6 +8,8 @@ const user = require("./routes/user");
 const role = require("./routes/role");
 const campaigns = require("./routes/campaigns");
 const category = require("./routes/category");
+const location = require("./routes/location");
+const startUp = require("./routes/start-up/campaigns/start-up");
 
 // mysql database connection initialize
 
@@ -40,3 +42,5 @@ app.use("/api/user", user);
 app.use("/api/role", role);
 app.use("/api/campaigns", campaigns);
 app.use("/api/category", category);
+app.use("/api/location", location);
+app.use("/api/start-up/campaign/start-up", startUp);

@@ -38,4 +38,21 @@ module.exports = {
   categoryUpdateFailed: "Category Update Failed",
   categoryDeleteSuccess: "Category Delete  Success",
   categoryDeleteFailed: "Category  Delete Failed",
+  // location
+  locationCreateSuccess: "Location Create Success",
+  locationCreateFailed: "Location Create Failed",
+  locationListFailed: "Location List Failed",
+  locationListSuccess: "Location List Success",
+  locationNotFound: "Location Not Found",
+  locationUpdateSuccess: "Location Update Success",
+  locationUpdateFailed: "Location Update Failed",
+  locationDeleteSuccess: "Location Delete  Success",
+  locationDeleteFailed: "Location  Delete Failed",
+
+  // campaigns
+  // start up
+  startCampaignCreateSuccess: "start up  create successfully",
+  startCampaignCreateFailed: "start up  create successfully",
+  startCampaignListSuccess: "start up  list successfully",
+  startCampaignListFailed: "start up list successfully",
 };

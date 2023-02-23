@@ -1,11 +1,11 @@
-import { AppDataSource } from "../data-source";
+import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
-import { Roles } from "../entity/roles";
+import { Campaigns } from "../../../entity/campaigns";
 const responseMessage = require("../configs/response");
 const msg = require("../configs/message");
 
-export class RolesController {
-  private rolesRepository = AppDataSource.getRepository(Roles);
+export class CampaignController {
+  private rolesRepository = AppDataSource.getRepository(Campaigns);
 
   //   list all role
   async all(request: Request, response: Response, next: NextFunction) {
