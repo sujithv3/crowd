@@ -137,7 +137,7 @@ export class UserController {
       } = request.body;
 
       // create user
-      this.userRepository.save({
+      await this.userRepository.save({
         id,
         first_name,
         last_name,

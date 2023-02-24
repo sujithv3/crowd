@@ -79,16 +79,18 @@ export class locationController {
       const {
         name,
         location_type = "TAX",
+        country,
         is_active = true,
         is_deleted = false,
       } = req.body;
 
       //   create location
-      this.locationRepository.save({
+      await this.locationRepository.save({
         name,
         location_type,
         is_active,
         is_deleted,
+        country,
         createdDate: new Date(),
         updatedDate: new Date(),
       });
@@ -114,15 +116,17 @@ export class locationController {
         id,
         name,
         location_type,
+        country,
         is_active,
         is_deleted = false,
       } = req.body;
 
       //   update location
-      this.locationRepository.save({
+      await this.locationRepository.save({
         id,
         name,
         location_type,
+        country,
         is_active,
         is_deleted,
         updatedDate: new Date(),

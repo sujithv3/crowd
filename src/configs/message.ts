@@ -55,4 +55,10 @@ module.exports = {
   startCampaignCreateFailed: "start up  create successfully",
   startCampaignListSuccess: "start up  list successfully",
   startCampaignListFailed: "start up list successfully",
+
+  // basic up
+  basicCampaignCreateSuccess: "basic info  create successfully",
+  basicCampaignCreateFailed: "basic info  create successfully",
+  basicCampaignListSuccess: "basic info  list successfully",
+  basicCampaignListFailed: "basic info list successfully",
 };

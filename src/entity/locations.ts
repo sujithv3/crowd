@@ -24,6 +24,12 @@ export class Location {
   })
   location_type: string;
 
+  @Column({
+    length: 255,
+    type: "varchar",
+  })
+  country: string;
+
   @CreateDateColumn()
   createdDate: Date;
 

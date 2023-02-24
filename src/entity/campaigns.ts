@@ -56,6 +56,13 @@ export class Campaigns {
   location: string;
 
   @Column({
+    length: 100,
+    type: "varchar",
+    default: null,
+  })
+  tag: string;
+
+  @Column({
     length: 5,
     type: "varchar",
     default: null,
@@ -107,10 +114,12 @@ export class Campaigns {
   })
   faq: string;
 
-  @ManyToOne(() => Users, (user) => user.id)
+  @ManyToOne((type) => Users)
+  @JoinColumn({ name: "user_id", referencedColumnName: "id" })
   user: Users;
 
-  @ManyToOne(() => Users, (user) => user.id)
+  @ManyToOne((type) => Users)
+  @JoinColumn({ name: "manager_id", referencedColumnName: "id" })
   manager: Users;
 
   @Column({ type: "json" })
@@ -122,6 +131,14 @@ export class Campaigns {
     default: businessType.BUSINESS,
   })
   format: businessType;
+
+  @ManyToOne((type) => Category)
+  @JoinColumn({ name: "primary_category", referencedColumnName: "id" })
+  primary_category: Category;
+
+  @ManyToOne((type) => Category)
+  @JoinColumn({ name: "primary_sub_category", referencedColumnName: "id" })
+  primary_sub_category: Category;
 
   @ManyToOne((type) => Category)
   @JoinColumn({ name: "category_id", referencedColumnName: "id" })

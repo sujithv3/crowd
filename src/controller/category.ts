@@ -84,7 +84,7 @@ export class categoryController {
       } = req.body;
 
       //   create category
-      this.categoryRepository.save({
+      await this.categoryRepository.save({
         name,
         parent_id,
         is_active,
@@ -113,7 +113,7 @@ export class categoryController {
       const { name, is_active, parent_id, id, is_deleted = false } = req.body;
 
       //   update category
-      this.categoryRepository.save({
+      await this.categoryRepository.save({
         id,
         name,
         parent_id,

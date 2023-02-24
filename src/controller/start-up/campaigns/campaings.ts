@@ -66,7 +66,7 @@ export class CampaignController {
       const { name, is_active = true } = req.body;
 
       //   create roles
-      this.rolesRepository.save({
+      await this.rolesRepository.save({
         name,
         is_active,
         created_date: new Date(),
@@ -93,7 +93,7 @@ export class CampaignController {
       const { name, is_active = true, id } = req.body;
 
       //   create roles
-      this.rolesRepository.save({
+      await this.rolesRepository.save({
         id,
         name,
         is_active,

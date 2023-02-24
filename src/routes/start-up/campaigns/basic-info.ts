@@ -1,50 +1,32 @@
-const { locationController } = require("../controller/locations");
+const {
+  basicInfoController,
+} = require("../../../controller/start-up/campaigns/basic-info");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
-const validationResult = require("../utils/validations/validation-error");
-const locationValidation = require("../utils/validations/location/locations");
-const JWT = require("../utils/jsonwebtoken");
+const validationResult = require("../../../utils/validations/validation-error");
+const startUpValidation = require("../../../utils/validations/campaigns/start-campaign");
+const JWT = require("../../../utils/jsonwebtoken");
+const { upload } = require("../../../utils/file-upload");
+
 export const Routes = [
   {
     method: "post",
     route: "/create",
-    controller: locationController,
+    controller: basicInfoController,
     action: "create",
-    validationField: locationValidation,
+    validationField: "",
     isLogin: true,
+    fileUpload: true,
   },
   {
     method: "get",
     route: "/list",
-    controller: locationController,
-    action: "all",
+    controller: basicInfoController,
+    action: "list",
     validationField: "",
     isLogin: true,
-  },
-  {
-    method: "get",
-    route: "/list/:id",
-    controller: locationController,
-    action: "one",
-    validationField: "",
-    isLogin: true,
-  },
-  {
-    method: "put",
-    route: "/update",
-    controller: locationController,
-    action: "update",
-    validationField: locationValidation,
-    isLogin: true,
-  },
-  {
-    method: "delete",
-    route: "/delete/:id",
-    controller: locationController,
-    action: "remove",
-    validationField: "",
-    isLogin: true,
+    fileUpload: false,
   },
 ];
 
@@ -59,6 +41,14 @@ Routes.forEach((route) => {
         },
     route.validationField
       ? validationResult(route.validationField)
+      : (req: Request, res: Response, next: Function) => {
+          return next();
+        },
+    route.fileUpload
+      ? upload.fields([
+          { name: "project_image", maxCount: 1 },
+          { name: "project_video", maxCount: 1 },
+        ])
       : (req: Request, res: Response, next: Function) => {
           return next();
         },
