@@ -1,16 +1,18 @@
-const { UserController } = require("../controller/User");
+const {
+  CampaignController,
+} = require("../../controller/start-up/campaigns/campaings");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
-const validationResult = require("../utils/validations/validation-error");
-const UserValidation = require("../utils/validations/user/user-validation");
-const signupValidationEdit = require("../utils/validations/user/user-validation-edit");
-const JWT = require("../utils/jsonwebtoken");
+const validationResult = require("../../utils/validations/validation-error");
+const UserValidation = require("../../utils/validations/user/user-validation");
+const signupValidationEdit = require("../../utils/validations/user/user-validation-edit");
+const JWT = require("../../utils/jsonwebtoken");
 export const Routes = [
   {
     method: "post",
     route: "/create",
-    controller: UserController,
+    controller: CampaignController,
     action: "create",
     validationField: UserValidation,
     isLogin: true,
@@ -18,7 +20,7 @@ export const Routes = [
   {
     method: "get",
     route: "/list",
-    controller: UserController,
+    controller: CampaignController,
     action: "all",
     validationField: "",
     isLogin: true,
@@ -26,7 +28,7 @@ export const Routes = [
   {
     method: "get",
     route: "/list/:id",
-    controller: UserController,
+    controller: CampaignController,
     action: "one",
     validationField: "",
     isLogin: false,
@@ -34,7 +36,7 @@ export const Routes = [
   {
     method: "put",
     route: "/update",
-    controller: UserController,
+    controller: CampaignController,
     action: "update",
     validationField: signupValidationEdit,
     isLogin: false,
@@ -42,7 +44,7 @@ export const Routes = [
   {
     method: "delete",
     route: "/delete/:id",
-    controller: UserController,
+    controller: CampaignController,
     action: "remove",
     validationField: "",
     isLogin: false,

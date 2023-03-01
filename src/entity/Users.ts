@@ -39,18 +39,96 @@ export class Users {
   email_id: string;
 
   @Column({
-    length: 100,
+    length: 16,
+    type: "varchar",
+    nullable: true,
+  })
+  contact_number: string;
+
+  @Column({
+    length: 250,
     type: "varchar",
     nullable: true,
   })
   profile: string;
 
   @Column({
-    length: 16,
+    length: 250,
     type: "varchar",
     nullable: true,
   })
-  contact_number: string;
+  company_logo: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    nullable: true,
+  })
+  street_name: string;
+
+  @Column({
+    length: 100,
+    type: "varchar",
+    nullable: true,
+  })
+  country: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    nullable: true,
+  })
+  description: string;
+
+  @Column({
+    length: 500,
+    type: "varchar",
+    nullable: true,
+  })
+  summary: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    nullable: true,
+  })
+  linked_in: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    nullable: true,
+  })
+  facebook: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    nullable: true,
+  })
+  twitter: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    nullable: true,
+  })
+  you_tube: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    nullable: true,
+  })
+  website: string;
+
+  @Column({
+    type: "json",
+    array: false,
+    default: () => "'[]'",
+    nullable: false,
+  })
+  extra_links!: Array<{ name: string; url: string }>;
 
   @Column({
     length: 100,

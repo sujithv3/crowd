@@ -43,6 +43,14 @@ export class bankController {
         },
       });
 
+      if (!campaign) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.banksCampaignNotFound
+        );
+      }
+
       //   find tames
       const bank = await this.bankRepository
         .createQueryBuilder("bank")
@@ -86,6 +94,17 @@ export class bankController {
           is_deleted,
         });
       }
+
+      // update campaign
+      await this.campaignRepository
+        .createQueryBuilder()
+        .update(Campaigns)
+        .set({
+          is_published: true,
+          bank_location: bank_location,
+        })
+        .where("user=:id", { id: user[0].id })
+        .execute();
 
       return responseMessage.responseMessage(
         true,

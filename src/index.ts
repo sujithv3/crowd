@@ -6,7 +6,6 @@ require("dotenv").config({ path: __dirname + "/.env" });
 import { AppDataSource } from "./data-source";
 const user = require("./routes/user");
 const role = require("./routes/role");
-const campaigns = require("./routes/campaigns");
 const category = require("./routes/category");
 const location = require("./routes/location");
 const startUp = require("./routes/start-up/campaigns/start-up");
@@ -16,6 +15,7 @@ const Team = require("./routes/start-up/campaigns/team");
 const Fund = require("./routes/start-up/campaigns/funds");
 const PaymentVerification = require("./routes/start-up/campaigns/payment-verification");
 const BankDetail = require("./routes/start-up/campaigns/bank");
+const Campaign = require("./routes/start-up/campaigns");
 
 // mysql database connection initialize
 
@@ -46,7 +46,6 @@ app.listen(process.env.SERVER_URL, () => {
 // routes
 app.use("/api/user", user);
 app.use("/api/role", role);
-app.use("/api/campaigns", campaigns);
 app.use("/api/category", category);
 app.use("/api/location", location);
 app.use("/api/start-up/campaign/start-up", startUp);
@@ -56,3 +55,4 @@ app.use("/api/start-up/campaign/team", Team);
 app.use("/api/start-up/campaign/fund", Fund);
 app.use("/api/start-up/campaign/payment-verification", PaymentVerification);
 app.use("/api/start-up/campaign/bank", BankDetail);
+app.use("/api/start-up/campaign", Campaign);

@@ -12,6 +12,8 @@ const {
   forgetPasswordValidation,
 } = require("../utils/validations/user/change-password");
 const JWT = require("../utils/jsonwebtoken");
+const { upload } = require("../utils/file-upload");
+
 export const Routes = [
   {
     method: "get",
@@ -20,6 +22,7 @@ export const Routes = [
     action: "all",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "get",
@@ -28,6 +31,16 @@ export const Routes = [
     action: "one",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "get",
+    route: "/profile-list",
+    controller: UserController,
+    action: "getProfile",
+    validationField: "",
+    isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -36,14 +49,16 @@ export const Routes = [
     action: "create",
     validationField: UserValidation,
     isLogin: false,
+    fileUpload: false,
   },
   {
     method: "put",
     route: "/update",
     controller: UserController,
     action: "update",
-    validationField: signupValidationEdit,
+    validationField: "",
     isLogin: true,
+    fileUpload: true,
   },
   {
     method: "delete",
@@ -52,6 +67,7 @@ export const Routes = [
     action: "remove",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -60,6 +76,7 @@ export const Routes = [
     action: "login",
     validationField: loginValidationEdit,
     isLogin: false,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -68,6 +85,7 @@ export const Routes = [
     action: "logOut",
     validationField: "",
     isLogin: false,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -76,6 +94,7 @@ export const Routes = [
     action: "changePassword",
     validationField: changePasswordValidation,
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -84,6 +103,7 @@ export const Routes = [
     action: "ForgetPassword",
     validationField: forgetPasswordValidation,
     isLogin: false,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -92,6 +112,7 @@ export const Routes = [
     action: "createPassword",
     validationField: createPasswordValidation,
     isLogin: false,
+    fileUpload: false,
   },
 ];
 
@@ -101,6 +122,14 @@ Routes.forEach((route) => {
     route.route,
     route.isLogin
       ? JWT.verify
+      : (req: Request, res: Response, next: Function) => {
+          return next();
+        },
+    route.fileUpload
+      ? upload.fields([
+          { name: "profile", maxCount: 1 },
+          { name: "company_logo", maxCount: 1 },
+        ])
       : (req: Request, res: Response, next: Function) => {
           return next();
         },

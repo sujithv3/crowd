@@ -7,10 +7,75 @@ const { genToken } = require("../utils/jsonwebtoken");
 const responseMessage = require("../configs/response");
 const crypto = require("crypto");
 const msg = require("../configs/message");
+const Jwt = require("../utils/jsonwebtoken");
 const sendEmail = require("../utils/nodemailer/email");
 export class UserController {
   private userRepository = AppDataSource.getRepository(Users);
   public forgetTokenRepository = AppDataSource.getRepository(ForgetToken);
+
+  //   create user
+  async create(request: Request, response: Response, next: NextFunction) {
+    try {
+      const {
+        first_name,
+        last_name,
+        email_id,
+        profile,
+        contact_number,
+        password,
+        deactivate_reason,
+        role_id,
+        is_active = true,
+      } = request.body;
+
+      // encrypt password
+      const encrypt_password: string = genPass(password);
+
+      // if user check
+      const user = await this.userRepository
+        .createQueryBuilder()
+        .where("email_id=:email_id AND role_id=:role_id", {
+          email_id: email_id,
+          role_id: role_id,
+        })
+        .getOne();
+
+      if (user) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.user_already_exist
+        );
+      }
+
+      // create user
+      await this.userRepository.save({
+        first_name,
+        last_name,
+        email_id,
+        profile,
+        contact_number,
+        password: encrypt_password,
+        deactivate_reason,
+        role: role_id,
+        is_active,
+        created_date: new Date(),
+        updated_date: new Date(),
+      });
+      return responseMessage.responseMessage(
+        true,
+        200,
+        msg.user_create_success
+      );
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.user_create_failed,
+        err
+      );
+    }
+  }
 
   //   list all users
   async all(request: Request, response: Response, next: NextFunction) {
@@ -54,6 +119,7 @@ export class UserController {
           role: true,
         },
       });
+      delete user.password;
 
       if (!user) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
@@ -75,82 +141,93 @@ export class UserController {
     }
   }
 
-  //   create user
-  async create(request: Request, response: Response, next: NextFunction) {
+  // get profile
+  async getProfile(request: Request, response: Response, next: NextFunction) {
     try {
-      const {
-        first_name,
-        last_name,
-        email_id,
-        profile,
-        contact_number,
-        password,
-        deactivate_reason,
-        role_id,
-        is_active = true,
-      } = request.body;
+      const userData = Jwt.decode(request.cookies.token);
 
-      // encrypt password
-      const encrypt_password: string = genPass(password);
+      const user = await this.userRepository
+        .createQueryBuilder()
+        .where("id=:id", { id: userData[0].id })
+        .getOne();
 
-      // create user
-      await this.userRepository.save({
-        first_name,
-        last_name,
-        email_id,
-        profile,
-        contact_number,
-        password: encrypt_password,
-        deactivate_reason,
-        role: role_id,
-        is_active,
-        created_date: new Date(),
-        updated_date: new Date(),
-      });
-      return responseMessage.responseMessage(
+      if (!user) {
+        return responseMessage.responseMessage(false, 400, msg.user_not_found);
+      }
+      delete user.password;
+      return responseMessage.responseWithData(
         true,
         200,
-        msg.user_create_success
+        msg.userListSuccess,
+        user
       );
-    } catch (err) {
+    } catch (error) {
+      console.log(error);
       return responseMessage.responseWithData(
         false,
         400,
-        msg.user_create_failed,
-        err
+        msg.userListFailed,
+        error
       );
     }
   }
-  //   create user
-  async update(request: Request, response: Response, next: NextFunction) {
+
+  //   create user or profile
+  async update(request: any, response: Response, next: NextFunction) {
     try {
       const {
         id,
         first_name,
         last_name,
-        email_id,
         profile,
         contact_number,
-        deactivate_reason,
-        role_id,
-        is_active,
+        company_logo,
+        street_name,
+        country,
+        description,
+        summary,
+        linked_in,
+        facebook,
+        twitter,
+        you_tube,
+        website,
+        extra_links,
       } = request.body;
 
-      // create user
-      await this.userRepository.save({
-        id,
-        first_name,
-        last_name,
-        email_id,
-        profile,
-        contact_number,
-        deactivate_reason,
-        role: role_id,
-        is_active,
-        updated_date: new Date(),
-      });
+      // get user
+
+      const user = Jwt.decode(request.cookies.token);
+
+      // update user
+      await this.userRepository
+        .createQueryBuilder("user")
+        .update(Users)
+        .set({
+          first_name,
+          last_name,
+          profile: request.files ? request.files.profile[0].location : profile,
+          contact_number,
+          company_logo: request.files
+            ? request.files.company_logo[0].location
+            : company_logo,
+          street_name,
+          country,
+          description,
+          summary,
+          linked_in,
+          facebook,
+          twitter,
+          you_tube,
+          website,
+          extra_links: JSON.parse(extra_links),
+          updated_date: new Date(),
+        })
+        .where("id =:id", { id: user[0].id })
+        .execute();
       return responseMessage.responseMessage(true, 200, msg.userUpdateSuccess);
     } catch (err) {
+      console.log(err);
+
       return responseMessage.responseWithData(
         false,
         400,
@@ -181,18 +258,21 @@ export class UserController {
 
   //   login user
   async login(request: Request, response: Response, next: NextFunction) {
-    const { email, password } = request.body;
+    const { email, password, role } = request.body;
     // find user
 
-    let user = await this.userRepository.find({
-      where: {
-        email_id: email,
-        is_active: true,
-      },
-      relations: {
-        role: true,
-      },
-    });
+    let user = await this.userRepository
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.role", "role")
+      .where(
+        "user.email_id=:email_id AND user.is_active=:is_active AND user.role_id=:role",
+        {
+          email_id: email,
+          is_active: true,
+          role: role,
+        }
+      )
+      .getMany();
 
     if (user.length === 0) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);
@@ -241,15 +321,18 @@ export class UserController {
     response: Response,
     next: NextFunction
   ) {
-    const { email_id, new_password, old_password } = request.body;
+    const { email_id, new_password, old_password, role } = request.body;
 
     // find user
 
-    let user = await this.userRepository.findOneBy({
-      email_id,
-      is_active: true,
-    });
-
+    let user = await this.userRepository
+      .createQueryBuilder()
+      .where("email_id=:email AND is_active=:is_active AND role_id=:role", {
+        email: email_id,
+        is_active: true,
+        role: role,
+      })
+      .getOne();
     if (!user) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);
     }
@@ -284,22 +367,25 @@ export class UserController {
     next: NextFunction
   ) {
     try {
-      const { email_id } = request.body;
+      const { email_id, role } = request.body;
       // find user
 
-      let user = await this.userRepository.findOneBy({
-        email_id,
-        is_active: true,
-      });
+      let user = await this.userRepository
+        .createQueryBuilder()
+        .where("email_id=:email AND is_active=:is_active AND role_id=:role", {
+          email: email_id,
+          is_active: true,
+          role: role,
+        })
+        .getOne();
       if (!user) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
       }
 
-      let token: any = await this.forgetTokenRepository.find({
-        where: {
-          user,
-        },
-      });
+      let token: any = await this.forgetTokenRepository
+        .createQueryBuilder()
+        .where("user=:id", { id: user.id })
+        .getOne();
       // set token table
       if (token.length === 0) {
         token = await this.forgetTokenRepository.save({
@@ -355,11 +441,10 @@ export class UserController {
     }
 
     // find token
-    let token: any = await this.forgetTokenRepository.find({
-      where: {
-        user,
-      },
-    });
+    let token: any = await this.forgetTokenRepository
+      .createQueryBuilder()
+      .where("user=:id", { id: user.id })
+      .getOne();
 
     // check token exist
     if (token.length === 0) {
@@ -369,8 +454,6 @@ export class UserController {
         msg.createPasswordInvalidToken
       );
     }
-    console.log(token[0].token);
-    console.log(verify_token);
 
     // compare token
     const compareToken = verify_token === token[0].token;

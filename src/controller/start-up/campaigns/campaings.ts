@@ -1,129 +1,83 @@
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
-const responseMessage = require("../configs/response");
-const msg = require("../configs/message");
-
+const responseMessage = require("../../../configs/response");
+const msg = require("../../../configs/message");
+const Jwt = require("../../../utils/jsonwebtoken");
 export class CampaignController {
   private rolesRepository = AppDataSource.getRepository(Campaigns);
 
-  //   list all role
+  //   list user bashed campaign
   async all(request: Request, response: Response, next: NextFunction) {
     try {
-      const userData = await this.rolesRepository.find();
+      // find user
+      const user = Jwt.decode(request.cookies.token);
 
-      //   check user exist
-      if (userData.length === 0) {
-        return responseMessage.responseMessage(false, 400, msg.roleNotFound);
-      }
+      const userData = await this.rolesRepository
+        .createQueryBuilder("campaign")
+        .where(
+          `campaign.user = :id AND
+         campaign.is_published=:published
+         AND campaign.is_deleted=:is_deleted
+         AND campaign.is_active=:is_active`,
+          {
+            id: user[0].id,
+            published: true,
+            is_deleted: false,
+            is_active: true,
+          }
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .leftJoinAndSelect("campaign.tax_location", "tax_location")
+        .leftJoinAndSelect("campaign.bank_location", "bank_location")
+        .leftJoinAndSelect("campaign.primary_category", "primary_category")
+        .leftJoinAndSelect(
+          "campaign.primary_sub_category",
+          "primary_sub_category"
+        )
+        .leftJoinAndSelect("campaign.category", "Category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.team", "Teams")
+        .leftJoinAndSelect("Teams.role", "role")
+        .leftJoinAndSelect("campaign.bank", "BankInfo")
+        .leftJoinAndSelect("BankInfo.bank_location", "location")
+        .getMany();
+
+      const total_count = await this.rolesRepository
+        .createQueryBuilder("campaign")
+        .where(
+          `campaign.user = :id AND
+       campaign.is_published=:published
+       AND campaign.is_deleted=:is_deleted
+       AND campaign.is_active=:is_active`,
+          {
+            id: user[0].id,
+            published: true,
+            is_deleted: false,
+            is_active: true,
+          }
+        )
+        .getCount();
+
       return responseMessage.responseWithData(
         true,
         200,
-        msg.roleListedSuccess,
-        userData
+        msg.campaignListSuccess,
+        { total_count, userData }
       );
     } catch (err) {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.roleListedFailed,
+        msg.campaignListFailed,
         err
       );
-    }
-  }
-
-  //   list one role
-  async one(request: Request, response: Response, next: NextFunction) {
-    const id = parseInt(request.params.id);
-    try {
-      const user = await this.rolesRepository.findOne({
-        where: { id },
-      });
-
-      if (!user) {
-        return responseMessage.responseMessage(false, 400, msg.roleNotFound);
-      }
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.roleListedSuccess,
-        user
-      );
-    } catch (error) {
-      return responseMessage.responseWithData(
-        false,
-        400,
-        msg.roleListedFailed,
-        error
-      );
-    }
-  }
-
-  // create role
-
-  async create(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { name, is_active = true } = req.body;
-
-      //   create roles
-      await this.rolesRepository.save({
-        name,
-        is_active,
-        created_date: new Date(),
-        updated_date: new Date(),
-      });
-      return responseMessage.responseMessage(
-        true,
-        200,
-        msg.roleCreatedSuccessfully
-      );
-    } catch (err) {
-      return responseMessage.responseWithData(
-        false,
-        400,
-        msg.roleCreatedFailed,
-        err
-      );
-    }
-  }
-
-  //   update role
-  async update(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { name, is_active = true, id } = req.body;
-
-      //   create roles
-      await this.rolesRepository.save({
-        id,
-        name,
-        is_active,
-        updated_date: new Date(),
-      });
-      return responseMessage.responseMessage(true, 200, msg.roleUpdatedSuccess);
-    } catch (err) {
-      return responseMessage.responseWithData(
-        false,
-        400,
-        msg.roleUpdatedFailed,
-        err
-      );
-    }
-  }
-
-  //   delete role
-  async remove(request: Request, response: Response, next: NextFunction) {
-    try {
-      const id = parseInt(request.params.id);
-
-      let roleToRemove = await this.rolesRepository.findOneBy({ id });
-
-      if (!roleToRemove) {
-        return responseMessage.responseMessage(false, 400, msg.roleNotFound);
-      }
-      await this.rolesRepository.remove(roleToRemove);
-      return responseMessage.responseMessage(true, 200, msg.roleDeleteSuccess);
-    } catch (error) {
-      return responseMessage.responseMessage(false, 400, msg.roleDeleteFailed);
     }
   }
 }

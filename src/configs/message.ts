@@ -50,6 +50,9 @@ module.exports = {
   locationDeleteFailed: "Location  Delete Failed",
 
   // campaigns
+  campaignListSuccess: "campaign list successfully",
+  campaignListFailed: "campaign list Failed",
+
   // start up for start up campaign
   startCampaignCreateSuccess: "start up  create successfully",
   startCampaignCreateFailed: "start up  create Failed",
@@ -87,4 +90,11 @@ module.exports = {
   paymentVerificationCampaignListSuccess:
     "payment verification  list successfully",
   paymentVerificationCampaignListFailed: "payment verification list Failed",
+
+  // bank for start up campaign
+  banksCampaignCreateSuccess: "bank  create successfully",
+  banksCampaignCreateFailed: "bank  create Failed",
+  banksCampaignListSuccess: "bank  list successfully",
+  banksCampaignListFailed: "bank list Failed",
+  banksCampaignNotFound: "Campaign Not Found",
 };
