@@ -1,11 +1,14 @@
+// created by : vijay
+// purpose route for funds api
+
 const {
-  basicInfoController,
-} = require("../../../controller/start-up/campaigns/basic-info");
+  fundsController,
+} = require("../../../controller/start-up/campaigns/funds");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
 const validationResult = require("../../../utils/validations/validation-error");
-const basicInfoCampaignValidation = require("../../../utils/validations/campaigns/basic-info");
+const fundsCampaignValidation = require("../../../utils/validations/campaigns/funds");
 const JWT = require("../../../utils/jsonwebtoken");
 const { upload } = require("../../../utils/file-upload");
 
@@ -13,16 +16,16 @@ export const Routes = [
   {
     method: "post",
     route: "/create",
-    controller: basicInfoController,
+    controller: fundsController,
     action: "create",
-    validationField: basicInfoCampaignValidation,
+    validationField: fundsCampaignValidation,
     isLogin: true,
     fileUpload: true,
   },
   {
     method: "get",
     route: "/list",
-    controller: basicInfoController,
+    controller: fundsController,
     action: "list",
     validationField: "",
     isLogin: true,
@@ -40,10 +43,7 @@ Routes.forEach((route) => {
           return next();
         },
     route.fileUpload
-      ? upload.fields([
-          { name: "project_image", maxCount: 1 },
-          { name: "project_video", maxCount: 1 },
-        ])
+      ? upload.single("fund_document")
       : (req: Request, res: Response, next: Function) => {
           return next();
         },

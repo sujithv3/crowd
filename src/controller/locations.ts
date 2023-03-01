@@ -1,3 +1,6 @@
+// created by : vijay
+// purpose : location table create update delete and list
+
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Location } from "../entity/locations";

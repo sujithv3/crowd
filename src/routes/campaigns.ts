@@ -1,4 +1,4 @@
-const { UserController } = require("../controller/UserController");
+const { UserController } = require("../controller/User");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";

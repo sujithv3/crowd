@@ -1,5 +1,5 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
+import { AppDataSource } from "../data-source";
 import { Roles } from "../entity/roles";
 const responseMessage = require("../configs/response");
 const msg = require("../configs/message");

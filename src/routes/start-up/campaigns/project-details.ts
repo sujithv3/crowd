@@ -1,11 +1,11 @@
 const {
-  basicInfoController,
-} = require("../../../controller/start-up/campaigns/basic-info");
+  projectDetailController,
+} = require("../../../controller/start-up/campaigns/project-detail");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
 const validationResult = require("../../../utils/validations/validation-error");
-const basicInfoCampaignValidation = require("../../../utils/validations/campaigns/basic-info");
+const projectDetailCampaignValidation = require("../../../utils/validations/campaigns/project-detail");
 const JWT = require("../../../utils/jsonwebtoken");
 const { upload } = require("../../../utils/file-upload");
 
@@ -13,20 +13,18 @@ export const Routes = [
   {
     method: "post",
     route: "/create",
-    controller: basicInfoController,
+    controller: projectDetailController,
     action: "create",
-    validationField: basicInfoCampaignValidation,
+    validationField: projectDetailCampaignValidation,
     isLogin: true,
-    fileUpload: true,
   },
   {
     method: "get",
     route: "/list",
-    controller: basicInfoController,
+    controller: projectDetailController,
     action: "list",
     validationField: "",
     isLogin: true,
-    fileUpload: false,
   },
 ];
 
@@ -39,14 +37,7 @@ Routes.forEach((route) => {
       : (req: Request, res: Response, next: Function) => {
           return next();
         },
-    route.fileUpload
-      ? upload.fields([
-          { name: "project_image", maxCount: 1 },
-          { name: "project_video", maxCount: 1 },
-        ])
-      : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+
     route.validationField
       ? validationResult(route.validationField)
       : (req: Request, res: Response, next: Function) => {

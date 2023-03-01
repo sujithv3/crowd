@@ -50,15 +50,41 @@ module.exports = {
   locationDeleteFailed: "Location  Delete Failed",
 
   // campaigns
-  // start up
+  // start up for start up campaign
   startCampaignCreateSuccess: "start up  create successfully",
-  startCampaignCreateFailed: "start up  create successfully",
+  startCampaignCreateFailed: "start up  create Failed",
   startCampaignListSuccess: "start up  list successfully",
-  startCampaignListFailed: "start up list successfully",
+  startCampaignListFailed: "start up list Failed",
 
-  // basic up
+  // basic up for start up campaign
   basicCampaignCreateSuccess: "basic info  create successfully",
-  basicCampaignCreateFailed: "basic info  create successfully",
+  basicCampaignCreateFailed: "basic info  create Failed",
   basicCampaignListSuccess: "basic info  list successfully",
-  basicCampaignListFailed: "basic info list successfully",
+  basicCampaignListFailed: "basic info list Failed",
+
+  // project detail for start up campaign
+  projectDetailsCampaignCreateSuccess: "project detail  create successfully",
+  projectDetailsCampaignCreateFailed: "project detail  create Failed",
+  projectDetailsCampaignListSuccess: "project detail  list successfully",
+  projectDetailsCampaignListFailed: "project detail list Failed",
+
+  // teams for start up campaign
+  teamsCampaignCreateSuccess: "team  create successfully",
+  teamsCampaignCreateFailed: "team  create Failed",
+  teamsCampaignListSuccess: "team  list successfully",
+  teamsCampaignListFailed: "team list Failed",
+
+  // funds for start up campaign
+  fundCampaignCreateSuccess: "fund  create successfully",
+  fundCampaignCreateFailed: "fund  create Failed",
+  fundCampaignListSuccess: "fund  list successfully",
+  fundCampaignListFailed: "fund list Failed",
+
+  // payment verification for start up campaign
+  paymentVerificationCampaignCreateSuccess:
+    "payment verification  successfully",
+  paymentVerificationCampaignCreateFailed: "payment verification  Failed",
+  paymentVerificationCampaignListSuccess:
+    "payment verification  list successfully",
+  paymentVerificationCampaignListFailed: "payment verification list Failed",
 };

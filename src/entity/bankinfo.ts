@@ -10,6 +10,7 @@ import {
   ManyToOne,
 } from "typeorm";
 import { Campaigns } from "./campaigns";
+import { Location } from "./locations";
 
 @Entity()
 export class BankInfo {
@@ -46,11 +47,9 @@ export class BankInfo {
   })
   swift: string;
 
-  @Column({
-    length: 100,
-    type: "varchar",
-  })
-  bank_location: string;
+  @ManyToOne((type) => Location)
+  @JoinColumn({ name: "bank_location_id", referencedColumnName: "id" })
+  bank_location: Location;
 
   @Column({
     length: 100,
@@ -58,7 +57,7 @@ export class BankInfo {
   })
   bank_address: string;
 
-  @ManyToOne((type) => Campaigns)
+  @ManyToOne((type) => Campaigns, (campaign) => campaign.bank)
   @JoinColumn({ name: "campaign_id", referencedColumnName: "id" })
   campaign: Campaigns;
 

@@ -13,6 +13,8 @@ import { Funds } from "./funds";
 import { Users } from "./Users";
 import { Category } from "./category";
 import { Location } from "./locations";
+import { Teams } from "./teams";
+import { BankInfo } from "./bankinfo";
 
 export enum businessType {
   BUSINESS = "business",
@@ -130,7 +132,7 @@ export class Campaigns {
     enum: businessType,
     default: businessType.BUSINESS,
   })
-  format: businessType;
+  business_type: businessType;
 
   @ManyToOne((type) => Category)
   @JoinColumn({ name: "primary_category", referencedColumnName: "id" })
@@ -150,6 +152,12 @@ export class Campaigns {
 
   @OneToMany(() => Funds, (fund) => fund.campaign)
   fund: Funds[];
+
+  @OneToMany(() => Teams, (team) => team.campaign)
+  team: Teams[];
+
+  @OneToMany(() => BankInfo, (bank) => bank.campaign)
+  bank: BankInfo[];
 
   @Column({
     type: "float",
@@ -177,6 +185,27 @@ export class Campaigns {
   deal_size: string;
 
   @Column({
+    length: 250,
+    type: "varchar",
+    default: null,
+  })
+  fund_document: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    default: null,
+  })
+  duration: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    default: null,
+  })
+  contact_number: string;
+
+  @Column({
     type: "float",
     default: null,
   })
@@ -190,6 +219,13 @@ export class Campaigns {
 
   @Column({ default: false })
   is_featured: boolean;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    default: null,
+  })
+  contact_email_id: string;
 
   @Column({
     length: 50,

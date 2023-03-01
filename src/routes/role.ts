@@ -1,4 +1,4 @@
-const { RolesController } = require("../controller/RolesControler");
+const { RolesController } = require("../controller/Roles");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";

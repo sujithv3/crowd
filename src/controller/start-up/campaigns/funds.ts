@@ -1,5 +1,5 @@
 // created by : vijay
-// purpose : start up campaign basic info module create update and list
+// purpose : start up campaign funds module create update and list
 
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
@@ -8,21 +8,24 @@ const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
 
-export class basicInfoController {
-  private basicInfoRepository = AppDataSource.getRepository(Campaigns);
+export class fundsController {
+  private fundsRepository = AppDataSource.getRepository(Campaigns);
 
-  //   create basic info
+  //   create funds
   async create(req: any, res: Response, next: NextFunction) {
     try {
       const {
         id,
-        title,
-        tag_line,
-        primary_category,
-        primary_sub_category,
-        location,
-        tag,
-        demo_url,
+        goal_amount,
+        min_invest,
+        max_invest,
+        currency,
+        deal_size,
+        contact_number,
+        start_date,
+        end_date,
+        duration,
+        fund_document,
       } = req.body;
 
       // get user id
@@ -30,32 +33,30 @@ export class basicInfoController {
       const user = Jwt.decode(req.cookies.token);
       delete user.role;
 
-      // find campaign basic info
+      // find campaign
 
-      const campaigns = await this.basicInfoRepository.findOne({
+      const campaigns = await this.fundsRepository.findOne({
         where: {
           is_active: true,
           is_published: false,
           user: user[0].id,
         },
       });
-      await this.basicInfoRepository
+
+      await this.fundsRepository
         .createQueryBuilder()
         .update(Campaigns)
         .set({
-          title,
-          tag_line,
-          primary_category,
-          primary_sub_category,
-          location,
-          tag,
-          project_image: req.files.project_image[0]
-            ? req.files.project_image[0].location
-            : "",
-          project_video: req.files.project_video[0]
-            ? req.files.project_video[0].location
-            : "",
-          demo_url,
+          goal_amount: Number(goal_amount),
+          min_invest: Number(min_invest),
+          max_invest: Number(max_invest),
+          currency,
+          deal_size,
+          contact_number,
+          start_date,
+          end_date,
+          duration,
+          fund_document: req.file ? req.file.location : fund_document,
         })
         .where("id = :id", { id: id ? id : campaigns.id })
         .execute();
@@ -63,14 +64,13 @@ export class basicInfoController {
       return responseMessage.responseMessage(
         true,
         200,
-        msg.basicCampaignCreateSuccess
+        msg.fundCampaignCreateSuccess
       );
     } catch (err) {
-      console.log(err);
       return responseMessage.responseWithData(
         false,
         400,
-        msg.basicCampaignCreateFailed,
+        msg.fundCampaignCreateFailed,
         err
       );
     }
@@ -83,37 +83,36 @@ export class basicInfoController {
       const user = Jwt.decode(req.cookies.token);
       delete user.role;
       //   find basic info
-      const basicCampaigns = await this.basicInfoRepository.findOne({
+      const basicCampaigns = await this.fundsRepository.findOne({
         select: [
           "id",
-          "title",
-          "tag_line",
-          "location",
-          "tag",
-          "project_image",
-          "project_video",
-          "demo_url",
+          "goal_amount",
+          "min_invest",
+          "max_invest",
+          "currency",
+          "deal_size",
+          "contact_number",
+          "start_date",
+          "end_date",
+          "duration",
+          "fund_document",
         ],
         where: {
           is_published: false,
           user: user[0].id,
         },
-        relations: {
-          primary_sub_category: true,
-          primary_category: true,
-        },
       });
       return responseMessage.responseWithData(
         true,
         200,
-        msg.basicCampaignListSuccess,
+        msg.fundCampaignListSuccess,
         basicCampaigns
       );
     } catch (err) {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.basicCampaignListFailed,
+        msg.fundCampaignListFailed,
         err
       );
     }

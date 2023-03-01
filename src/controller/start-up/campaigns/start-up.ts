@@ -1,3 +1,6 @@
+// created by : vijay
+// purpose : start up campaign start up module create update and list
+
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
@@ -27,11 +30,6 @@ export class startUpController {
       const user = Jwt.decode(req.cookies.token);
       delete user.role;
 
-      // find sub category
-      // const subCategory = await this.categoryRepository.findOne({
-      //   where: { id:sub_category, is_active: true, is_deleted: false },
-      // });
-
       // find campaign start up
 
       const campaigns = await this.startUpRepository.findOne({
@@ -50,7 +48,7 @@ export class startUpController {
             id,
             category,
             subcategory: sub_category,
-            format: business_type,
+            business_type,
             user: user[0].id,
             tax_location,
             bank_location,
@@ -123,7 +121,7 @@ export class startUpController {
       const user = Jwt.decode(req.cookies.token);
       //   find startUp
       const startCampaigns = await this.startUpRepository.findOne({
-        select: ["id", "currency", "format"],
+        select: ["id", "currency", "business_type"],
         where: {
           is_published: false,
           user: user[0].id,
@@ -150,6 +148,4 @@ export class startUpController {
       );
     }
   }
-
-  // update start up
 }

@@ -11,6 +11,11 @@ const category = require("./routes/category");
 const location = require("./routes/location");
 const startUp = require("./routes/start-up/campaigns/start-up");
 const BasicInfo = require("./routes/start-up/campaigns/basic-info");
+const ProjectDetail = require("./routes/start-up/campaigns/project-details");
+const Team = require("./routes/start-up/campaigns/team");
+const Fund = require("./routes/start-up/campaigns/funds");
+const PaymentVerification = require("./routes/start-up/campaigns/payment-verification");
+const BankDetail = require("./routes/start-up/campaigns/bank");
 
 // mysql database connection initialize
 
@@ -46,3 +51,8 @@ app.use("/api/category", category);
 app.use("/api/location", location);
 app.use("/api/start-up/campaign/start-up", startUp);
 app.use("/api/start-up/campaign/basic-info", BasicInfo);
+app.use("/api/start-up/campaign/project-detail", ProjectDetail);
+app.use("/api/start-up/campaign/team", Team);
+app.use("/api/start-up/campaign/fund", Fund);
+app.use("/api/start-up/campaign/payment-verification", PaymentVerification);
+app.use("/api/start-up/campaign/bank", BankDetail);

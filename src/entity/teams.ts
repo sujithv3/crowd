@@ -61,13 +61,13 @@ export class Teams {
     length: 100,
     type: "varchar",
   })
-  personal_email: string;
+  team_member_email: string;
 
   @ManyToOne((type) => Roles)
   @JoinColumn({ name: "team_role_id", referencedColumnName: "id" })
   role: Roles;
 
-  @ManyToOne((type) => Campaigns)
+  @ManyToOne(() => Campaigns, (campaign) => campaign.team)
   @JoinColumn({ name: "campaign_id", referencedColumnName: "id" })
   campaign: Campaigns;
 
