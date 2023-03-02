@@ -17,6 +17,11 @@ const PaymentVerification = require("./routes/start-up/campaigns/payment-verific
 const BankDetail = require("./routes/start-up/campaigns/bank");
 const Campaign = require("./routes/start-up/campaigns");
 
+const client = require("twilio")(
+  process.env.ACCOUNT_SID,
+  process.env.ACCOUNT_AUTH_TOKEN
+);
+
 // mysql database connection initialize
 
 AppDataSource.initialize()
@@ -42,6 +47,18 @@ app.use(cookieParser());
 app.listen(process.env.SERVER_URL, () => {
   console.log(`server is started ${process.env.SERVER_URL}`);
 });
+
+// send sms
+
+// client.verify.v2
+//   .services("VA62653ec25298359e3368a66c659759d7")
+//   .verifications.create({ to: "+916383451170", channel: "sms" })
+//   .then((verification) => console.log(verification.status));
+
+// client.verify.v2
+//   .services("VA62653ec25298359e3368a66c659759d7")
+//   .verificationChecks.create({ to: "+916383451170", code: "792104" })
+//   .then((verification_check) => console.log(verification_check.status));
 
 // routes
 app.use("/api/user", user);

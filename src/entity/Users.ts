@@ -74,6 +74,13 @@ export class Users {
   country: string;
 
   @Column({
+    length: 100,
+    type: "varchar",
+    nullable: true,
+  })
+  code: string;
+
+  @Column({
     length: 250,
     type: "varchar",
     nullable: true,
@@ -124,9 +131,7 @@ export class Users {
 
   @Column({
     type: "json",
-    array: false,
-    default: () => "'[]'",
-    nullable: false,
+    default: null,
   })
   extra_links!: Array<{ name: string; url: string }>;
 
@@ -135,6 +140,13 @@ export class Users {
     type: "varchar",
   })
   password: string;
+
+  @Column({
+    length: 100,
+    type: "varchar",
+    default: null,
+  })
+  email_otp: string;
 
   @Column({
     length: 100,

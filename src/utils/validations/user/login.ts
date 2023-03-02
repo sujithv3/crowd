@@ -12,6 +12,11 @@ const loginValidationEdit = [
     .withMessage("must be string")
     .notEmpty()
     .withMessage("password is required"),
+  body("role")
+    .isInt()
+    .withMessage("must be number")
+    .notEmpty()
+    .withMessage("role is required"),
 ];
 
 module.exports = loginValidationEdit;

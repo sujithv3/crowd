@@ -11,6 +11,13 @@ const {
   createPasswordValidation,
   forgetPasswordValidation,
 } = require("../utils/validations/user/change-password");
+const {
+  mobileOTPSend,
+  verifyMobileOTP,
+  emailOTPSend,
+  emailOTPverify,
+} = require("../utils/validations/user/verification");
+const { Verifications } = require("../controller/verification");
 const JWT = require("../utils/jsonwebtoken");
 const { upload } = require("../utils/file-upload");
 
@@ -56,9 +63,45 @@ export const Routes = [
     route: "/update",
     controller: UserController,
     action: "update",
-    validationField: "",
+    validationField: signupValidationEdit,
     isLogin: true,
     fileUpload: true,
+  },
+  {
+    method: "post",
+    route: "/sent-otp/mobile",
+    controller: Verifications,
+    action: "sendMobileVerificationCode",
+    validationField: mobileOTPSend,
+    isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "post",
+    route: "/verify/mobile",
+    controller: Verifications,
+    action: "verifyMobileVerificationCode",
+    validationField: verifyMobileOTP,
+    isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "post",
+    route: "/sent-otp/email",
+    controller: Verifications,
+    action: "sendEMailVerificationCode",
+    validationField: emailOTPSend,
+    isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "post",
+    route: "/verify/email",
+    controller: Verifications,
+    action: "verifyEMailVerificationCode",
+    validationField: emailOTPverify,
+    isLogin: true,
+    fileUpload: false,
   },
   {
     method: "delete",
@@ -112,6 +155,15 @@ export const Routes = [
     action: "createPassword",
     validationField: createPasswordValidation,
     isLogin: false,
+    fileUpload: false,
+  },
+  {
+    method: "post",
+    route: "/setting",
+    controller: UserController,
+    action: "setting",
+    validationField: "",
+    isLogin: true,
     fileUpload: false,
   },
 ];

@@ -57,7 +57,7 @@ export class teamController {
             .set({
               first_name,
               last_name,
-              join_date,
+              join_date: new Date(join_date),
               contact_number,
               summary,
               linkedin,
@@ -76,7 +76,7 @@ export class teamController {
           await this.teamRepository.save({
             first_name,
             last_name,
-            join_date,
+            join_date: new Date(join_date),
             contact_number,
             summary,
             linkedin,

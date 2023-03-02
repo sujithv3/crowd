@@ -53,8 +53,8 @@ export class fundsController {
           currency,
           deal_size,
           contact_number,
-          start_date,
-          end_date,
+          start_date: new Date(start_date),
+          end_date: new Date(end_date),
           duration,
           fund_document: req.file ? req.file.location : fund_document,
         })

@@ -39,8 +39,7 @@ export class startUpController {
           user: user[0].id,
         },
       });
-
-      if (campaigns || id) {
+      if (campaigns) {
         await this.startUpRepository
           .createQueryBuilder()
           .update(Campaigns)

@@ -9,6 +9,7 @@ const crypto = require("crypto");
 const msg = require("../configs/message");
 const Jwt = require("../utils/jsonwebtoken");
 const sendEmail = require("../utils/nodemailer/email");
+
 export class UserController {
   private userRepository = AppDataSource.getRepository(Users);
   public forgetTokenRepository = AppDataSource.getRepository(ForgetToken);
@@ -80,16 +81,13 @@ export class UserController {
   //   list all users
   async all(request: Request, response: Response, next: NextFunction) {
     try {
-      const userData = await this.userRepository.find({
-        where: {
-          is_active: true,
-        },
-        relations: {
-          role: true,
-        },
-      });
-      // console.log(userData);
+      const userData = await this.userRepository
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.role", "role")
+        .where("user.is_active=:is_active", { is_active: true })
+        .getMany();
       //   check user exist
+
       if (userData.length === 0) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
       }
@@ -100,6 +98,7 @@ export class UserController {
         userData
       );
     } catch (err) {
+      console.log(err);
       return responseMessage.responseWithData(
         false,
         400,
@@ -119,11 +118,11 @@ export class UserController {
           role: true,
         },
       });
-      delete user.password;
-
       if (!user) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
       }
+      delete user.password;
+
       return responseMessage.responseWithData(
         true,
         200,
@@ -181,6 +180,8 @@ export class UserController {
         last_name,
         profile,
         contact_number,
+        code,
+        email_id,
         company_logo,
         street_name,
         country,
@@ -212,6 +213,8 @@ export class UserController {
             : company_logo,
           street_name,
           country,
+          code,
+          email_id,
           description,
           summary,
           linked_in,
@@ -485,5 +488,34 @@ export class UserController {
       400,
       msg.createPasswordSuccess
     );
+  }
+
+  // setting
+  async setting(req: Request, res: Response) {
+    try {
+      const user = Jwt.decode(req.cookies.token);
+
+      const { is_active, is_deleted, reason } = req.body;
+
+      await this.userRepository
+        .createQueryBuilder()
+        .update(Users)
+        .set({
+          is_active,
+          is_deleted,
+          deactivate_reason: reason,
+        })
+        .where("id=:id", { id: user[0].id })
+        .execute();
+      return responseMessage.responseMessage(true, 200, msg.userUpdateSuccess);
+    } catch (err) {
+      console.log(err);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userUpdateFailed,
+        err
+      );
+    }
   }
 }

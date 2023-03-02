@@ -13,6 +13,8 @@ export class CampaignController {
       // find user
       const user = Jwt.decode(request.cookies.token);
 
+      console.log(request.query.limit);
+
       const userData = await this.rolesRepository
         .createQueryBuilder("campaign")
         .where(
@@ -27,13 +29,13 @@ export class CampaignController {
             is_active: true,
           }
         )
-        .take(request.query.limit ? Number(request.query.limit) : 10)
         .skip(
           request.query.page
             ? Number(request.query.page) *
                 (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.bank_location", "bank_location")
         .leftJoinAndSelect("campaign.primary_category", "primary_category")

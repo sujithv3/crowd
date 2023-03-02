@@ -5,7 +5,7 @@ const express = require("express");
 const app = express();
 import { Request, Response } from "express";
 const validationResult = require("../../../utils/validations/validation-error");
-const paymentVerificationCampaignValidation = require("../../../utils/validations/campaigns/payment-verification");
+const bankCampaignValidation = require("../../../utils/validations/campaigns/bank");
 const JWT = require("../../../utils/jsonwebtoken");
 
 export const Routes = [
@@ -14,7 +14,7 @@ export const Routes = [
     route: "/create",
     controller: bankController,
     action: "create",
-    validationField: "",
+    validationField: bankCampaignValidation,
     isLogin: true,
   },
   {

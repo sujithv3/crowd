@@ -12,6 +12,11 @@ const changePasswordValidation = [
     .withMessage(
       "Password should be combination of one uppercase , one lower case, one special char, one digit and min 8 , max 20 char long"
     ),
+  body("role")
+    .isInt()
+    .withMessage("must be number")
+    .notEmpty()
+    .withMessage("role is required"),
 ];
 
 const createPasswordValidation = [
@@ -27,6 +32,12 @@ const createPasswordValidation = [
 
 const forgetPasswordValidation = [
   body("email_id").isEmail().notEmpty().withMessage("email_id is required"),
+  body("role")
+    .isInt()
+    .withMessage("must be number")
+    .notEmpty()
+    .withMessage("role is required"),
+  ,
 ];
 
 module.exports = {

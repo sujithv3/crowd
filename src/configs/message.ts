@@ -8,7 +8,7 @@ module.exports = {
   user_not_found: "User Not Found",
   userCreationFailed: "Invalid Credential ",
   userListSuccess: "User Listed Successfully",
-  userUpdateSuccess: "User Listed Successfully",
+  userUpdateSuccess: "User Updated Successfully",
   userListFailed: "User Listed Failed",
   userUpdateFailed: "User Update Failed",
   userDeleteSuccess: "User Deleted Success",
@@ -28,6 +28,16 @@ module.exports = {
   createPasswordFailed: "Create Password Failed",
   createPasswordSuccess: "Create Password Success",
   createPasswordInvalidToken: "link has expired",
+
+  // verification
+
+  otpSendYourMobile: "Verification OTP Send your mobile",
+  otpSendYourEmail: "Verification OTP Send your email",
+  otpSendYourMobileFailed: "send OTP failed",
+  verifyOTPFailed: "verify OTP failed",
+  invalidOTP: "Invalid OTP",
+  verifySuccess: "successfully verified",
+
   // category
   categoryCreateSuccess: "Category Create Success",
   categoryCreateFailed: "Category Create Failed",
