@@ -15,12 +15,8 @@ const Team = require("./routes/start-up/campaigns/team");
 const Fund = require("./routes/start-up/campaigns/funds");
 const PaymentVerification = require("./routes/start-up/campaigns/payment-verification");
 const BankDetail = require("./routes/start-up/campaigns/bank");
-const Campaign = require("./routes/start-up/campaigns");
-
-const client = require("twilio")(
-  process.env.ACCOUNT_SID,
-  process.env.ACCOUNT_AUTH_TOKEN
-);
+const startupCampaign = require("./routes/start-up/campaigns");
+const Campaign = require("./routes/campaign");
 
 // mysql database connection initialize
 
@@ -48,23 +44,12 @@ app.listen(process.env.SERVER_URL, () => {
   console.log(`server is started ${process.env.SERVER_URL}`);
 });
 
-// send sms
-
-// client.verify.v2
-//   .services("VA62653ec25298359e3368a66c659759d7")
-//   .verifications.create({ to: "+916383451170", channel: "sms" })
-//   .then((verification) => console.log(verification.status));
-
-// client.verify.v2
-//   .services("VA62653ec25298359e3368a66c659759d7")
-//   .verificationChecks.create({ to: "+916383451170", code: "792104" })
-//   .then((verification_check) => console.log(verification_check.status));
-
 // routes
 app.use("/api/user", user);
 app.use("/api/role", role);
 app.use("/api/category", category);
 app.use("/api/location", location);
+app.use("/api/campaign", Campaign);
 app.use("/api/start-up/campaign/start-up", startUp);
 app.use("/api/start-up/campaign/basic-info", BasicInfo);
 app.use("/api/start-up/campaign/project-detail", ProjectDetail);
@@ -72,4 +57,4 @@ app.use("/api/start-up/campaign/team", Team);
 app.use("/api/start-up/campaign/fund", Fund);
 app.use("/api/start-up/campaign/payment-verification", PaymentVerification);
 app.use("/api/start-up/campaign/bank", BankDetail);
-app.use("/api/start-up/campaign", Campaign);
+app.use("/api/start-up/campaign", startupCampaign);
