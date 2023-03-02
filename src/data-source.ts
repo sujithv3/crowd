@@ -16,10 +16,10 @@ export const AppDataSource = new DataSource({
   host: "localhost",
   port: 3306,
   username: "root",
-  password: "Admin@35",
+  password: "abservetech",
   database: "CROWD_FUNDING_TEST",
   logging: false,
-  synchronize: false,
+  synchronize: true,
   dropSchema: false,
   entities: [
     Users,

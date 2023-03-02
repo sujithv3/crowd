@@ -51,6 +51,7 @@ module.exports = {
 
   // campaigns
   campaignListSuccess: "campaign list successfully",
+  campaignNotFound: "campaign Not Found",
   campaignListFailed: "campaign list Failed",
 
   // start up for start up campaign

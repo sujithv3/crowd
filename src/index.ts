@@ -15,7 +15,8 @@ const Team = require("./routes/start-up/campaigns/team");
 const Fund = require("./routes/start-up/campaigns/funds");
 const PaymentVerification = require("./routes/start-up/campaigns/payment-verification");
 const BankDetail = require("./routes/start-up/campaigns/bank");
-const Campaign = require("./routes/start-up/campaigns");
+const startupCampaign = require("./routes/start-up/campaigns");
+const Campaign = require("./routes/campaign");
 
 // mysql database connection initialize
 
@@ -48,6 +49,7 @@ app.use("/api/user", user);
 app.use("/api/role", role);
 app.use("/api/category", category);
 app.use("/api/location", location);
+app.use("/api/campaign", Campaign);
 app.use("/api/start-up/campaign/start-up", startUp);
 app.use("/api/start-up/campaign/basic-info", BasicInfo);
 app.use("/api/start-up/campaign/project-detail", ProjectDetail);
@@ -55,4 +57,4 @@ app.use("/api/start-up/campaign/team", Team);
 app.use("/api/start-up/campaign/fund", Fund);
 app.use("/api/start-up/campaign/payment-verification", PaymentVerification);
 app.use("/api/start-up/campaign/bank", BankDetail);
-app.use("/api/start-up/campaign", Campaign);
+app.use("/api/start-up/campaign", startupCampaign);

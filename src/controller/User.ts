@@ -61,6 +61,7 @@ export class UserController {
         is_active,
         created_date: new Date(),
         updated_date: new Date(),
+        extra_links: [],
       });
       return responseMessage.responseMessage(
         true,

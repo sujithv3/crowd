@@ -125,7 +125,6 @@ export class Users {
   @Column({
     type: "json",
     array: false,
-    default: () => "'[]'",
     nullable: false,
   })
   extra_links!: Array<{ name: string; url: string }>;
