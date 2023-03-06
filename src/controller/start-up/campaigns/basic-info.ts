@@ -39,6 +39,7 @@ export class basicInfoController {
           user: user[0].id,
         },
       });
+
       await this.basicInfoRepository
         .createQueryBuilder()
         .update(Campaigns)
@@ -49,12 +50,16 @@ export class basicInfoController {
           primary_sub_category,
           location,
           tag,
-          project_image: req.files.project_image[0]
-            ? req.files.project_image[0].location
-            : "",
-          project_video: req.files.project_video[0]
-            ? req.files.project_video[0].location
-            : "",
+          project_image: req.files.project_image
+            ? req.files.project_image[0]
+              ? req.files.project_image[0].location
+              : ""
+            : req.body.project_image,
+          project_video: req.files.project_video
+            ? req.files.project_video[0]
+              ? req.files.project_video[0].location
+              : ""
+            : req.body.project_video,
           demo_url,
         })
         .where("id = :id", { id: id ? id : campaigns.id })

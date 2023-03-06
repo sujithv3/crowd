@@ -296,8 +296,7 @@ export class UserController {
     delete user[0].password;
     const jwtToken: string = genToken(user);
     response.cookie("token", jwtToken, {
-      maxAge: 900000,
-      sameSite: true,
+      sameSite: "none",
     });
     return responseMessage.responseWithToken(
       true,
