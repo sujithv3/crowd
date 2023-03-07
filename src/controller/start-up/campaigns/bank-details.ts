@@ -51,6 +51,20 @@ export class bankController {
         );
       }
 
+      // all module complete check
+      const checked =
+        campaign.title &&
+        campaign.currency &&
+        campaign.description &&
+        campaign.goal_amount;
+      if (checked) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.completeAllStartUpModule
+        );
+      }
+
       //   find tames
       const bank = await this.bankRepository
         .createQueryBuilder("bank")

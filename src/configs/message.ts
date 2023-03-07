@@ -108,4 +108,5 @@ module.exports = {
   banksCampaignListSuccess: "bank  list successfully",
   banksCampaignListFailed: "bank list Failed",
   banksCampaignNotFound: "Campaign Not Found",
+  completeAllStartUpModule: "complete all start up module",
 };

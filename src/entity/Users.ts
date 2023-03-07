@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Roles } from "./roles";
+import { Location } from "./locations";
 
 @Entity()
 export class Users {
@@ -65,6 +66,14 @@ export class Users {
     nullable: true,
   })
   street_name: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    default: null,
+    nullable: true,
+  })
+  city: string;
 
   @Column({
     length: 100,
