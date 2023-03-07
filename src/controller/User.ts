@@ -299,6 +299,8 @@ export class UserController {
     const jwtToken: string = genToken(user);
     response.cookie("token", jwtToken, {
       sameSite: "none",
+      httpOnly: false,
+      secure: true,
     });
     return responseMessage.responseWithToken(
       true,

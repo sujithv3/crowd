@@ -15,16 +15,24 @@ module.exports = {
   },
   verify: async (req: any, res: Response, next: NextFunction) => {
     try {
-      if (
-        typeof req.cookies.token === "undefined" ||
-        req.cookies.token === null
-      ) {
+      // if (
+      //   typeof req.cookies.token === "undefined" ||
+      //   req.cookies.token === null
+      // ) {
+      //   return res
+      //     .status(412)
+      //     .send(response.responseMessage(false, 402, msg.user_login_required));
+      // }
+
+      // const verify = jwt.verify(req.cookies.token, process.env.JWT_SECRET_KEY);
+      if (!req.headers.authorization) {
         return res
           .status(412)
           .send(response.responseMessage(false, 402, msg.user_login_required));
       }
+      let token = req.headers.authorization.slice(7);
+      const verify = jwt.verify(token, process.env.SECRET_KEY);
 
-      const verify = jwt.verify(req.cookies.token, process.env.JWT_SECRET_KEY);
       if (!verify) {
         return res
           .status(402)
