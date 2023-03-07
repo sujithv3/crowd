@@ -31,6 +31,13 @@ export class teamController {
         },
       });
 
+      // find team
+      await this.teamRepository
+        .createQueryBuilder()
+        .delete()
+        .where("campaign_id=:id", { id: campaigns.id })
+        .execute();
+
       //   find tames
 
       for (let i = 0; i < req.body.length; i++) {
@@ -49,47 +56,23 @@ export class teamController {
           is_deleted = false,
         } = req.body[i];
 
-        if (id) {
-          // update team table
-          await this.teamRepository
-            .createQueryBuilder()
-            .update(Teams)
-            .set({
-              first_name,
-              last_name,
-              join_date: new Date(join_date),
-              contact_number,
-              summary,
-              linkedin,
-              campaign: campaigns,
-              email_id,
-              team_member_email,
-              role,
-              updatedDate: new Date(),
-              is_active,
-              is_deleted,
-            })
-            .where("id = :id", { id })
-            .execute();
-        } else {
-          // create team table
-          await this.teamRepository.save({
-            first_name,
-            last_name,
-            join_date: new Date(join_date),
-            contact_number,
-            summary,
-            linkedin,
-            campaign: campaigns,
-            email_id,
-            team_member_email,
-            role,
-            createdDate: new Date(),
-            updatedDate: new Date(),
-            is_active,
-            is_deleted,
-          });
-        }
+        // create team table
+        await this.teamRepository.save({
+          first_name,
+          last_name,
+          join_date: new Date(join_date),
+          contact_number,
+          summary,
+          linkedin,
+          campaign: campaigns,
+          email_id,
+          team_member_email,
+          role,
+          createdDate: new Date(),
+          updatedDate: new Date(),
+          is_active,
+          is_deleted,
+        });
       }
 
       return responseMessage.responseMessage(
@@ -128,7 +111,6 @@ export class teamController {
       //   find team
       const basicCampaigns = await this.teamRepository
         .createQueryBuilder("team")
-        .leftJoinAndSelect("team.role", "Roles")
         .where("team.campaign = :id", { id: campaign.id })
         .getMany();
 

@@ -28,11 +28,7 @@ const TeamsCampaignValidation = [
     .withMessage("must be string")
     .notEmpty()
     .withMessage("linkedin is required"),
-  body("*.role")
-    .isInt()
-    .withMessage("role be number")
-    .notEmpty()
-    .withMessage("role is required"),
+  body("*.role").notEmpty().withMessage("role is required"),
   body("*.is_active").isBoolean().withMessage("role be boolean").optional(),
   body("*.email_id").isEmail().notEmpty().withMessage("email is required"),
   body("*.team_member_email")
