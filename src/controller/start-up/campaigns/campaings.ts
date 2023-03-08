@@ -11,7 +11,29 @@ export class CampaignController {
   async all(request: Request, response: Response, next: NextFunction) {
     try {
       // find user
-      const user = Jwt.decode(request.cookies.token);
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        if (!request.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              responseMessage.responseMessage(
+                false,
+                402,
+                msg.user_login_required
+              )
+            );
+        } else {
+          token = request.headers.authorization.slice(7);
+        }
+      } else {
+        token = request.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
 
       console.log(request.query.limit);
 

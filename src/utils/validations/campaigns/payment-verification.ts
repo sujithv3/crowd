@@ -16,7 +16,7 @@ const paymentVerificationCampaignValidation = [
     .isString()
     .withMessage("must be string")
     .notEmpty()
-    .withMessage("location is required")
+    .withMessage("business type is required")
     .isIn(["BUSINESS", "INDIVIDUAL"])
     .withMessage(" invalid value"),
 ];

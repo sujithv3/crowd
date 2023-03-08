@@ -29,25 +29,45 @@ export class bankController {
         is_deleted = false,
       } = req.body;
       // get user id
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        if (!req.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              responseMessage.responseMessage(
+                false,
+                402,
+                msg.user_login_required
+              )
+            );
+        } else {
+          token = req.headers.authorization.slice(7);
+        }
+      } else {
+        token = req.cookies.token;
+      }
 
-      const user = Jwt.decode(req.cookies.token);
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign
 
-      const campaign = await this.campaignRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("")
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
 
       if (!campaign) {
         return responseMessage.responseMessage(
           false,
           400,
-          msg.banksCampaignNotFound
+          msg.createStartCampaignFirst
         );
       }
 
@@ -57,7 +77,7 @@ export class bankController {
         campaign.currency &&
         campaign.description &&
         campaign.goal_amount;
-      if (checked) {
+      if (!checked) {
         return responseMessage.responseMessage(
           false,
           400,
@@ -117,7 +137,7 @@ export class bankController {
           is_published: true,
           bank_location: bank_location,
         })
-        .where("user=:id", { id: user[0].id })
+        .where("id=:id", { id: campaign.id })
         .execute();
 
       return responseMessage.responseMessage(
@@ -140,7 +160,29 @@ export class bankController {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
       // find user
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        if (!req.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              responseMessage.responseMessage(
+                false,
+                402,
+                msg.user_login_required
+              )
+            );
+        } else {
+          token = req.headers.authorization.slice(7);
+        }
+      } else {
+        token = req.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign

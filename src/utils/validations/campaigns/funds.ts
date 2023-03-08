@@ -27,11 +27,7 @@ const fundsCampaignValidation = [
     .withMessage("must be string")
     .notEmpty()
     .withMessage("deal_size is required"),
-  body("contact_number")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("contact_number is required"),
+
   body("duration")
     .isString()
     .withMessage("must be string")

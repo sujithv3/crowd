@@ -17,19 +17,35 @@ export class teamController {
   async create(req: any, res: Response, next: NextFunction) {
     try {
       // get user id
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
 
-      const user = Jwt.decode(req.cookies.token);
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign
 
-      const campaigns = await this.campaignRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaigns = await this.campaignRepository
+        .createQueryBuilder()
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
+
+      if (!campaigns) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.createStartCampaignFirst
+        );
+      }
 
       // find team
       await this.teamRepository
@@ -95,18 +111,27 @@ export class teamController {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
       // find user
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign
 
-      const campaign = await this.campaignRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaign = await this.campaignRepository
+        .createQueryBuilder()
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
 
       //   find team
       const basicCampaigns = await this.teamRepository

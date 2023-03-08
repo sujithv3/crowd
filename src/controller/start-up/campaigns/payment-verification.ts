@@ -18,19 +18,47 @@ export class paymentVerificationController {
       const { id, business_type, contact_email_id, status } = req.body;
 
       // get user id
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        if (!req.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              responseMessage.responseMessage(
+                false,
+                402,
+                msg.user_login_required
+              )
+            );
+        } else {
+          token = req.headers.authorization.slice(7);
+        }
+      } else {
+        token = req.cookies.token;
+      }
 
-      const user = Jwt.decode(req.cookies.token);
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign
 
-      const campaigns = await this.paymentVerificationRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaigns = await this.paymentVerificationRepository
+        .createQueryBuilder()
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
+
+      if (!campaigns) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.createStartCampaignFirst
+        );
+      }
 
       await this.paymentVerificationRepository
         .createQueryBuilder()
@@ -62,16 +90,35 @@ export class paymentVerificationController {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
       // find user
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
       delete user.role;
       //   find basic info
-      const basicCampaigns = await this.paymentVerificationRepository.findOne({
-        select: ["id", "business_type", "contact_email_id", "status"],
-        where: {
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const basicCampaigns = await this.paymentVerificationRepository
+        .createQueryBuilder("campaign")
+        .where(
+          "campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false",
+          {
+            id: user[0].id,
+          }
+        )
+        .select([
+          "campaign.id",
+          "campaign.business_type",
+          "campaign.contact_email_id",
+          "campaign.status",
+        ])
+        .getOne();
+
       return responseMessage.responseWithData(
         true,
         200,

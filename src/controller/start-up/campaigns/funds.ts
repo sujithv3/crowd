@@ -21,7 +21,7 @@ export class fundsController {
         max_invest,
         currency,
         deal_size,
-        contact_number,
+
         start_date,
         end_date,
         duration,
@@ -29,19 +29,35 @@ export class fundsController {
       } = req.body;
 
       // get user id
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
 
-      const user = Jwt.decode(req.cookies.token);
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign
 
-      const campaigns = await this.fundsRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaigns = await this.fundsRepository
+        .createQueryBuilder()
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
+
+      if (!campaigns) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.createStartCampaignFirst
+        );
+      }
 
       await this.fundsRepository
         .createQueryBuilder()
@@ -52,7 +68,7 @@ export class fundsController {
           max_invest: Number(max_invest),
           currency,
           deal_size,
-          contact_number,
+
           start_date: new Date(start_date),
           end_date: new Date(end_date),
           duration,
@@ -83,25 +99,29 @@ export class fundsController {
       const user = Jwt.decode(req.cookies.token);
       delete user.role;
       //   find basic info
-      const basicCampaigns = await this.fundsRepository.findOne({
-        select: [
-          "id",
-          "goal_amount",
-          "min_invest",
-          "max_invest",
-          "currency",
-          "deal_size",
-          "contact_number",
-          "start_date",
-          "end_date",
-          "duration",
-          "fund_document",
-        ],
-        where: {
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const basicCampaigns = await this.fundsRepository
+        .createQueryBuilder("campaign")
+        .where(
+          "campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false",
+          {
+            id: user[0].id,
+          }
+        )
+
+        .select([
+          "campaign.id",
+          "campaign.goal_amount",
+          "campaign.min_invest",
+          "campaign.max_invest",
+          "campaign.currency",
+          "campaign.deal_size",
+          "campaign.start_date",
+          "campaign.end_date",
+          "campaign.duration",
+          "campaign.fund_document",
+        ])
+        .getOne();
+
       return responseMessage.responseWithData(
         true,
         200,
@@ -109,6 +129,7 @@ export class fundsController {
         basicCampaigns
       );
     } catch (err) {
+      console.log(err);
       return responseMessage.responseWithData(
         false,
         400,

@@ -74,7 +74,16 @@ export class Verifications {
     try {
       const code = Math.floor(100000 + Math.random() * 900000);
 
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+      const user = Jwt.decode(token);
 
       await this.userRepository
         .createQueryBuilder()
@@ -110,7 +119,16 @@ export class Verifications {
     next: NextFunction
   ) {
     try {
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+      const user = Jwt.decode(token);
 
       const userDetail = await this.userRepository
         .createQueryBuilder()

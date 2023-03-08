@@ -26,19 +26,27 @@ export class startUpController {
       } = req.body;
 
       // get user id
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
 
-      const user = Jwt.decode(req.cookies.token);
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign start up
 
-      const campaigns = await this.startUpRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaigns = await this.startUpRepository
+        .createQueryBuilder()
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
       if (campaigns) {
         await this.startUpRepository
           .createQueryBuilder()
@@ -117,21 +125,41 @@ export class startUpController {
   // list startUp
   async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
       //   find startUp
-      const startCampaigns = await this.startUpRepository.findOne({
-        select: ["id", "currency", "business_type"],
-        where: {
-          is_published: false,
-          user: user[0].id,
-        },
-        relations: {
-          tax_location: true,
-          bank_location: true,
-          category: true,
-          subcategory: true,
-        },
-      });
+      const startCampaigns = await this.startUpRepository
+        .createQueryBuilder("campaign")
+        .where(
+          "campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false",
+          {
+            id: user[0].id,
+          }
+        )
+        .leftJoinAndSelect("campaign.tax_location", "tax_location")
+        .leftJoinAndSelect("campaign.bank_location", "bank_location")
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .select([
+          "campaign.id",
+          "campaign.currency",
+          "campaign.business_type",
+          "tax_location",
+          "bank_location",
+          "category",
+          "subcategory",
+        ])
+        .getOne();
+
       return responseMessage.responseWithData(
         true,
         200,

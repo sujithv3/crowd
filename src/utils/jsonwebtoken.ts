@@ -15,25 +15,27 @@ module.exports = {
   },
   verify: async (req: any, res: Response, next: NextFunction) => {
     try {
+      let token: any;
+
       if (
         typeof req.cookies.token === "undefined" ||
         req.cookies.token === null
       ) {
-        return res
-          .status(412)
-          .send(response.responseMessage(false, 402, msg.user_login_required));
+        if (!req.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              response.responseMessage(false, 402, msg.user_login_required)
+            );
+        } else {
+          token = req.headers.authorization.slice(7);
+        }
+      } else {
+        token = req.cookies.token;
       }
 
-      const verify = jwt.verify(req.cookies.token, process.env.JWT_SECRET_KEY);
-
-      // if (!req.headers.authorization) {
-      //   return res
-      //     .status(412)
-      //     .send(response.responseMessage(false, 402, msg.user_login_required));
-      // }
-      // let token = req.headers.authorization.slice(7);
-      // const verify = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
+      const verify = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      // console.log(verify);
       if (!verify) {
         return res
           .status(402)
@@ -50,7 +52,7 @@ module.exports = {
     }
   },
   decode(data: string) {
-    let token = data.slice(7);
+    let token = data;
     const decode = jwtDecode(token);
     return decode.data;
   },

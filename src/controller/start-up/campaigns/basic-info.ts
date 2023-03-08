@@ -26,19 +26,47 @@ export class basicInfoController {
       } = req.body;
 
       // get user id
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        if (!req.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              responseMessage.responseMessage(
+                false,
+                402,
+                msg.user_login_required
+              )
+            );
+        } else {
+          token = req.headers.authorization.slice(7);
+        }
+      } else {
+        token = req.cookies.token;
+      }
 
-      const user = Jwt.decode(req.cookies.token);
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign basic info
 
-      const campaigns = await this.basicInfoRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaigns = await this.basicInfoRepository
+        .createQueryBuilder()
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
+
+      if (!campaigns) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.createStartCampaignFirst
+        );
+      }
 
       await this.basicInfoRepository
         .createQueryBuilder()
@@ -85,29 +113,58 @@ export class basicInfoController {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
       // find user
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        if (!req.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              responseMessage.responseMessage(
+                false,
+                402,
+                msg.user_login_required
+              )
+            );
+        } else {
+          token = req.headers.authorization.slice(7);
+        }
+      } else {
+        token = req.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
       delete user.role;
       //   find basic info
-      const basicCampaigns = await this.basicInfoRepository.findOne({
-        select: [
-          "id",
-          "title",
-          "tag_line",
-          "location",
-          "tag",
-          "project_image",
-          "project_video",
-          "demo_url",
-        ],
-        where: {
-          is_published: false,
-          user: user[0].id,
-        },
-        relations: {
-          primary_sub_category: true,
-          primary_category: true,
-        },
-      });
+      const basicCampaigns = await this.basicInfoRepository
+        .createQueryBuilder("campaign")
+        .where(
+          "campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false",
+          {
+            id: user[0].id,
+          }
+        )
+        .leftJoinAndSelect(
+          "campaign.primary_sub_category",
+          "primary_sub_category"
+        )
+        .leftJoinAndSelect("campaign.primary_category", "primary_category")
+        .select([
+          "campaign.id",
+          "campaign.title",
+          "campaign.tag_line",
+          "campaign.location",
+          "campaign.tag",
+          "campaign.project_image",
+          "campaign.project_video",
+          "campaign.demo_url",
+          "primary_sub_category",
+          "primary_category",
+        ])
+        .getOne();
+
       return responseMessage.responseWithData(
         true,
         200,
@@ -115,6 +172,7 @@ export class basicInfoController {
         basicCampaigns
       );
     } catch (err) {
+      console.log(err);
       return responseMessage.responseWithData(
         false,
         400,

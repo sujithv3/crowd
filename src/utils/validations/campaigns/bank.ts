@@ -9,13 +9,13 @@ const bankCampaignValidation = [
     .withMessage("transit_number is required"),
 
   body("finance_number")
-    .isInt()
-    .withMessage("must be number")
+    .isString()
+    .withMessage("must be string")
     .notEmpty()
     .withMessage("finance_number is required"),
   body("bank_name")
-    .isInt()
-    .withMessage("must be number")
+    .isString()
+    .withMessage("must be string")
     .notEmpty()
     .withMessage("bank_name is required"),
   body("account_number")

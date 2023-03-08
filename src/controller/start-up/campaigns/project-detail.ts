@@ -17,19 +17,35 @@ export class projectDetailController {
       const { id, description, challenges, faq } = req.body;
 
       // get user id
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
 
-      const user = Jwt.decode(req.cookies.token);
+      const user = Jwt.decode(token);
       delete user.role;
 
       // find campaign
 
-      const campaigns = await this.projectDetailRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaigns = await this.projectDetailRepository
+        .createQueryBuilder()
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
+
+      if (!campaigns) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.createStartCampaignFirst
+        );
+      }
 
       await this.projectDetailRepository
         .createQueryBuilder()
@@ -57,20 +73,39 @@ export class projectDetailController {
     }
   }
 
-  // list basic info
+  // list project info
   async list(req: Request, res: Response, next: NextFunction) {
     try {
       // find user
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
       delete user.role;
       //   find basic info
-      const basicCampaigns = await this.projectDetailRepository.findOne({
-        select: ["id", "description", "challenges", "faq"],
-        where: {
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const basicCampaigns = await this.projectDetailRepository
+        .createQueryBuilder("campaign")
+        .where(
+          "campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false",
+          {
+            id: user[0].id,
+          }
+        )
+        .select([
+          "campaign.id",
+          "campaign.description",
+          "campaign.challenges",
+          "campaign.faq",
+        ])
+        .getOne();
+
       return responseMessage.responseWithData(
         true,
         200,

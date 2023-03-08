@@ -144,7 +144,16 @@ export class UserController {
   // get profile
   async getProfile(request: Request, response: Response, next: NextFunction) {
     try {
-      const userData = Jwt.decode(request.cookies.token);
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+      const userData = Jwt.decode(token);
 
       const user = await this.userRepository
         .createQueryBuilder()
@@ -199,7 +208,17 @@ export class UserController {
 
       // get user
 
-      const user = Jwt.decode(request.cookies.token);
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
 
       // update user
       await this.userRepository
@@ -329,15 +348,24 @@ export class UserController {
     next: NextFunction
   ) {
     const { email_id, new_password, old_password, role } = request.body;
-
+    let token: any;
+    if (
+      typeof request.cookies.token === "undefined" ||
+      request.cookies.token === null
+    ) {
+      token = request.headers.authorization.slice(7);
+    } else {
+      token = request.cookies.token;
+    }
+    const users = Jwt.decode(token);
     // find user
 
     let user = await this.userRepository
       .createQueryBuilder()
-      .where("email_id=:email AND is_active=:is_active AND role_id=:role", {
-        email: email_id,
+      .where("id=:id AND is_active=:is_active AND role_id=:role", {
+        id: users[0].id,
         is_active: true,
-        role: role,
+        role: users[0].role.id,
       })
       .getOne();
     if (!user) {
@@ -497,7 +525,16 @@ export class UserController {
   // setting
   async setting(req: Request, res: Response) {
     try {
-      const user = Jwt.decode(req.cookies.token);
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+      const user = Jwt.decode(token);
 
       const { is_active, is_deleted, reason } = req.body;
 
