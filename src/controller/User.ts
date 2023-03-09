@@ -2,6 +2,7 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Users } from "../entity/Users";
 import { ForgetToken } from "../entity/forget-password-token";
+import { deleteS3BucketValues } from "../utils/file-upload";
 const { genPass, verifyPass } = require("../utils/password");
 const { genToken } = require("../utils/jsonwebtoken");
 const responseMessage = require("../configs/response");
@@ -85,7 +86,7 @@ export class UserController {
       const userData = await this.userRepository
         .createQueryBuilder("user")
         .leftJoinAndSelect("user.role", "role")
-        .where("user.is_active=:is_active", { is_active: true })
+        .where("user.is_active=true")
         .getMany();
       //   check user exist
 
@@ -219,6 +220,28 @@ export class UserController {
       }
 
       const user = Jwt.decode(token);
+
+      const getProfile = await this.userRepository
+        .createQueryBuilder()
+        .where("id=:id", { id: user[0].id })
+        .getOne();
+
+      // delete s3 image
+
+      if (getProfile.profile) {
+        if (request.files) {
+          const getKey = getProfile.profile.split("/");
+          const key = getKey[getKey.length - 1];
+          await deleteS3BucketValues(key);
+        }
+      }
+      if (getProfile.company_logo) {
+        if (request.files) {
+          const getKey = getProfile.company_logo.split("/");
+          const key = getKey[getKey.length - 1];
+          await deleteS3BucketValues(key);
+        }
+      }
 
       // update user
       await this.userRepository

@@ -4,6 +4,7 @@
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
+import { deleteS3BucketValues } from "../../../utils/file-upload";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
@@ -57,6 +58,15 @@ export class fundsController {
           400,
           msg.createStartCampaignFirst
         );
+      }
+
+      // delete s3 bucket image
+      if (campaigns.fund_document) {
+        if (req.files) {
+          const getKey = campaigns.fund_document.split("/");
+          const key = getKey[getKey.length - 1];
+          await deleteS3BucketValues(key);
+        }
       }
 
       await this.fundsRepository
