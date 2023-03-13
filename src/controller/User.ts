@@ -278,7 +278,7 @@ export class UserController {
         twitter,
         you_tube,
         website,
-        extra_links,
+        extra_links = [],
       } = request.body;
 
       // get user
@@ -343,6 +343,7 @@ export class UserController {
           website,
           extra_links: JSON.parse(extra_links),
           updated_date: new Date(),
+          is_verify: true,
         })
         .where("id =:id", { id: user[0].id })
         .execute();

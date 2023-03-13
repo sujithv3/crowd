@@ -97,7 +97,7 @@ export class Users {
   description: string;
 
   @Column({
-    length: 500,
+    length: 2000,
     type: "varchar",
     nullable: true,
   })

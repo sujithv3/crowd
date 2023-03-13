@@ -24,7 +24,7 @@ export class Verifications {
       await client.verify.v2
         .services(process.env.SERVICE_TOKEN)
         .verifications.create({
-          to: `+${req.body.contact_number}`,
+          to: `+${process.env.COUNTRY_CODE}${req.body.contact_number}`,
           channel: "sms",
         })
         .then((verification) => console.log(verification.status));
