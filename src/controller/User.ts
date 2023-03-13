@@ -51,7 +51,7 @@ export class UserController {
       }
 
       // create user
-      await this.userRepository.save({
+      const users: any = await this.userRepository.save({
         first_name,
         last_name,
         email_id,
@@ -65,12 +65,33 @@ export class UserController {
         updated_date: new Date(),
         extra_links: [],
       });
+      // console.log(users);
+      const token = await this.forgetTokenRepository.save({
+        user: users.id,
+        token: crypto.randomBytes(32).toString("hex"),
+        created_date: new Date(),
+        updated_date: new Date(),
+      });
+      // console.log(token);
+
+      // send email
+      const link = `${process.env.BASE_URL_CREATE_PASSWORD}/?id=${users.id}&token=${token.token}`;
+
+      await sendEmail(
+        email_id,
+        "Verify Email",
+        { link },
+        "",
+        "click to verify"
+      );
+
       return responseMessage.responseMessage(
         true,
         200,
         msg.user_create_success
       );
     } catch (err) {
+      console.log(err);
       return responseMessage.responseWithData(
         false,
         400,
@@ -78,6 +99,59 @@ export class UserController {
         err
       );
     }
+  }
+
+  // verify email
+  async verify(request: Request, response: Response, next: NextFunction) {
+    const id = parseInt(request.params.id);
+    const verify_token = request.params.token;
+    // find user
+    let user = await this.userRepository.findOneBy({
+      id,
+      is_active: true,
+    });
+    if (!user) {
+      return responseMessage.responseMessage(false, 400, msg.user_not_found);
+    }
+
+    // find token
+    let token: any = await this.forgetTokenRepository
+      .createQueryBuilder()
+      .where("userId=:id", { id: id })
+      .getOne();
+
+    // check token exist
+    if (!token) {
+      return responseMessage.responseMessage(
+        false,
+        400,
+        msg.createPasswordInvalidToken
+      );
+    }
+
+    // compare token
+    const compareToken = verify_token === token.token;
+
+    if (!compareToken) {
+      return responseMessage.responseMessage(
+        false,
+        400,
+        msg.createPasswordInvalidToken
+      );
+    }
+
+    await this.userRepository.update(
+      {
+        id,
+      },
+      {
+        is_verify: true,
+      }
+    );
+    // delete token
+    await this.forgetTokenRepository.remove(token);
+
+    return responseMessage.responseMessage(true, 200, msg.verifySuccessfully);
   }
 
   //   list all users
@@ -325,6 +399,10 @@ export class UserController {
     if (user.length === 0) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);
     }
+
+    if (!user[0].is_verify) {
+      return responseMessage.responseMessage(false, 400, msg.verifyYourEmail);
+    }
     // compare password
     const comparePassword = verifyPass(user[0].password, password);
 
@@ -343,6 +421,7 @@ export class UserController {
       sameSite: "none",
       httpOnly: false,
       secure: true,
+      domain: "localhost",
     });
     return responseMessage.responseWithToken(
       true,
@@ -442,10 +521,10 @@ export class UserController {
 
       let token: any = await this.forgetTokenRepository
         .createQueryBuilder()
-        .where("user=:id", { id: user.id })
+        .where("userId=:id", { id: user.id })
         .getOne();
       // set token table
-      if (token.length === 0) {
+      if (!token) {
         token = await this.forgetTokenRepository.save({
           user,
           token: crypto.randomBytes(32).toString("hex"),
@@ -501,11 +580,11 @@ export class UserController {
     // find token
     let token: any = await this.forgetTokenRepository
       .createQueryBuilder()
-      .where("user=:id", { id: user.id })
+      .where("userId=:id", { id: user.id })
       .getOne();
 
     // check token exist
-    if (token.length === 0) {
+    if (!token) {
       return responseMessage.responseMessage(
         false,
         400,
@@ -514,7 +593,7 @@ export class UserController {
     }
 
     // compare token
-    const compareToken = verify_token === token[0].token;
+    const compareToken = verify_token === token.token;
 
     if (!compareToken) {
       return responseMessage.responseMessage(
@@ -536,7 +615,7 @@ export class UserController {
       }
     );
     // delete token
-    await this.forgetTokenRepository.remove(token[0]);
+    await this.forgetTokenRepository.remove(token);
 
     return responseMessage.responseMessage(
       false,

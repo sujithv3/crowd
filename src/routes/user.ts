@@ -51,6 +51,15 @@ export const Routes = [
   },
   {
     method: "post",
+    route: "/verify/:id/:token",
+    controller: UserController,
+    action: "verify",
+    validationField: "",
+    isLogin: false,
+    fileUpload: false,
+  },
+  {
+    method: "post",
     route: "/create",
     controller: UserController,
     action: "create",

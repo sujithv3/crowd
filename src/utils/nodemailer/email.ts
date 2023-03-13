@@ -8,7 +8,8 @@ const sendEmail = async (
   email: string,
   subject: string,
   payload: any,
-  template?: string
+  template?: string,
+  action_name = "click to proceed"
 ) => {
   try {
     const transporter = nodemailer.createTransport({
@@ -30,7 +31,7 @@ const sendEmail = async (
       },
       to: email,
       subject: subject,
-      html: `<a style="background:#46a4e3; padding-top:20px,padding-bottom:20px,padding-left:20px,padding-right:20px" href="${payload.link}">Click To Proceed</a>`,
+      html: `<a style="background:#46a4e3; padding-top:20px,padding-bottom:20px,padding-left:20px,padding-right:20px" href="${payload.link}">${action_name}</a>`,
     };
     let result = await transporter.sendMail(option);
   } catch (error) {

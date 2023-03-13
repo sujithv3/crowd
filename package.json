@@ -35,7 +35,7 @@
     "typeorm": "0.3.12"
   },
   "scripts": {
-    "start": "nodemon --exec ts-node src/index.ts",
+    "start": " ts-node src/index.ts",
     "typeorm": "typeorm-ts-node-commonjs -d src/data-source.ts"
   }
 }

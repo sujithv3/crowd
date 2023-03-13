@@ -1,5 +1,5 @@
 module.exports = {
-  user_create_success: "Account Created Successfully",
+  user_create_success: "Verification Link is sent your email",
   user_create_failed: "Account Created Failed",
   user_already_exist: "Account Already Exist",
   user_login_required: "Login Is Required",
@@ -28,6 +28,8 @@ module.exports = {
   createPasswordFailed: "Create Password Failed",
   createPasswordSuccess: "Create Password Success",
   createPasswordInvalidToken: "link has expired",
+  verifySuccessfully: "Verify Successfully",
+  verifyYourEmail: "Please check your email",
 
   // verification
 

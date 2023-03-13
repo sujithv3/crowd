@@ -177,4 +177,9 @@ export class Users {
     default: false,
   })
   is_deleted: boolean;
+
+  @Column({
+    default: false,
+  })
+  is_verify: boolean;
 }
