@@ -303,14 +303,14 @@ export class UserController {
       // delete s3 image
 
       if (getProfile.profile) {
-        if (request.files) {
+        if (request.files.profile) {
           const getKey = getProfile.profile.split("/");
           const key = getKey[getKey.length - 1];
           await deleteS3BucketValues(key);
         }
       }
       if (getProfile.company_logo) {
-        if (request.files) {
+        if (request.files.company_logo) {
           const getKey = getProfile.company_logo.split("/");
           const key = getKey[getKey.length - 1];
           await deleteS3BucketValues(key);
@@ -324,9 +324,11 @@ export class UserController {
         .set({
           first_name,
           last_name,
-          profile: request.files ? request.files.profile[0].location : profile,
+          profile: request.files.profile
+            ? request.files.profile[0].location
+            : profile,
           contact_number,
-          company_logo: request.files
+          company_logo: request.files.company_logo
             ? request.files.company_logo[0].location
             : company_logo,
           street_name,

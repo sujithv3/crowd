@@ -182,4 +182,9 @@ export class Users {
     default: false,
   })
   is_verify: boolean;
+
+  @Column({
+    default: false,
+  })
+  contact_number_verified: boolean;
 }

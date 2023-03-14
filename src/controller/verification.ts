@@ -46,27 +46,62 @@ export class Verifications {
     res: Response,
     next: NextFunction
   ) {
-    await client.verify.v2
-      .services(process.env.SERVICE_TOKEN)
-      .verificationChecks.create({
-        to: `+${process.env.COUNTRY_CODE}${req.body.contact_number}`,
-        code: req.body.otp,
-      })
-      .then((data) => {
-        if (!data.valid) {
-          return res.send(
-            responseMessage.responseMessage(false, 400, msg.invalidOTP)
-          );
+    try {
+      // get user
+
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
+
+      await this.userRepository.update(
+        {
+          id: user[0].id,
+        },
+        {
+          contact_number_verified: true,
         }
-        return res.send(
-          responseMessage.responseMessage(true, 200, msg.verifySuccess)
-        );
-      })
-      .catch((err) => {
-        return res.send(
-          responseMessage.responseWithData(false, 400, msg.verifyOTPFailed, err)
-        );
-      });
+      );
+
+      await client.verify.v2
+        .services(process.env.SERVICE_TOKEN)
+        .verificationChecks.create({
+          to: `+${process.env.COUNTRY_CODE}${req.body.contact_number}`,
+          code: req.body.otp,
+        })
+        .then((data) => {
+          if (!data.valid) {
+            return res.send(
+              responseMessage.responseMessage(false, 400, msg.invalidOTP)
+            );
+          }
+          return res.send(
+            responseMessage.responseMessage(true, 200, msg.verifySuccess)
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.send(
+            responseMessage.responseWithData(
+              false,
+              400,
+              msg.verifyOTPFailed,
+              err
+            )
+          );
+        });
+    } catch (err) {
+      return res.send(
+        responseMessage.responseWithData(false, 400, msg.verifyOTPFailed, err)
+      );
+    }
   }
 
   //   send code for email

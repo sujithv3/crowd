@@ -5,7 +5,7 @@ const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
 export class CampaignController {
-  private rolesRepository = AppDataSource.getRepository(Campaigns);
+  private campaignRepository = AppDataSource.getRepository(Campaigns);
 
   //   list user bashed campaign
   async all(request: Request, response: Response, next: NextFunction) {
@@ -37,7 +37,7 @@ export class CampaignController {
 
       console.log(request.query.limit);
 
-      const userData = await this.rolesRepository
+      const userData = await this.campaignRepository
         .createQueryBuilder("campaign")
         .where(
           `campaign.user = :id AND
@@ -73,7 +73,7 @@ export class CampaignController {
         .leftJoinAndSelect("BankInfo.bank_location", "location")
         .getMany();
 
-      const total_count = await this.rolesRepository
+      const total_count = await this.campaignRepository
         .createQueryBuilder("campaign")
         .where(
           `campaign.user = :id AND
@@ -101,6 +101,59 @@ export class CampaignController {
         400,
         msg.campaignListFailed,
         err
+      );
+    }
+  }
+
+  // list one campaign
+  async getOne(req: Request, res: Response, next: NextFunction) {
+    const id = parseInt(req.params.id);
+    try {
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .where(
+          `campaign.id = :id 
+       `,
+          {
+            id: id,
+          }
+        )
+
+        .leftJoinAndSelect("campaign.tax_location", "tax_location")
+        .leftJoinAndSelect("campaign.bank_location", "bank_location")
+        .leftJoinAndSelect("campaign.primary_category", "primary_category")
+        .leftJoinAndSelect(
+          "campaign.primary_sub_category",
+          "primary_sub_category"
+        )
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.team", "Teams")
+        .leftJoinAndSelect("campaign.bank", "BankInfo")
+        .getOne();
+
+      if (!campaign) {
+        return responseMessage.responseWithData(
+          false,
+          400,
+          "campaign not found",
+          campaign
+        );
+      }
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.userListSuccess,
+        campaign
+      );
+    } catch (error) {
+      console.log(error);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userListFailed,
+        error
       );
     }
   }

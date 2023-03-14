@@ -10,14 +10,6 @@ const signupValidationEdit = require("../../utils/validations/user/user-validati
 const JWT = require("../../utils/jsonwebtoken");
 export const Routes = [
   {
-    method: "post",
-    route: "/create",
-    controller: CampaignController,
-    action: "create",
-    validationField: UserValidation,
-    isLogin: true,
-  },
-  {
     method: "get",
     route: "/list",
     controller: CampaignController,
@@ -29,23 +21,7 @@ export const Routes = [
     method: "get",
     route: "/list/:id",
     controller: CampaignController,
-    action: "one",
-    validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "put",
-    route: "/update",
-    controller: CampaignController,
-    action: "update",
-    validationField: signupValidationEdit,
-    isLogin: false,
-  },
-  {
-    method: "delete",
-    route: "/delete/:id",
-    controller: CampaignController,
-    action: "remove",
+    action: "getOne",
     validationField: "",
     isLogin: false,
   },
