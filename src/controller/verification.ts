@@ -49,7 +49,7 @@ export class Verifications {
     await client.verify.v2
       .services(process.env.SERVICE_TOKEN)
       .verificationChecks.create({
-        to: `+${req.body.contact_number}`,
+        to: `+${process.env.COUNTRY_CODE}${req.body.contact_number}`,
         code: req.body.otp,
       })
       .then((data) => {
