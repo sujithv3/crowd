@@ -8,11 +8,16 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  Tree,
+  TreeChildren,
+  TreeParent,
+  TreeLevelColumn,
 } from "typeorm";
 import { Users } from "./Users";
 import { Campaigns } from "./campaigns";
 
 @Entity()
+@Tree("materialized-path")
 export class Category {
   @PrimaryGeneratedColumn()
   id: number;
@@ -27,6 +32,12 @@ export class Category {
     type: "int",
   })
   parent_id: number;
+
+  @TreeChildren()
+  children: Category[];
+
+  @TreeParent()
+  parent: Category;
 
   @CreateDateColumn()
   createdDate: Date;
