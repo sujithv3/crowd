@@ -9,16 +9,12 @@ const msg = require("../configs/message");
 
 export class categoryController {
   private categoryRepository = AppDataSource.getRepository(Category);
+  private categoryTree = AppDataSource.getTreeRepository(Category);
 
   // list all
   async all(request: Request, response: Response, next: NextFunction) {
     try {
-      const categoryData = await this.categoryRepository.find({
-        where: {
-          is_active: true,
-          is_deleted: false,
-        },
-      });
+      const categoryData = await this.categoryTree.findTrees();
 
       //   check category exist
       if (categoryData.length === 0) {
@@ -86,15 +82,25 @@ export class categoryController {
         is_deleted = false,
       } = req.body;
 
+      const category = new Category();
+
+      category.name = name;
+      category.is_active = is_active;
+      category.is_deleted = is_deleted;
+      if (parent_id > 0) {
+        const myparent = await this.categoryRepository.findOne({
+          where: { id: parent_id },
+        });
+
+        category.parent_id = parent_id;
+        category.parent = myparent;
+      } else {
+        category.parent_id = 0;
+      }
+
       //   create category
-      await this.categoryRepository.save({
-        name,
-        parent_id,
-        is_active,
-        is_deleted,
-        createdDate: new Date(),
-        updatedDate: new Date(),
-      });
+      await this.categoryRepository.save(category);
+
       return responseMessage.responseMessage(
         true,
         200,
