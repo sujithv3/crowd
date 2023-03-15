@@ -39,31 +39,11 @@ const signupValidationEdit = [
     .withMessage("must be string")
     .notEmpty()
     .withMessage("summary is required"),
-  body("linked_in")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("linked_in is required"),
-  body("facebook")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("facebook is required"),
-  body("twitter")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("twitter is required"),
-  body("you_tube")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("you_tube is required"),
-  body("website")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("website is required"),
+  body("linked_in").isString().withMessage("must be string").optional(),
+  body("facebook").isString().withMessage("must be string").optional(),
+  body("twitter").isString().withMessage("must be string").optional(),
+  body("you_tube").isString().withMessage("must be string").optional(),
+  body("website").isString().withMessage("must be string").optional(),
 ];
 
 module.exports = signupValidationEdit;

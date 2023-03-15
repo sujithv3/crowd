@@ -8,26 +8,16 @@ const basicInfoCampaignValidation = [
     .notEmpty()
     .withMessage("title is required"),
 
-  body("demo_url")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("demo_url is required"),
-  body("tag")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("tag is required"),
+  body("demo_url").isString().withMessage("must be string").optional(),
+
+  body("tag").isString().withMessage("must be string").optional(),
+
   body("tag_line")
     .isString()
     .withMessage("must be string")
     .notEmpty()
     .withMessage("tag_line is required"),
-  body("location")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("location is required"),
+  body("location").isString().withMessage("must be string").optional(),
 ];
 
 module.exports = basicInfoCampaignValidation;

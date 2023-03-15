@@ -28,11 +28,7 @@ const bankCampaignValidation = [
     .withMessage("must be string")
     .notEmpty()
     .withMessage("swift is required"),
-  body("bank_address")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("bank_address is required"),
+  body("bank_address").isString().withMessage("must be string").optional(),
   body("bank_location")
     .isInt()
     .withMessage("must be number")

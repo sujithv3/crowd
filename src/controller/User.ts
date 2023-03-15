@@ -36,7 +36,7 @@ export class UserController {
       // if user check
       const user = await this.userRepository
         .createQueryBuilder()
-        .where("email_id=:email_id AND role_id=:role_id", {
+        .where("email_id=:email_id AND role_id=:role_id AND is_deleted=false", {
           email_id: email_id,
           role_id: role_id,
         })

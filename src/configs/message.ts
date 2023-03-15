@@ -33,8 +33,8 @@ module.exports = {
 
   // verification
 
-  otpSendYourMobile: "Verification OTP Send your mobile",
-  otpSendYourEmail: "Verification OTP Send your email",
+  otpSendYourMobile: "Verification OTP has been sent to your mobile",
+  otpSendYourEmail: "Verification OTP has been sent to your email",
   otpSendYourMobileFailed: "send OTP failed",
   verifyOTPFailed: "verify OTP failed",
   invalidOTP: "Invalid OTP",
