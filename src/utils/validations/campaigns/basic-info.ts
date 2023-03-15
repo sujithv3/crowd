@@ -8,16 +8,6 @@ const basicInfoCampaignValidation = [
     .notEmpty()
     .withMessage("title is required"),
 
-  body("primary_category")
-    .isInt()
-    .withMessage("must be number")
-    .notEmpty()
-    .withMessage("primary_category is required"),
-  body("primary_sub_category")
-    .isInt()
-    .withMessage("must be number")
-    .notEmpty()
-    .withMessage("primary_sub_category is required"),
   body("demo_url")
     .isString()
     .withMessage("must be string")

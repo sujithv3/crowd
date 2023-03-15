@@ -31,10 +31,6 @@ const TeamsCampaignValidation = [
   body("*.role").notEmpty().withMessage("role is required"),
   body("*.is_active").isBoolean().withMessage("role be boolean").optional(),
   body("*.email_id").isEmail().notEmpty().withMessage("email is required"),
-  body("*.team_member_email")
-    .isEmail()
-    .notEmpty()
-    .withMessage("team_member_email is required"),
 ];
 
 module.exports = TeamsCampaignValidation;

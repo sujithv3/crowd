@@ -390,7 +390,7 @@ export class UserController {
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.role", "role")
       .where(
-        "user.email_id=:email_id AND user.is_active=:is_active AND user.role_id=:role",
+        "user.email_id=:email_id AND user.is_active=:is_active AND user.role_id=:role AND user.is_deleted=false",
         {
           email_id: email,
           is_active: true,
@@ -541,7 +541,7 @@ export class UserController {
       token = token.token ?? token[0].token;
 
       // generate links
-      const link = `${process.env.BASE_URL_CREATE_PASSWORD}create_password/?id=${user.id}&token=${token}`;
+      const link = `${process.env.BASE_URL_CREATE_PASSWORD}/?resetId=${user.id}&token=${token}`;
 
       // send email
 
