@@ -1,4 +1,8 @@
-const { CampaignController } = require("../controller/Campaign");
+/**
+ * Created By Muthu
+ * routers will be blocked after moved the seed
+ */
+const { SeedController } = require("../controller/seed");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
@@ -7,43 +11,18 @@ const JWT = require("../utils/jsonwebtoken");
 
 export const Routes = [
   {
-    method: "get",
-    route: "/get",
-    controller: CampaignController,
-    action: "get",
+    method: "post",
+    route: "/seed-category",
+    controller: SeedController,
+    action: "seedCategory",
     validationField: "",
     isLogin: false,
   },
   {
-    method: "get",
-    route: "/featured",
-    controller: CampaignController,
-    action: "featuredDeals",
-    validationField: "",
-    isLogin: false,
-  },
-
-  {
-    method: "get",
-    route: "/rasing-deals",
-    controller: CampaignController,
-    action: "raisingDeals",
-    validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "get",
-    route: "/closing-soon",
-    controller: CampaignController,
-    action: "closingSoon",
-    validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "get",
-    route: "/funded-deals",
-    controller: CampaignController,
-    action: "fundedDeals",
+    method: "post",
+    route: "/seed-stages",
+    controller: SeedController,
+    action: "seedStages",
     validationField: "",
     isLogin: false,
   },

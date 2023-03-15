@@ -17,6 +17,8 @@ const PaymentVerification = require("./routes/start-up/campaigns/payment-verific
 const BankDetail = require("./routes/start-up/campaigns/bank");
 const startupCampaign = require("./routes/start-up/campaigns");
 const Campaign = require("./routes/campaign");
+const Investor = require("./routes/investor");
+const seed = require("./routes/seed");
 
 // mysql database connection initialize
 
@@ -58,3 +60,5 @@ app.use("/api/start-up/campaign/fund", Fund);
 app.use("/api/start-up/campaign/payment-verification", PaymentVerification);
 app.use("/api/start-up/campaign/bank", BankDetail);
 app.use("/api/start-up/campaign", startupCampaign);
+app.use("/api/investor", Investor);
+app.use("/api/seed", seed);

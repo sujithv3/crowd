@@ -1,51 +1,27 @@
-const { CampaignController } = require("../controller/Campaign");
+const { investorController } = require("../controller/investor");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
 const validationResult = require("../utils/validations/validation-error");
+// const categoryCreateValidation = require("../utils/validations/category/create");
+// const categoryUpdateValidationEdit = require("../utils/validations/category/update");
 const JWT = require("../utils/jsonwebtoken");
-
 export const Routes = [
   {
     method: "get",
-    route: "/get",
-    controller: CampaignController,
-    action: "get",
+    route: "/getAll",
+    controller: investorController,
+    action: "getAll",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
   {
     method: "get",
-    route: "/featured",
-    controller: CampaignController,
-    action: "featuredDeals",
+    route: "/deals",
+    controller: investorController,
+    action: "deals",
     validationField: "",
-    isLogin: false,
-  },
-
-  {
-    method: "get",
-    route: "/rasing-deals",
-    controller: CampaignController,
-    action: "raisingDeals",
-    validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "get",
-    route: "/closing-soon",
-    controller: CampaignController,
-    action: "closingSoon",
-    validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "get",
-    route: "/funded-deals",
-    controller: CampaignController,
-    action: "fundedDeals",
-    validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
 ];
 
