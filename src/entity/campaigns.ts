@@ -15,6 +15,7 @@ import { Category } from "./category";
 import { Location } from "./locations";
 import { Teams } from "./teams";
 import { BankInfo } from "./bankinfo";
+import { Staging } from "./staging";
 
 export enum businessType {
   BUSINESS = "business",
@@ -119,6 +120,10 @@ export class Campaigns {
   @ManyToOne((type) => Users)
   @JoinColumn({ name: "user_id", referencedColumnName: "id" })
   user: Users;
+
+  @ManyToOne((type) => Staging)
+  @JoinColumn({ name: "staging_id", referencedColumnName: "id" })
+  staging: Staging;
 
   @ManyToOne((type) => Users)
   @JoinColumn({ name: "manager_id", referencedColumnName: "id" })
