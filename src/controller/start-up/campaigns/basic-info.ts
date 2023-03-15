@@ -94,8 +94,7 @@ export class basicInfoController {
         .set({
           title,
           tag_line,
-          primary_category,
-          primary_sub_category,
+
           location,
           tag,
           project_image: req.files.project_image

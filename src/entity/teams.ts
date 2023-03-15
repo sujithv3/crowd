@@ -60,6 +60,8 @@ export class Teams {
   @Column({
     length: 100,
     type: "varchar",
+    nullable: true,
+    default: null,
   })
   team_member_email: string;
 

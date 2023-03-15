@@ -82,7 +82,7 @@ export class teamController {
           linkedin,
           campaign: campaigns,
           email_id,
-          team_member_email,
+          team_member_email: null,
           role,
           createdDate: new Date(),
           updatedDate: new Date(),
