@@ -10,6 +10,7 @@ import { Category } from "./entity/category";
 import { Campaigns } from "./entity/campaigns";
 import { BankInfo } from "./entity/bankinfo";
 import { Location } from "./entity/locations";
+import { Staging } from "./entity/staging";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -32,6 +33,7 @@ export const AppDataSource = new DataSource({
     Campaigns,
     BankInfo,
     Location,
+    Staging,
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],
