@@ -1,28 +1,57 @@
 // created by : Muthukumar
-// purpose : Campaign list for carousel view
+// purpose : Campaign list view for carousel view for dashboard & investor
 
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../entity/campaigns";
 const responseMessage = require("../configs/response");
 const msg = require("../configs/message");
+const Jwt = require("./../utils/jsonwebtoken");
 
 export class CampaignController {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
 
-  // list all
-  async get(request: Request, response: Response, next: NextFunction) {
+  async getUserBased(request: Request, response: Response, next: NextFunction) {
     try {
-      const data = await this.campaignRepository
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        if (!request.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              responseMessage.responseMessage(
+                false,
+                402,
+                msg.user_login_required
+              )
+            );
+        } else {
+          token = request.headers.authorization.slice(7);
+        }
+      } else {
+        token = request.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
+
+      // featured
+      // AND campaign.is_featured=1
+
+      const featured = await this.campaignRepository
         .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
         .where(
-          `campaign.is_published=:published
+          `campaign.user = :id
+         AND campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
-         AND campaign.is_featured=1
-
+         
          `,
           {
+            id: user[0].id,
             published: true,
             is_deleted: false,
             is_active: true,
@@ -30,18 +59,85 @@ export class CampaignController {
         )
         .skip(0)
         .take(20)
-        .leftJoinAndSelect("campaign.tax_location", "tax_location")
-        .leftJoinAndSelect("campaign.category", "Category")
-        .getMany();
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
 
-      //   check category exist
-      if (data.length === 0) {
-        return responseMessage.responseMessage(
-          false,
-          400,
-          msg.campaignNotFound
-        );
-      }
+      const raising = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        .where(
+          `campaign.user = :id
+         AND campaign.is_published=:published
+         AND campaign.is_deleted=:is_deleted
+         AND campaign.is_active=:is_active
+         
+         `,
+          {
+            id: user[0].id,
+            published: true,
+            is_deleted: false,
+            is_active: true,
+          }
+        )
+        .skip(0)
+        .take(20)
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
+
+      const closingsoon = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        .where(
+          `campaign.user = :id
+         AND campaign.is_published=:published
+         AND campaign.is_deleted=:is_deleted
+         AND campaign.is_active=:is_active
+         
+         `,
+          {
+            id: user[0].id,
+            published: true,
+            is_deleted: false,
+            is_active: true,
+          }
+        )
+        .skip(0)
+        .take(20)
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
+
+      const funded = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        .where(
+          `campaign.user = :id
+         AND campaign.is_published=:published
+         AND campaign.is_deleted=:is_deleted
+         AND campaign.is_active=:is_active
+         
+         `,
+          {
+            id: user[0].id,
+            published: true,
+            is_deleted: false,
+            is_active: true,
+          }
+        )
+        .skip(0)
+        .take(20)
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
+
+      const data = {
+        featured: featured,
+        raising: raising,
+        closingsoon: closingsoon,
+        funded: funded,
+      };
 
       return responseMessage.responseWithData(
         true,
@@ -59,21 +155,20 @@ export class CampaignController {
     }
   }
 
-  async featuredDeals(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) {
+  // list all
+  async get(request: Request, response: Response, next: NextFunction) {
     try {
-      // find user
-      const data = await this.campaignRepository
+      // featured
+      // AND campaign.is_featured=1
+
+      const featured = await this.campaignRepository
         .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
         .where(
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
-         AND campaign.is_featured=1
-
+         
          `,
           {
             published: true,
@@ -83,72 +178,18 @@ export class CampaignController {
         )
         .skip(0)
         .take(20)
-        .leftJoinAndSelect("campaign.tax_location", "tax_location")
-        .leftJoinAndSelect("campaign.category", "Category")
-        .getMany();
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
 
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.campaignListSuccess,
-        { data }
-      );
-    } catch (err) {
-      return responseMessage.responseWithData(
-        false,
-        400,
-        msg.campaignListFailed,
-        err
-      );
-    }
-  }
-
-  async raisingDeals(request: Request, response: Response, next: NextFunction) {
-    try {
-      // find user
-      const data = await this.campaignRepository
+      const raising = await this.campaignRepository
         .createQueryBuilder("campaign")
-        .where(
-          `campaign.is_published=:published
-         AND campaign.is_deleted=:is_deleted
-         AND campaign.is_active=:is_active`,
-          {
-            published: true,
-            is_deleted: false,
-            is_active: true,
-          }
-        )
-        .skip(0)
-        .take(20)
-        .leftJoinAndSelect("campaign.tax_location", "tax_location")
-        .leftJoinAndSelect("campaign.category", "Category")
-        .getMany();
-
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.campaignListSuccess,
-        { data }
-      );
-    } catch (err) {
-      return responseMessage.responseWithData(
-        false,
-        400,
-        msg.campaignListFailed,
-        err
-      );
-    }
-  }
-
-  async closingSoon(request: Request, response: Response, next: NextFunction) {
-    try {
-      // find user
-      const data = await this.campaignRepository
-        .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
         .where(
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
+         
          `,
           {
             published: true,
@@ -158,36 +199,18 @@ export class CampaignController {
         )
         .skip(0)
         .take(20)
-        .leftJoinAndSelect("campaign.tax_location", "tax_location")
-        .leftJoinAndSelect("campaign.category", "Category")
-        .getMany();
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
 
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.campaignListSuccess,
-        { data }
-      );
-    } catch (err) {
-      return responseMessage.responseWithData(
-        false,
-        400,
-        msg.campaignListFailed,
-        err
-      );
-    }
-  }
-
-  async fundedDeals(request: Request, response: Response, next: NextFunction) {
-    try {
-      // find user
-      const data = await this.campaignRepository
+      const closingsoon = await this.campaignRepository
         .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
         .where(
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
-         AND raised_fund >= goal_amount
+         
          `,
           {
             published: true,
@@ -197,21 +220,88 @@ export class CampaignController {
         )
         .skip(0)
         .take(20)
-        .leftJoinAndSelect("campaign.tax_location", "tax_location")
-        .leftJoinAndSelect("campaign.category", "Category")
-        .getMany();
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
+
+      const funded = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        .where(
+          `campaign.is_published=:published
+         AND campaign.is_deleted=:is_deleted
+         AND campaign.is_active=:is_active
+         
+         `,
+          {
+            published: true,
+            is_deleted: false,
+            is_active: true,
+          }
+        )
+        .skip(0)
+        .take(20)
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
+
+      const data = {
+        featured: featured,
+        raising: raising,
+        closingsoon: closingsoon,
+        funded: funded,
+      };
 
       return responseMessage.responseWithData(
         true,
         200,
         msg.campaignListSuccess,
-        { data }
+        data
       );
     } catch (err) {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.campaignListFailed,
+        msg.categoryListFailed,
+        err
+      );
+    }
+  }
+  // recent campaign from home page
+  async recent(request: Request, response: Response, next: NextFunction) {
+    try {
+      const data = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        .where(
+          `campaign.is_published=:published
+         AND campaign.is_deleted=:is_deleted
+         AND campaign.is_active=:is_active
+         
+         `,
+          {
+            published: true,
+            is_deleted: false,
+            is_active: true,
+          }
+        )
+        .skip(0)
+        .take(20)
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getRawMany();
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.campaignListSuccess,
+        data
+      );
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.categoryListFailed,
         err
       );
     }
