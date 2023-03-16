@@ -16,36 +16,19 @@ export const Routes = [
   },
   {
     method: "get",
-    route: "/featured",
+    route: "/recent",
     controller: CampaignController,
-    action: "featuredDeals",
-    validationField: "",
-    isLogin: false,
-  },
-
-  {
-    method: "get",
-    route: "/rasing-deals",
-    controller: CampaignController,
-    action: "raisingDeals",
+    action: "recent",
     validationField: "",
     isLogin: false,
   },
   {
     method: "get",
-    route: "/closing-soon",
+    route: "/user/get",
     controller: CampaignController,
-    action: "closingSoon",
+    action: "getUserBased",
     validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "get",
-    route: "/funded-deals",
-    controller: CampaignController,
-    action: "fundedDeals",
-    validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
 ];
 

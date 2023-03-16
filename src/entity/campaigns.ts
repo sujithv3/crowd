@@ -216,6 +216,12 @@ export class Campaigns {
   })
   raised_fund: number;
 
+  @Column({
+    type: "datetime",
+    default: null,
+  })
+  raised_fund_date: Date;
+
   @Column({ type: "datetime", nullable: true }) // Recommended
   start_date: Date;
 
