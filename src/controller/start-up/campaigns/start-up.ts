@@ -113,6 +113,8 @@ export class startUpController {
         );
       }
     } catch (err) {
+      console.log(err);
+
       return responseMessage.responseWithData(
         false,
         400,
