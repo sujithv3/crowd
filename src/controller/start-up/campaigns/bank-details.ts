@@ -185,16 +185,20 @@ export class bankController {
       const user = Jwt.decode(token);
       delete user.role;
 
+      console.log(user[0].id);
+
       // find campaign
 
-      const campaign = await this.campaignRepository.findOne({
-        where: {
-          is_active: true,
-          is_published: false,
-          user: user[0].id,
-        },
-      });
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("")
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
+        .getOne();
 
+      if (!campaign) {
+        return responseMessage.responseMessage(false, 404, "No Data Found");
+      }
       //   find bank
       const basicCampaigns = await this.bankRepository
         .createQueryBuilder("bank")

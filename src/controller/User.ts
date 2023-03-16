@@ -390,10 +390,11 @@ export class UserController {
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.role", "role")
       .where(
-        "user.email_id=:email_id AND user.is_active=:is_active AND user.role_id=:role AND user.is_deleted=false",
+        "user.email_id=:email_id AND is_deleted=:is_deleted AND user.is_active=:is_active AND user.role_id=:role AND user.is_deleted=false",
         {
           email_id: email,
           is_active: true,
+          is_deleted: false,
           role: role,
         }
       )
@@ -467,11 +468,15 @@ export class UserController {
 
     let user = await this.userRepository
       .createQueryBuilder()
-      .where("id=:id AND is_active=:is_active AND role_id=:role", {
-        id: users[0].id,
-        is_active: true,
-        role: users[0].role.id,
-      })
+      .where(
+        "id=:id AND is_active=:is_active AND is_deleted=:is_deleted AND role_id=:role",
+        {
+          id: users[0].id,
+          is_active: true,
+          is_deleted: false,
+          role: users[0].role.id,
+        }
+      )
       .getOne();
     if (!user) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);
@@ -512,11 +517,15 @@ export class UserController {
 
       let user = await this.userRepository
         .createQueryBuilder()
-        .where("email_id=:email AND is_active=:is_active AND role_id=:role", {
-          email: email_id,
-          is_active: true,
-          role: role,
-        })
+        .where(
+          "email_id=:email AND is_active=:is_active AND is_deleted=:is_deleted AND role_id=:role",
+          {
+            email: email_id,
+            is_active: true,
+            is_deleted: false,
+            role: role,
+          }
+        )
         .getOne();
       if (!user) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
@@ -575,6 +584,7 @@ export class UserController {
     let user = await this.userRepository.findOneBy({
       id,
       is_active: true,
+      is_deleted: false,
     });
     if (!user) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);
@@ -621,8 +631,8 @@ export class UserController {
     await this.forgetTokenRepository.remove(token);
 
     return responseMessage.responseMessage(
-      false,
-      400,
+      true,
+      200,
       msg.createPasswordSuccess
     );
   }

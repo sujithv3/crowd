@@ -66,7 +66,7 @@ export class teamController {
           summary,
           linkedin,
           email_id,
-          team_member_email,
+          // team_member_email,
           role,
           is_active = true,
           is_deleted = false,

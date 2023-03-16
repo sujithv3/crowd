@@ -57,13 +57,12 @@ export class Teams {
   })
   email_id: string;
 
-  @Column({
-    length: 100,
-    type: "varchar",
-    nullable: true,
-    default: null,
-  })
-  team_member_email: string;
+  // @Column({
+  //   length: 100,
+  //   type: "varchar",
+  //   default: null,
+  // })
+  // team_member_email: string;
 
   @Column({
     length: 200,
