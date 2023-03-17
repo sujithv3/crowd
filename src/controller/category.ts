@@ -12,7 +12,41 @@ export class categoryController {
   private categoryTree = AppDataSource.getTreeRepository(Category);
 
   // list all
+
   async all(request: Request, response: Response, next: NextFunction) {
+    try {
+      const categoryData = await this.categoryRepository.find({
+        where: {
+          is_active: true,
+          is_deleted: false,
+        },
+      });
+
+      //   check category exist
+      if (categoryData.length === 0) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.categoryNotFound
+        );
+      }
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.categoryListSuccess,
+        categoryData
+      );
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.categoryListFailed,
+        err
+      );
+    }
+  }
+
+  async tree(request: Request, response: Response, next: NextFunction) {
     try {
       const categoryData = await this.categoryTree.findTrees();
 

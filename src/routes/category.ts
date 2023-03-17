@@ -25,6 +25,14 @@ export const Routes = [
   },
   {
     method: "get",
+    route: "/tree",
+    controller: categoryController,
+    action: "tree",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
     route: "/list/:id",
     controller: categoryController,
     action: "one",
