@@ -12,7 +12,7 @@ const projectDetailCampaignValidation = [
     .withMessage("must be string")
     .notEmpty()
     .withMessage("challenges is required"),
-  body("faq").isString().withMessage("must be string").optional(),
+  // body("faq").isString().withMessage("must be string").optional(),
 ];
 
 module.exports = projectDetailCampaignValidation;

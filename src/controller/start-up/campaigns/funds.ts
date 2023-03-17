@@ -105,9 +105,18 @@ export class fundsController {
   // list basic info
   async list(req: Request, res: Response, next: NextFunction) {
     try {
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
       // find user
-      const user = Jwt.decode(req.cookies.token);
-      delete user.role;
+      const user = Jwt.decode(token);
+      // delete user.role;
       //   find basic info
       const basicCampaigns = await this.fundsRepository
         .createQueryBuilder("campaign")

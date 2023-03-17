@@ -112,10 +112,11 @@ export class Campaigns {
   challenges: string;
 
   @Column({
-    type: "text",
+    type: "json",
     default: null,
+    nullable: true,
   })
-  faq: string;
+  faq!: Array<{ question: string; answer: string }>;
 
   @ManyToOne((type) => Users)
   @JoinColumn({ name: "user_id", referencedColumnName: "id" })
@@ -167,18 +168,21 @@ export class Campaigns {
   @Column({
     type: "float",
     default: null,
+    nullable: true,
   })
   goal_amount: number;
 
   @Column({
     type: "float",
     default: null,
+    nullable: true,
   })
   min_invest: number;
 
   @Column({
     type: "float",
     default: null,
+    nullable: true,
   })
   max_invest: number;
 
@@ -186,6 +190,7 @@ export class Campaigns {
     length: 50,
     type: "varchar",
     default: null,
+    nullable: true,
   })
   deal_size: string;
 
@@ -213,6 +218,7 @@ export class Campaigns {
   @Column({
     type: "float",
     default: null,
+    nullable: true,
   })
   raised_fund: number;
 
