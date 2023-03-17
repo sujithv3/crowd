@@ -29,7 +29,7 @@ export class projectDetailController {
 
       const user = Jwt.decode(token);
       delete user.role;
-
+      console.log(faq)
       // find campaign
 
       const campaigns = await this.projectDetailRepository
@@ -53,7 +53,7 @@ export class projectDetailController {
         .set({
           description,
           challenges,
-          faq,
+          faq: faq ?? [],
         })
         .where("id = :id", { id: id ? id : campaigns.id })
         .execute();

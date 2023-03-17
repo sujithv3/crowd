@@ -112,10 +112,11 @@ export class Campaigns {
   challenges: string;
 
   @Column({
-    type: "text",
+    type: "json",
     default: null,
+    nullable: true,
   })
-  faq: string;
+  faq!: Array<{ question: string; answer: string }>;
 
   @ManyToOne((type) => Users)
   @JoinColumn({ name: "user_id", referencedColumnName: "id" })
@@ -167,6 +168,7 @@ export class Campaigns {
   @Column({
     type: "float",
     default: null,
+    nullable: true,
   })
   goal_amount: number;
 
