@@ -35,15 +35,14 @@ export class CampaignController {
 
       const user = Jwt.decode(token);
 
-      console.log(request.query.limit);
+      console.log(user[0].id);
 
-      const userData = await this.campaignRepository
+      const data = await this.campaignRepository
         .createQueryBuilder("campaign")
         .where(
           `campaign.user = :id AND
          campaign.is_published=:published
-         AND campaign.is_deleted=:is_deleted
-         AND campaign.is_active=:is_active`,
+         AND campaign.is_deleted=:is_deleted`,
           {
             id: user[0].id,
             published: true,
@@ -60,18 +59,9 @@ export class CampaignController {
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.bank_location", "bank_location")
-        .leftJoinAndSelect("campaign.primary_category", "primary_category")
-        .leftJoinAndSelect(
-          "campaign.primary_sub_category",
-          "primary_sub_category"
-        )
         .leftJoinAndSelect("campaign.category", "Category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .leftJoinAndSelect("campaign.team", "Teams")
-        .leftJoinAndSelect("Teams.role", "role")
-        .leftJoinAndSelect("campaign.bank", "BankInfo")
-        .leftJoinAndSelect("BankInfo.bank_location", "location")
-        .getMany();
+        .getRawMany();
 
       const total_count = await this.campaignRepository
         .createQueryBuilder("campaign")
@@ -93,9 +83,10 @@ export class CampaignController {
         true,
         200,
         msg.campaignListSuccess,
-        { total_count, userData }
+        { total_count, data }
       );
     } catch (err) {
+      console.log("err", err);
       return responseMessage.responseWithData(
         false,
         400,
