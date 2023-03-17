@@ -18,6 +18,7 @@ const BankDetail = require("./routes/start-up/campaigns/bank");
 const startupCampaign = require("./routes/start-up/campaigns");
 const Campaign = require("./routes/campaign");
 const Investor = require("./routes/investor");
+const staging = require("./routes/staging");
 const seed = require("./routes/seed");
 
 // mysql database connection initialize
@@ -50,6 +51,7 @@ app.listen(process.env.SERVER_URL, () => {
 app.use("/api/user", user);
 app.use("/api/role", role);
 app.use("/api/category", category);
+app.use("/api/staging", staging);
 app.use("/api/location", location);
 app.use("/api/campaign", Campaign);
 app.use("/api/start-up/campaign/start-up", startUp);

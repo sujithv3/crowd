@@ -175,12 +175,14 @@ export class Campaigns {
   @Column({
     type: "float",
     default: null,
+    nullable: true,
   })
   min_invest: number;
 
   @Column({
     type: "float",
     default: null,
+    nullable: true,
   })
   max_invest: number;
 
@@ -188,6 +190,7 @@ export class Campaigns {
     length: 50,
     type: "varchar",
     default: null,
+    nullable: true,
   })
   deal_size: string;
 
@@ -215,6 +218,7 @@ export class Campaigns {
   @Column({
     type: "float",
     default: null,
+    nullable: true,
   })
   raised_fund: number;
 
