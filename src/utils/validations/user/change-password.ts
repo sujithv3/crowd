@@ -2,7 +2,6 @@ import { body } from "express-validator";
 
 // validations for change password
 const changePasswordValidation = [
-  body("email_id").isEmail().notEmpty().withMessage("email is required"),
   body("old_password").isString().withMessage("old password is required"),
   body("new_password")
     .isString()
