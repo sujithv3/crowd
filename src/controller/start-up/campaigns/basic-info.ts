@@ -94,7 +94,6 @@ export class basicInfoController {
         .set({
           title,
           tag_line,
-
           location,
           tag,
           project_image: req.files.project_image
@@ -165,11 +164,8 @@ export class basicInfoController {
             id: user[0].id,
           }
         )
-        .leftJoinAndSelect(
-          "campaign.primary_sub_category",
-          "primary_sub_category"
-        )
-        .leftJoinAndSelect("campaign.primary_category", "primary_category")
+        .leftJoinAndSelect("campaign.location", "project_location")
+
         .select([
           "campaign.id",
           "campaign.title",
@@ -179,8 +175,7 @@ export class basicInfoController {
           "campaign.project_image",
           "campaign.project_video",
           "campaign.demo_url",
-          "primary_sub_category",
-          "primary_category",
+          "project_location",
         ])
         .getOne();
 

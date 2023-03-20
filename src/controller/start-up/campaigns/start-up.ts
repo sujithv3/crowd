@@ -79,7 +79,7 @@ export class startUpController {
           currency,
           title: "",
           tag_line: "",
-          location: "",
+          location: null,
           tax: 0,
           project_image: "",
           project_video: "",
