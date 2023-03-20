@@ -16,6 +16,14 @@ export const Routes = [
   },
   {
     method: "get",
+    route: "/get/:id",
+    controller: CampaignController,
+    action: "getOne",
+    validationField: "",
+    isLogin: false,
+  },
+  {
+    method: "get",
     route: "/recent",
     controller: CampaignController,
     action: "recent",
