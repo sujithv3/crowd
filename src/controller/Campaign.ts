@@ -306,4 +306,47 @@ export class CampaignController {
       );
     }
   }
+  // campaign detail view
+  async getOne(req: Request, res: Response, next: NextFunction) {
+    const id = parseInt(req.params.id);
+    try {
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .where(
+          `campaign.id = :id 
+       `,
+          {
+            id: id,
+          }
+        )
+        .leftJoinAndSelect("campaign.tax_location", "tax_location")
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .getOne();
+
+      if (!campaign) {
+        return responseMessage.responseWithData(
+          false,
+          400,
+          "campaign not found",
+          campaign
+        );
+      }
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.userListSuccess,
+        campaign
+      );
+    } catch (error) {
+      console.log(error);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userListFailed,
+        error
+      );
+    }
+  }
 }
