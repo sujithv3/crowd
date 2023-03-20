@@ -16,7 +16,7 @@ export class stagingController {
       const categoryData = await this.stagingRepository
         .createQueryBuilder()
         .select(["name", "id"])
-        .where("is_active = 1 AND is_deleted=1")
+        .where("is_active = true AND is_deleted=false")
         .orderBy("name", "ASC")
         .getRawMany();
 

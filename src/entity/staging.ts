@@ -18,10 +18,10 @@ export class Staging {
   })
   name: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ default: new Date() })
   createdDate: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ default: new Date() })
   updatedDate: Date;
 
   @Column("boolean", { default: true })
