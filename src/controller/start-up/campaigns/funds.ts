@@ -22,11 +22,11 @@ export class fundsController {
         max_invest,
         currency,
         deal_size,
-
         start_date,
         end_date,
         duration,
         fund_document,
+        ...NonChangedFiles
       } = req.body;
 
       // get user id
@@ -39,6 +39,27 @@ export class fundsController {
       } else {
         token = req.cookies.token;
       }
+      // get dynamic files
+      const FundFiles: any = req.files.map((e: any) => {
+        return {
+          name: e.fieldname,
+          value: e.location,
+        };
+      });
+
+      for (var prop in NonChangedFiles) {
+        if (NonChangedFiles.hasOwnProperty(prop)) {
+          var innerObj = {};
+          innerObj[prop] = NonChangedFiles[prop];
+          const getKey = Object.keys(innerObj)[0];
+          FundFiles.push({
+            name: getKey,
+            value: innerObj[getKey],
+          });
+        }
+      }
+
+      console.log(FundFiles);
 
       const user = Jwt.decode(token);
       delete user.role;
@@ -78,7 +99,7 @@ export class fundsController {
           max_invest: Number(max_invest),
           currency,
           deal_size,
-
+          files: FundFiles,
           start_date: new Date(start_date),
           end_date: new Date(end_date),
           duration,
@@ -138,6 +159,7 @@ export class fundsController {
           "campaign.end_date",
           "campaign.duration",
           "campaign.fund_document",
+          "campaign.files",
         ])
         .getOne();
 

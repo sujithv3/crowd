@@ -42,8 +42,9 @@ Routes.forEach((route) => {
       : (req: Request, res: Response, next: Function) => {
           return next();
         },
+
     route.fileUpload
-      ? upload.single("fund_document")
+      ? upload.any()
       : (req: Request, res: Response, next: Function) => {
           return next();
         },
