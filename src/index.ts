@@ -20,6 +20,7 @@ const Campaign = require("./routes/campaign");
 const Investor = require("./routes/investor");
 const staging = require("./routes/staging");
 const seed = require("./routes/seed");
+const rmAdmin = require("./routes/relation-mang/rmAdmin");
 
 // mysql database connection initialize
 
@@ -64,3 +65,4 @@ app.use("/api/start-up/campaign/bank", BankDetail);
 app.use("/api/start-up/campaign", startupCampaign);
 app.use("/api/investor", Investor);
 app.use("/api/seed", seed);
+app.use("/api/relation-mang", rmAdmin);
