@@ -11,6 +11,8 @@ import { Campaigns } from "./entity/campaigns";
 import { BankInfo } from "./entity/bankinfo";
 import { Location } from "./entity/locations";
 import { Staging } from "./entity/staging";
+import { rmAdmin } from "./entity/rmAdmin";
+import { rmForgetToken } from "./entity/rmforget-password-token";
 import { MyDeals } from "./entity/mydeals";
 
 export const AppDataSource = new DataSource({
@@ -35,6 +37,8 @@ export const AppDataSource = new DataSource({
     BankInfo,
     Location,
     Staging,
+    rmAdmin,
+    rmForgetToken,
     MyDeals,
   ],
   migrations: ["migration/*.ts"],
