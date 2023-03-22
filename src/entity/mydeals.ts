@@ -19,7 +19,7 @@ export class MyDeals {
   @JoinColumn({ name: "user_id", referencedColumnName: "id" })
   user: Users;
 
-  @ManyToOne((type) => Campaigns)
+  @ManyToOne((type) => Campaigns, (campaign) => campaign.myDeals)
   @JoinColumn({ name: "campaign_id", referencedColumnName: "id" })
   campaign: Campaigns;
 
@@ -39,6 +39,6 @@ export class MyDeals {
   @Column("boolean", { default: true })
   is_active: boolean = true;
 
-  @Column("boolean", { default: true })
+  @Column("boolean", { default: false })
   is_deleted: boolean = false;
 }

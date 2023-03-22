@@ -16,7 +16,7 @@ export const Routes = [
     controller: MydealsController,
     action: "add",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
   {
     method: "post",
@@ -24,15 +24,15 @@ export const Routes = [
     controller: MydealsController,
     action: "remove",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
   {
-    method: "post",
+    method: "get",
     route: "/list",
     controller: MydealsController,
-    action: "remove",
+    action: "list",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
 ];
 

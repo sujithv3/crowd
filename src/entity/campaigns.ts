@@ -16,6 +16,7 @@ import { Location } from "./locations";
 import { Teams } from "./teams";
 import { BankInfo } from "./bankinfo";
 import { Staging } from "./staging";
+import { MyDeals } from "./mydeals";
 
 export enum businessType {
   BUSINESS = "business",
@@ -161,6 +162,9 @@ export class Campaigns {
 
   @OneToMany(() => BankInfo, (bank) => bank.campaign)
   bank: BankInfo[];
+
+  @OneToMany(() => MyDeals, (myDeal) => myDeal.campaign)
+  myDeals: MyDeals[];
 
   @Column({
     type: "float",

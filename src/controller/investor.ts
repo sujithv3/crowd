@@ -416,6 +416,7 @@ export class investorController {
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.category", "Category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.myDeals", "myDeals")
         .getMany();
 
       const total_count = await totalQuery.getCount();

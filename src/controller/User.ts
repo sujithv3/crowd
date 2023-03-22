@@ -44,6 +44,7 @@ export class UserController {
           }
         )
         .getOne();
+      console.log(role_id);
 
       if (user) {
         return responseMessage.responseMessage(
