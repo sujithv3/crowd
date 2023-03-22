@@ -4,19 +4,24 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from "typeorm";
+import { Users } from "./Users";
+import { Campaigns } from "./campaigns";
 
 @Entity()
-export class Staging {
+export class MyDeals {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    length: 100,
-    type: "varchar",
-    unique: true,
-  })
-  name: string;
+  @ManyToOne((type) => Users)
+  @JoinColumn({ name: "user_id", referencedColumnName: "id" })
+  user: Users;
+
+  @ManyToOne((type) => Campaigns)
+  @JoinColumn({ name: "campaign_id", referencedColumnName: "id" })
+  campaign: Campaigns;
 
   @CreateDateColumn({
     type: "timestamp",
