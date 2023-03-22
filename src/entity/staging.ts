@@ -18,6 +18,7 @@ export class Staging {
   })
   name: string;
 
+<<<<<<< HEAD
   @CreateDateColumn({
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP(6)",
@@ -29,6 +30,12 @@ export class Staging {
     default: () => "CURRENT_TIMESTAMP(6)",
     onUpdate: "CURRENT_TIMESTAMP(6)",
   })
+=======
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+>>>>>>> 564a1957db0db8f279ab8a9bc098c0b6753b61c0
   updatedDate: Date;
 
   @Column("boolean", { default: true })
