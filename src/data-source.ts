@@ -13,6 +13,7 @@ import { Location } from "./entity/locations";
 import { Staging } from "./entity/staging";
 import { rmAdmin } from "./entity/rmAdmin";
 import { rmForgetToken } from "./entity/rmforget-password-token";
+import { MyDeals } from "./entity/mydeals";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -21,7 +22,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DATABASE_USER_NAME,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
-  logging: true,
+  logging: false,
   synchronize: true,
   dropSchema: false,
   entities: [
@@ -37,7 +38,8 @@ export const AppDataSource = new DataSource({
     Location,
     Staging,
     rmAdmin,
-    rmForgetToken
+    rmForgetToken,
+    MyDeals,
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],

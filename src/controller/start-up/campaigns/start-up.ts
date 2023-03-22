@@ -22,6 +22,7 @@ export class startUpController {
         business_type,
         tax_location,
         bank_location,
+        staging,
         currency,
       } = req.body;
 
@@ -40,7 +41,7 @@ export class startUpController {
       delete user.role;
 
       // find campaign start up
-
+      console.log(user[0].id);
       const campaigns = await this.startUpRepository
         .createQueryBuilder()
         .where("user_id=:id AND is_active=true AND is_published=false", {
@@ -58,6 +59,7 @@ export class startUpController {
             business_type,
             user: user[0].id,
             tax_location,
+            staging,
             bank_location,
             currency,
           })
@@ -79,7 +81,7 @@ export class startUpController {
           currency,
           title: "",
           tag_line: "",
-          location: "",
+          location: null,
           tax: 0,
           project_image: "",
           project_video: "",
@@ -93,6 +95,7 @@ export class startUpController {
           fund: null,
           goal_amount: null,
           min_invest: null,
+          staging,
           max_invest: null,
           deal_size: "",
           raised_fund: null,
@@ -151,6 +154,7 @@ export class startUpController {
         .leftJoinAndSelect("campaign.bank_location", "bank_location")
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.staging", "staging")
         .select([
           "campaign.id",
           "campaign.currency",
@@ -159,6 +163,7 @@ export class startUpController {
           "bank_location",
           "category",
           "subcategory",
+          "staging",
         ])
         .getOne();
 

@@ -51,12 +51,9 @@ export class Campaigns {
   })
   tag_line: string;
 
-  @Column({
-    length: 100,
-    type: "varchar",
-    default: null,
-  })
-  location: string;
+  @ManyToOne(() => Location, (user) => user.id)
+  @JoinColumn({ name: "project_location_id", referencedColumnName: "id" })
+  location: Location;
 
   @Column({
     length: 100,

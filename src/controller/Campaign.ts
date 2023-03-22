@@ -61,6 +61,7 @@ export class CampaignController {
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
         .getRawMany();
 
       const raising = await this.campaignRepository
@@ -84,6 +85,7 @@ export class CampaignController {
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
         .getRawMany();
 
       const closingsoon = await this.campaignRepository
@@ -106,6 +108,7 @@ export class CampaignController {
         .skip(0)
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.location", "location")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .getRawMany();
 
@@ -129,6 +132,7 @@ export class CampaignController {
         .skip(0)
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.location", "location")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .getRawMany();
 
@@ -180,6 +184,7 @@ export class CampaignController {
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
         .getRawMany();
 
       const raising = await this.campaignRepository
@@ -201,6 +206,7 @@ export class CampaignController {
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
         .getRawMany();
 
       const closingsoon = await this.campaignRepository
@@ -222,6 +228,7 @@ export class CampaignController {
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
         .getRawMany();
 
       const funded = await this.campaignRepository
@@ -243,6 +250,7 @@ export class CampaignController {
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
         .getRawMany();
 
       const data = {
@@ -274,21 +282,16 @@ export class CampaignController {
         .createQueryBuilder("campaign")
         .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
         .where(
-          `campaign.is_published=:published
-         AND campaign.is_deleted=:is_deleted
-         AND campaign.is_active=:is_active
-         
-         `,
-          {
-            published: true,
-            is_deleted: false,
-            is_active: true,
-          }
+          `campaign.is_published=1
+         AND campaign.is_deleted=0
+         AND campaign.is_active=1
+         `
         )
         .skip(0)
         .take(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
         .getRawMany();
 
       return responseMessage.responseWithData(
@@ -322,6 +325,7 @@ export class CampaignController {
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
         .getOne();
 
       if (!campaign) {

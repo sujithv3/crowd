@@ -1,35 +1,38 @@
-// created by : vijay
-// purpose route for funds api
-
-const {
-  fundsController,
-} = require("../../../controller/start-up/campaigns/funds");
+/**
+ * Created By Muthu
+ * routers will be blocked after moved the seed
+ */
+const { MydealsController } = require("../controller/mydeals");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
-const validationResult = require("../../../utils/validations/validation-error");
-const fundsCampaignValidation = require("../../../utils/validations/campaigns/funds");
-const JWT = require("../../../utils/jsonwebtoken");
-const { upload } = require("../../../utils/file-upload");
+const validationResult = require("../utils/validations/validation-error");
+const JWT = require("../utils/jsonwebtoken");
 
 export const Routes = [
   {
     method: "post",
-    route: "/create",
-    controller: fundsController,
-    action: "create",
-    validationField: fundsCampaignValidation,
-    isLogin: true,
-    fileUpload: true,
+    route: "/add",
+    controller: MydealsController,
+    action: "add",
+    validationField: "",
+    isLogin: false,
   },
   {
-    method: "get",
-    route: "/list",
-    controller: fundsController,
-    action: "list",
+    method: "post",
+    route: "/remove",
+    controller: MydealsController,
+    action: "remove",
     validationField: "",
-    isLogin: true,
-    fileUpload: false,
+    isLogin: false,
+  },
+  {
+    method: "post",
+    route: "/list",
+    controller: MydealsController,
+    action: "remove",
+    validationField: "",
+    isLogin: false,
   },
 ];
 
@@ -39,12 +42,6 @@ Routes.forEach((route) => {
     route.route,
     route.isLogin
       ? JWT.verify
-      : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
-
-    route.fileUpload
-      ? upload.any()
       : (req: Request, res: Response, next: Function) => {
           return next();
         },

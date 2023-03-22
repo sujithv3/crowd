@@ -59,6 +59,7 @@ export class CampaignController {
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.bank_location", "bank_location")
+        .leftJoinAndSelect("campaign.location", "location")
         .leftJoinAndSelect("campaign.category", "Category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .getRawMany();
@@ -112,6 +113,7 @@ export class CampaignController {
 
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.bank_location", "bank_location")
+        .leftJoinAndSelect("campaign.location", "location")
         .leftJoinAndSelect("campaign.primary_category", "primary_category")
         .leftJoinAndSelect(
           "campaign.primary_sub_category",
