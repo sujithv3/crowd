@@ -301,18 +301,22 @@ export class UserController {
       let profile_image = profile;
       let company_image = company_logo;
 
-      const FundFiles: any = request.files.map((e: any) => {
-        if (e.fieldname === "profile") {
-          profile_image = e.location;
-        } else if (e.fieldname === "company_logo") {
-          company_image = e.location;
-        } else {
+      const FundFiles: any = request.files
+        .filter((e: any) => {
+          if (e.fieldname === "profile") {
+            profile_image = e.location;
+          } else if (e.fieldname === "company_logo") {
+            company_image = e.location;
+          } else {
+            return e;
+          }
+        })
+        .map((e: any) => {
           return {
             name: e.fieldname,
             value: e.location,
           };
-        }
-      });
+        });
 
       for (var prop in NonChangedFiles) {
         if (NonChangedFiles.hasOwnProperty(prop)) {
@@ -334,6 +338,7 @@ export class UserController {
         .where("id=:id", { id: user[0].id })
         .getOne();
 
+      console.log(FundFiles);
       // delete s3 image
 
       if (getProfile.profile) {
