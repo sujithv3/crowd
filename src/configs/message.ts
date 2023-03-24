@@ -63,8 +63,10 @@ module.exports = {
 
   // campaigns
   campaignListSuccess: "campaign list successfully",
+  campaignDeleteSuccess: "campaign Deleted successfully",
   campaignNotFound: "campaign Not Found",
   campaignListFailed: "campaign list Failed",
+  campaignDeleteFailed: "campaign Delete Failed",
   createStartCampaignFirst: "Create Start Campaign First",
 
   // start up for start up campaign

@@ -25,6 +25,14 @@ export const Routes = [
     validationField: "",
     isLogin: false,
   },
+  {
+    method: "delete",
+    route: "/delete/:id",
+    controller: CampaignController,
+    action: "delete",
+    validationField: "",
+    isLogin: true,
+  },
 ];
 
 // function routes
