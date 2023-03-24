@@ -150,4 +150,76 @@ export class CampaignController {
       );
     }
   }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    const id = parseInt(req.params.id);
+    let token: any;
+    if (
+      typeof req.cookies.token === "undefined" ||
+      req.cookies.token === null
+    ) {
+      token = req.headers.authorization.slice(7);
+    } else {
+      token = req.cookies.token;
+    }
+    const user = Jwt.decode(token);
+
+    console.log("userId", user[0].id);
+
+    try {
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .where(
+          `campaign.id = :id AND
+          campaign.user_id = :userid AND
+          campaign.is_deleted = 0
+       `,
+          {
+            id: id,
+            userid: user[0].id,
+          }
+        )
+        .getOne();
+
+      console.log("campaign", campaign);
+
+      if (!campaign) {
+        return responseMessage.responseWithData(
+          false,
+          400,
+          "campaign not found",
+          campaign
+        );
+      } else {
+        await this.campaignRepository
+          .createQueryBuilder("campaign")
+          .update(Campaigns)
+          .set({
+            is_deleted: true,
+          })
+          .where(
+            `id = :id 
+       `,
+            {
+              id: campaign.id,
+            }
+          )
+          .execute();
+      }
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.campaignDeleteSuccess
+      );
+    } catch (error) {
+      console.log(error);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.campaignDeleteFailed,
+        error
+      );
+    }
+  }
 }
