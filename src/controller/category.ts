@@ -15,13 +15,16 @@ export class categoryController {
 
   async all(request: Request, response: Response, next: NextFunction) {
     try {
-      const categoryData = await this.categoryRepository.find({
-        where: {
-          is_active: true,
-          is_deleted: false,
-        },
-      });
+      const categoryQueryBuilder = await this.categoryRepository
+        .createQueryBuilder()
+        .where("is_active=true AND is_deleted=false");
 
+      if (request.query.category_only) {
+        categoryQueryBuilder.andWhere(` ( parent_id=0)`, {
+          category: request.query.category,
+        });
+      }
+      const categoryData = await categoryQueryBuilder.getMany();
       //   check category exist
       if (categoryData.length === 0) {
         return responseMessage.responseMessage(
