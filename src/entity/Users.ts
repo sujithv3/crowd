@@ -12,6 +12,8 @@ import {
 import { Roles } from "./roles";
 import { Location } from "./locations";
 
+type FILE_LIST = { name: number; value: any }[];
+
 @Entity()
 export class Users {
   @PrimaryGeneratedColumn()
@@ -20,6 +22,9 @@ export class Users {
   @ManyToOne((type) => Roles)
   @JoinColumn({ name: "role_id", referencedColumnName: "id" })
   role: Roles;
+
+  @Column({ type: "json", default: [] })
+  files: FILE_LIST;
 
   @Column({
     length: 100,

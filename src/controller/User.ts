@@ -64,6 +64,7 @@ export class UserController {
         password: encrypt_password,
         deactivate_reason,
         role: role_id,
+        files: [],
         is_active,
         created_date: new Date(),
         updated_date: new Date(),
@@ -283,6 +284,7 @@ export class UserController {
         you_tube,
         website,
         extra_links = [],
+        ...NonChangedFiles
       } = request.body;
 
       // get user
@@ -296,8 +298,36 @@ export class UserController {
       } else {
         token = request.cookies.token;
       }
+      let profile_image = profile;
+      let company_image = company_logo;
+
+      const FundFiles: any = request.files.map((e: any) => {
+        if (e.fieldname === "profile") {
+          profile_image = e.location;
+        } else if (e.fieldname === "company_logo") {
+          company_image = e.location;
+        } else {
+          return {
+            name: e.fieldname,
+            value: e.location,
+          };
+        }
+      });
+
+      for (var prop in NonChangedFiles) {
+        if (NonChangedFiles.hasOwnProperty(prop)) {
+          var innerObj = {};
+          innerObj[prop] = NonChangedFiles[prop];
+          const getKey = Object.keys(innerObj)[0];
+          FundFiles.push({
+            name: getKey,
+            value: innerObj[getKey],
+          });
+        }
+      }
 
       const user = Jwt.decode(token);
+      console.log(user[0].id);
 
       const getProfile = await this.userRepository
         .createQueryBuilder()
@@ -328,13 +358,10 @@ export class UserController {
         .set({
           first_name,
           last_name,
-          profile: request.files.profile
-            ? request.files.profile[0].location
-            : profile,
+          profile: profile_image,
           contact_number,
-          company_logo: request.files.company_logo
-            ? request.files.company_logo[0].location
-            : company_logo,
+          company_logo: company_image,
+          files: FundFiles,
           street_name,
           country,
           code,

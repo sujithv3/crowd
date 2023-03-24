@@ -187,10 +187,7 @@ Routes.forEach((route) => {
           return next();
         },
     route.fileUpload
-      ? upload.fields([
-          { name: "profile", maxCount: 1 },
-          { name: "company_logo", maxCount: 1 },
-        ])
+      ? upload.any()
       : (req: Request, res: Response, next: Function) => {
           return next();
         },

@@ -23,7 +23,7 @@ export enum businessType {
   INDIVIDUAL = "individual",
 }
 
-type FILE_LIST = { name: number; type: string; url: string }[];
+type FILE_LIST = { name: number; value: any }[];
 
 @Entity()
 export class Campaigns {
