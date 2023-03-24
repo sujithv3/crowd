@@ -23,7 +23,7 @@ export class Users {
   @JoinColumn({ name: "role_id", referencedColumnName: "id" })
   role: Roles;
 
-  @Column({ type: "json", default: [] })
+  @Column({ type: "json", nullable: true, default: null })
   files: FILE_LIST;
 
   @Column({
