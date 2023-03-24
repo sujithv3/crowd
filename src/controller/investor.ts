@@ -160,6 +160,21 @@ export class investorController {
         }
       });
       let dealSizeData = await queryBuild.getRawOne();
+      const deals = [];
+
+      for (let i in dealSizeData) {
+        const val = dealSizeData[i];
+        if (val === "1") {
+          const arr = i.split("-");
+          if (arr[1] === "null") {
+            deals.push({ id: i, name: arr[0] + " USD+" });
+          } else if (arr[0] === "0") {
+            deals.push({ id: i, name: "0 - " + arr[1] + " USD+" });
+          } else
+            deals.push({ id: i, name: arr[0] + " USD - " + arr[1] + " USD" });
+        }
+      }
+
       queryBuild = this.manager.createQueryBuilder().fromDummy();
       queryBuild.addSelect(
         `EXISTS(SELECT NULL FROM campaigns where is_active=1 AND is_deleted=0 AND is_featured=1 LIMIT 1) as 'featured'`
@@ -167,14 +182,28 @@ export class investorController {
       queryBuild.addSelect(
         `EXISTS(SELECT NULL FROM campaigns where is_active=1 AND is_deleted=0 AND raised_fund >= goal_amount LIMIT 1) as 'funded'`
       );
+
       let sortByData = await queryBuild.getRawOne();
+      const sort = [];
+
+      for (let i in sortByData) {
+        const val = sortByData[i];
+        if (val === "1") {
+          if (i === "featured") {
+            sort.push({ id: "featured", name: "Featured Deals" });
+          }
+          if (i === "funded") {
+            sort.push({ id: "funded", name: "Successfully Funded Deals" });
+          }
+        }
+      }
 
       const data = {
         category: categoryTre,
         location: locationTree,
         stages: stages,
-        dealSize: dealSizeData,
-        sortby: sortByData,
+        dealSize: deals,
+        sortby: sort,
       };
 
       return responseMessage.responseWithData(
@@ -298,17 +327,17 @@ export class investorController {
       let queryBuild = this.manager.createQueryBuilder().fromDummy();
 
       dealSize.forEach((item) => {
-        if (item.min && item.max) {
+        if ((item.min || item.min === 0) && item.max) {
           queryBuild.addSelect(
             `EXISTS(SELECT NULL FROM campaigns where is_active=1 AND is_deleted=0 AND goal_amount BETWEEN ${item.min} AND ${item.max} LIMIT 1) as '${item.min}-${item.max}'`
           );
         }
 
-        if (item.min === 0) {
-          queryBuild.addSelect(
-            `EXISTS(SELECT NULL FROM campaigns where is_active=1 AND is_deleted=0 AND goal_amount >= ${item.max} LIMIT 1) as '${item.min}-${item.max}'`
-          );
-        }
+        // if (item.min === 0) {
+        //   queryBuild.addSelect(
+        //     `EXISTS(SELECT NULL FROM campaigns where is_active=1 AND is_deleted=0 AND goal_amount >= ${item.max} LIMIT 1) as '${item.min}-${item.max}'`
+        //   );
+        // }
 
         if (item.min && item.max === null) {
           queryBuild.addSelect(
