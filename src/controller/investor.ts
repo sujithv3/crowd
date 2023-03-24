@@ -379,6 +379,17 @@ export class investorController {
 
   async deals(request: Request, response: Response, next: NextFunction) {
     try {
+      // get user id
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+      const user = Jwt.decode(token);
       const campaignQueryBuilder = this.campaignRepository
         .createQueryBuilder("campaign")
         .where(
@@ -445,7 +456,15 @@ export class investorController {
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.category", "Category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .leftJoinAndSelect("campaign.myDeals", "myDeals")
+        .leftJoinAndSelect(
+          "campaign.myDeals",
+          "myDeals",
+          "myDeals.user_id=:id AND campaign_id=campaign.id",
+          {
+            id: user[0].id,
+          }
+        )
+
         .getMany();
 
       const total_count = await totalQuery.getCount();
