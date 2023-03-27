@@ -14,6 +14,8 @@ import { Staging } from "./entity/staging";
 import { rmAdmin } from "./entity/rmAdmin";
 import { rmForgetToken } from "./entity/rmforget-password-token";
 import { MyDeals } from "./entity/mydeals";
+import { Meeting } from "./entity/meeting";
+import { Tagged } from "./entity/tagged";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -40,6 +42,8 @@ export const AppDataSource = new DataSource({
     rmAdmin,
     rmForgetToken,
     MyDeals,
+    Meeting,
+    Tagged,
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],
