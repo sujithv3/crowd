@@ -114,4 +114,17 @@ module.exports = {
   banksCampaignListFailed: "bank list Failed",
   banksCampaignNotFound: "Campaign Not Found",
   completeAllStartUpModule: "complete all start up module",
+
+  // my deals
+  createMyDeals: "Create my deals success",
+  createMyDealFail: "Create my deals failed",
+  RemoveMyDealSuccess: "Removed my deals success",
+  RemoveMyDealFail: "Removed my deals failed",
+  ListMyDealSuccess: "List my deals success",
+  ListMyDealFail: "List my deals failed",
+
+  // admin
+  // dashboard
+  listDashboard: "successfully listed",
+  listDashboardFailed: "dashboard list failed",
 };

@@ -41,16 +41,12 @@ export class MydealsController {
         })
         .orIgnore()
         .execute();
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.categoryListSuccess
-      );
+      return responseMessage.responseWithData(true, 200, msg.createMyDeals);
     } catch (err) {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.categoryListFailed,
+        msg.createMyDealFail,
         err
       );
     }
@@ -73,13 +69,13 @@ export class MydealsController {
       return responseMessage.responseWithData(
         true,
         200,
-        msg.categoryListSuccess
+        msg.RemoveMyDealSuccess
       );
     } catch (err) {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.categoryListFailed,
+        msg.RemoveMyDealFail,
         err
       );
     }
@@ -111,7 +107,7 @@ export class MydealsController {
       return responseMessage.responseWithData(
         true,
         200,
-        msg.categoryListSuccess,
+        msg.listDashboard,
         campaign
       );
     } catch (err) {
@@ -120,7 +116,7 @@ export class MydealsController {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.categoryListFailed,
+        msg.listDashboardFailed,
         err
       );
     }

@@ -22,6 +22,7 @@ const staging = require("./routes/staging");
 const seed = require("./routes/seed");
 const rmAdmin = require("./routes/relation-mang/rmAdmin");
 const mydeals = require("./routes/mydeals");
+const dashBoard = require("./routes/admin/dashboard");
 
 // mysql database connection initialize
 
@@ -68,3 +69,4 @@ app.use("/api/investor", Investor);
 app.use("/api/seed", seed);
 app.use("/api/relation-mang", rmAdmin);
 app.use("/api/mydeals", mydeals);
+app.use("/api/admin", dashBoard);
