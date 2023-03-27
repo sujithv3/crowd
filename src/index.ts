@@ -21,6 +21,7 @@ const Investor = require("./routes/investor");
 const staging = require("./routes/staging");
 const seed = require("./routes/seed");
 const rmAdmin = require("./routes/relation-mang/rmAdmin");
+const rmTagged = require("./routes/relation-mang/tagged");
 const mydeals = require("./routes/mydeals");
 const dashBoard = require("./routes/admin/dashboard");
 
@@ -66,7 +67,8 @@ app.use("/api/start-up/campaign/payment-verification", PaymentVerification);
 app.use("/api/start-up/campaign/bank", BankDetail);
 app.use("/api/start-up/campaign", startupCampaign);
 app.use("/api/investor", Investor);
-app.use("/api/seed", seed);
+app.use("/api/relation-mang/tagged", rmTagged);
 app.use("/api/relation-mang", rmAdmin);
+app.use("/api/seed", seed);
 app.use("/api/mydeals", mydeals);
 app.use("/api/admin", dashBoard);
