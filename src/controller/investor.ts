@@ -403,6 +403,15 @@ export class investorController {
           }
         );
 
+      if (request.query.search) {
+        campaignQueryBuilder.andWhere(
+          ` (campaign.title LIKE :search OR campaign.description LIKE :search OR campaign.tag_line LIKE :search OR campaign.tag LIKE :search)`,
+          {
+            search: "%" + request.query.search + "%",
+          }
+        );
+      }
+
       if (request.query.category) {
         campaignQueryBuilder.andWhere(
           ` (campaign.category_id=:category OR campaign.sub_category_id=:category)`,
