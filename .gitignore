@@ -4,4 +4,8 @@ node_modules/
 build/
 tmp/
 temp/
+<<<<<<< HEAD
 # src/data-source.ts
+=======
+src/data-source.ts
+>>>>>>> 44c145c257f452ac8adb73dc67103a05572d07ef
