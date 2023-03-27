@@ -11,11 +11,24 @@ import {
 } from "typeorm";
 import { Roles } from "./roles";
 import { Location } from "./locations";
+import { Tagged } from "./tagged";
+
+type FILE_LIST = any[];
 
 @Entity()
 export class rmAdmin {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ManyToOne((type) => Roles)
+  @JoinColumn({ name: "role_id", referencedColumnName: "id" })
+  role: Roles;
+
+  @Column({
+    length: 100,
+    type: "varchar",
+  })
+  profile_id: string;
 
   @Column({
     length: 100,
@@ -52,20 +65,6 @@ export class rmAdmin {
   @Column({
     length: 250,
     type: "varchar",
-    nullable: true,
-  })
-  company_logo: string;
-
-  @Column({
-    length: 250,
-    type: "varchar",
-    nullable: true,
-  })
-  street_name: string;
-
-  @Column({
-    length: 250,
-    type: "varchar",
     default: null,
     nullable: true,
   })
@@ -83,62 +82,7 @@ export class rmAdmin {
     type: "varchar",
     nullable: true,
   })
-  code: string;
-
-  @Column({
-    length: 250,
-    type: "varchar",
-    nullable: true,
-  })
-  description: string;
-
-  @Column({
-    length: 2000,
-    type: "varchar",
-    nullable: true,
-  })
-  summary: string;
-
-  @Column({
-    length: 250,
-    type: "varchar",
-    nullable: true,
-  })
-  linked_in: string;
-
-  @Column({
-    length: 250,
-    type: "varchar",
-    nullable: true,
-  })
-  facebook: string;
-
-  @Column({
-    length: 250,
-    type: "varchar",
-    nullable: true,
-  })
-  twitter: string;
-
-  @Column({
-    length: 250,
-    type: "varchar",
-    nullable: true,
-  })
-  you_tube: string;
-
-  @Column({
-    length: 250,
-    type: "varchar",
-    nullable: true,
-  })
-  website: string;
-
-  @Column({
-    type: "json",
-    default: null,
-  })
-  extra_links!: Array<{ name: string; url: string }>;
+  state: string;
 
   @Column({
     length: 100,
@@ -153,15 +97,14 @@ export class rmAdmin {
   })
   email_otp: string;
 
-  @Column({
-    length: 100,
-    type: "varchar",
-    nullable: true,
-  })
-  deactivate_reason: string;
+  @OneToMany(() => Tagged, (Tagged) => Tagged.RelationManager)
+  tagged: Tagged[];
 
   @CreateDateColumn()
   created_date: Date;
+
+  @Column({ type: "json", nullable: true, default: null })
+  sector: FILE_LIST;
 
   @UpdateDateColumn()
   updated_date: Date;
