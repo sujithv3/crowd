@@ -25,8 +25,11 @@ export class UserController {
         profile,
         contact_number,
         password,
-        deactivate_reason,
+        sector,
         role_id,
+        country,
+        state,
+        city,
         is_active = true,
       } = request.body;
 
@@ -58,12 +61,14 @@ export class UserController {
         profile,
         contact_number,
         password: encrypt_password,
-        deactivate_reason,
         role: role_id,
         is_active,
+        country,
+        state,
+        city,
+        sector: sector ? sector : [],
         created_date: new Date(),
         updated_date: new Date(),
-        extra_links: [],
       });
       // console.log(users);
       const token = await this.forgetTokenRepository.save({
@@ -188,7 +193,7 @@ export class UserController {
     const id = parseInt(request.params.id);
     try {
       const user = await this.userRepository.findOne({
-        where: { id, is_active: true }
+        where: { id, is_active: true },
       });
       if (!user) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
@@ -261,23 +266,13 @@ export class UserController {
         last_name,
         profile,
         contact_number,
-        code,
         city,
         email_id,
-        company_logo,
-        street_name,
         country,
-        description,
-        summary,
-        linked_in,
-        facebook,
-        twitter,
-        you_tube,
-        website,
-        extra_links = [],
+        state,
       } = request.body;
 
-      console.log('data from signup', request.body);
+      console.log("data from signup", request.body);
 
       // get user
 
@@ -307,13 +302,6 @@ export class UserController {
           await deleteS3BucketValues(key);
         }
       }
-      if (getProfile.company_logo) {
-        if (request.files.company_logo) {
-          const getKey = getProfile.company_logo.split("/");
-          const key = getKey[getKey.length - 1];
-          await deleteS3BucketValues(key);
-        }
-      }
 
       // update user
       await this.userRepository
@@ -326,22 +314,10 @@ export class UserController {
             ? request.files.profile[0].location
             : profile,
           contact_number,
-          company_logo: request.files.company_logo
-            ? request.files.company_logo[0].location
-            : company_logo,
-          street_name,
           country,
-          code,
           city,
+          state,
           email_id,
-          description,
-          summary,
-          linked_in: linked_in ?? null,
-          facebook: facebook ?? null,
-          twitter: twitter ?? null,
-          you_tube: you_tube ?? null,
-          website: website ?? null,
-          extra_links: extra_links ? JSON.parse(extra_links) : [],
           updated_date: new Date(),
           is_verify: true,
         })
@@ -381,8 +357,8 @@ export class UserController {
 
   //   login user
   async login(request: Request, response: Response, next: NextFunction) {
-    const { email, password} = request.body;
-    console.log('this is from relationship');
+    const { email, password } = request.body;
+    console.log("this is from relationship");
     console.log(email, password);
     // find user
 
@@ -511,7 +487,7 @@ export class UserController {
   ) {
     try {
       const { email_id } = request.body;
-      console.log('this is from relation forgot');
+      console.log("this is from relation forgot");
       console.log(email_id);
       // find user
 
@@ -580,7 +556,7 @@ export class UserController {
     const verify_token = request.params.token;
     const { password } = request.body;
 
-    console.log(id,verify_token, password);
+    console.log(id, verify_token, password);
 
     // find user
     let user = await this.userRepository.findOneBy({
@@ -640,40 +616,39 @@ export class UserController {
   }
 
   // setting
-  async setting(req: Request, res: Response) {
-    try {
-      let token: any;
-      if (
-        typeof req.cookies.token === "undefined" ||
-        req.cookies.token === null
-      ) {
-        token = req.headers.authorization.slice(7);
-      } else {
-        token = req.cookies.token;
-      }
-      const user = Jwt.decode(token);
+  // async setting(req: Request, res: Response) {
+  //   try {
+  //     let token: any;
+  //     if (
+  //       typeof req.cookies.token === "undefined" ||
+  //       req.cookies.token === null
+  //     ) {
+  //       token = req.headers.authorization.slice(7);
+  //     } else {
+  //       token = req.cookies.token;
+  //     }
+  //     const user = Jwt.decode(token);
 
-      const { is_active, is_deleted, reason } = req.body;
+  //     const { is_active, is_deleted, reason } = req.body;
 
-      await this.userRepository
-        .createQueryBuilder()
-        .update(rmAdmin)
-        .set({
-          is_active,
-          is_deleted,
-          deactivate_reason: reason,
-        })
-        .where("id=:id", { id: user[0].id })
-        .execute();
-      return responseMessage.responseMessage(true, 200, msg.userUpdateSuccess);
-    } catch (err) {
-      console.log(err);
-      return responseMessage.responseWithData(
-        false,
-        400,
-        msg.userUpdateFailed,
-        err
-      );
-    }
-  }
+  //     await this.userRepository
+  //       .createQueryBuilder()
+  //       .update(rmAdmin)
+  //       .set({
+  //         is_active,
+  //         is_deleted,
+  //       })
+  //       .where("id=:id", { id: user[0].id })
+  //       .execute();
+  //     return responseMessage.responseMessage(true, 200, msg.userUpdateSuccess);
+  //   } catch (err) {
+  //     console.log(err);
+  //     return responseMessage.responseWithData(
+  //       false,
+  //       400,
+  //       msg.userUpdateFailed,
+  //       err
+  //     );
+  //   }
+  // }
 }

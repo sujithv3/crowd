@@ -8,7 +8,7 @@ import {
   JoinColumn,
 } from "typeorm";
 import { Users } from "./Users";
-import { Campaigns } from "./campaigns";
+import { rmAdmin } from "./rmAdmin";
 
 @Entity()
 export class Tagged {
@@ -16,23 +16,22 @@ export class Tagged {
   id: number;
 
   @ManyToOne((type) => Users)
-  @JoinColumn({ name: "user_id", referencedColumnName: "id" })
-  user: Users;
+  @JoinColumn({ name: "start_up_id", referencedColumnName: "id" })
+  StartUp: Users;
 
-  @ManyToOne((type) => Campaigns, (campaign) => campaign.myDeals)
-  @JoinColumn({ name: "campaign_id", referencedColumnName: "id" })
-  campaign: Campaigns;
+  @ManyToOne((type) => rmAdmin, (campaign) => campaign.tagged)
+  @JoinColumn({ name: "rm_id", referencedColumnName: "id" })
+  RelationManager: rmAdmin;
 
   @CreateDateColumn({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP(6)",
+    type: "date",
+    default: new Date(),
   })
   createdDate: Date;
 
   @UpdateDateColumn({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP(6)",
-    onUpdate: "CURRENT_TIMESTAMP(6)",
+    type: "date",
+    default: new Date(),
   })
   updatedDate: Date;
 
