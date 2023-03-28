@@ -1,7 +1,7 @@
 import { AppDataSource } from "../../data-source";
 import { NextFunction, Request, Response } from "express";
 // import { rmAdmin } from "../../entity/rmAdmin";
-// import { Tagged } from "../../entity/tagged";
+import { Tagged } from "../../entity/tagged";
 import { Campaigns } from "../../entity/campaigns";
 const { genToken } = require("../../utils/jsonwebtoken");
 const responseMessage = require("../../configs/response");
@@ -12,7 +12,7 @@ const sendEmail = require("../../utils/nodemailer/email");
 
 export class TaggedController {
   //   private userRepository = AppDataSource.getRepository(rmAdmin);
-  //   private taggedRepository = AppDataSource.getRepository(Tagged);
+  private taggedRepository = AppDataSource.getRepository(Tagged);
   private campaignRepository = AppDataSource.getRepository(Campaigns);
 
   //   list all users
@@ -29,16 +29,15 @@ export class TaggedController {
       }
 
       const user = Jwt.decode(token);
+      console.log("user", user);
 
-      const campaign = await this.campaignRepository
-        .createQueryBuilder("campaign")
-        .innerJoinAndSelect("campaign.tagged", "myDeals")
-        .where("tagged.user_id = :id AND tagged.is_active=true", {
+      const campaign = await this.taggedRepository
+        .createQueryBuilder("tagged")
+        .innerJoinAndSelect("tagged.StartUp", "startup")
+        .innerJoin("tagged.RelationManager", "relationManager")
+        .where("relationManager.id = :id AND tagged.is_active=true", {
           id: user[0].id,
         })
-        .leftJoinAndSelect("campaign.category", "category")
-        .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .loadRelationCountAndMap("campaign.fund", "campaign.fund")
         .getMany();
 
       if (campaign.length === 0) {
