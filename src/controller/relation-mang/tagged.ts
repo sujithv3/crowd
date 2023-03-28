@@ -64,6 +64,55 @@ export class TaggedController {
     }
   }
 
+  async funded(request: Request, response: Response, next: NextFunction) {
+    try {
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
+
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .innerJoinAndSelect("campaign.user", "user")
+        .innerJoin("user.tagged", "tagged")
+        .loadRelationCountAndMap("campaign.fund", "campaign.fund")
+        .innerJoin("tagged.RelationManager", "relationManager")
+        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+          id: user[0].id,
+        })
+        .getMany();
+
+      if (campaign.length === 0) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.campaignListFailed
+        );
+      }
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.campaignListSuccess,
+        campaign
+      );
+    } catch (err) {
+      console.log(err);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userListFailed,
+        err
+      );
+    }
+  }
+
   //   list one users
   async one(request: Request, response: Response, next: NextFunction) {
     const id = parseInt(request.params.id);
