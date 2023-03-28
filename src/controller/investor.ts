@@ -14,18 +14,18 @@ const msg = require("../configs/message");
 const dealSize = [
   {
     min: 0,
-    max: 1000,
+    max: 100000,
   },
   {
-    min: 1000,
-    max: 2000,
+    min: 100000,
+    max: 500000,
   },
   {
-    min: 2000,
-    max: 5000,
+    min: 500000,
+    max: 2000000,
   },
   {
-    min: 5000,
+    min: 200000,
     max: null,
   },
 ];
@@ -186,17 +186,21 @@ export class investorController {
       let sortByData = await queryBuild.getRawOne();
       const sort = [];
 
-      for (let i in sortByData) {
-        const val = sortByData[i];
-        if (val === "1") {
-          if (i === "featured") {
-            sort.push({ id: "featured", name: "Featured Deals" });
-          }
-          if (i === "funded") {
-            sort.push({ id: "funded", name: "Successfully Funded Deals" });
-          }
-        }
-      }
+      // for (let i in sortByData) {
+      //   const val = sortByData[i];
+      //   if (val === "1") {
+      //     if (i === "featured") {
+      //       sort.push({ id: "featured", name: "Featured Deals" });
+      //     }
+      //     if (i === "funded") {
+      //       sort.push({ id: "funded", name: "Successfully Funded Deals" });
+      //     }
+      //   }
+      // }
+      sort.push({ id: "funded", name: "Successfully Funded Deals" });
+      sort.push({ id: "comingsoon", name: "Closing soon Deals" });
+      sort.push({ id: "featured", name: "Featured Deals" });
+      sort.push({ id: "raising", name: "Raising Fund Deals" });
 
       const data = {
         category: categoryTre,
