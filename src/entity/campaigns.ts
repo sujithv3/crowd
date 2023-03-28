@@ -248,7 +248,7 @@ export class Campaigns {
   @Column({
     length: 50,
     type: "varchar",
-    default: null,
+    default: "Not Approved",
   })
   status: string;
 
