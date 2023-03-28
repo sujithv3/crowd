@@ -3,9 +3,9 @@ const express = require("express");
 const app = express();
 import { Request, Response } from "express";
 const validationResult = require("../../utils/validations/validation-error");
-const UserValidation = require("../../utils/validations/user/user-validation");
-const signupValidationEdit = require("../../utils/validations/user/user-validation-edit");
-const loginValidationEdit = require("../../utils/validations/user/login");
+const UserValidation = require("../../utils/validations/rmUser/user-validation");
+const signupValidationEdit = require("../../utils/validations/rmUser/user-validation-edit");
+const loginValidationEdit = require("../../utils/validations/rmUser/login");
 const {
   changePasswordValidation,
   createPasswordValidation,
