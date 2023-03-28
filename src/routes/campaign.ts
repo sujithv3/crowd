@@ -38,6 +38,22 @@ export const Routes = [
     validationField: "",
     isLogin: true,
   },
+  {
+    method: "get",
+    route: "/country",
+    controller: CampaignController,
+    action: "getCountry",
+    validationField: "",
+    isLogin: false,
+  },
+  {
+    method: "get",
+    route: "/deal-size",
+    controller: CampaignController,
+    action: "getDealSize",
+    validationField: "",
+    isLogin: false,
+  },
 ];
 
 // function routes
