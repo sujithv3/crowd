@@ -11,6 +11,8 @@ import {
 } from "typeorm";
 import { Roles } from "./roles";
 import { Location } from "./locations";
+import { Campaigns } from "./campaigns";
+import { Tagged } from "./tagged";
 
 type FILE_LIST = { name: number; value: any }[];
 
@@ -168,6 +170,12 @@ export class Users {
     nullable: true,
   })
   deactivate_reason: string;
+
+  @OneToMany(() => Campaigns, (Campaigns) => Campaigns.user)
+  campaign: Campaigns[];
+
+  @OneToMany(() => Tagged, (Tagged) => Tagged.StartUp)
+  tagged: Tagged[];
 
   @CreateDateColumn()
   created_date: Date;

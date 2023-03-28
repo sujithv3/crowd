@@ -15,7 +15,7 @@ export class Tagged {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Users)
+  @ManyToOne((type) => Users, (Users) => Users.tagged)
   @JoinColumn({ name: "start_up_id", referencedColumnName: "id" })
   StartUp: Users;
 
@@ -23,16 +23,10 @@ export class Tagged {
   @JoinColumn({ name: "rm_id", referencedColumnName: "id" })
   RelationManager: rmAdmin;
 
-  @CreateDateColumn({
-    type: "date",
-    default: new Date(),
-  })
+  @CreateDateColumn()
   createdDate: Date;
 
-  @UpdateDateColumn({
-    type: "date",
-    default: new Date(),
-  })
+  @UpdateDateColumn()
   updatedDate: Date;
 
   @Column("boolean", { default: true })

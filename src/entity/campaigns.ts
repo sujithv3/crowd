@@ -116,7 +116,7 @@ export class Campaigns {
   })
   faq!: Array<{ question: string; answer: string }>;
 
-  @ManyToOne((type) => Users)
+  @ManyToOne(() => Users, (Users) => Users.campaign)
   @JoinColumn({ name: "user_id", referencedColumnName: "id" })
   user: Users;
 
@@ -248,7 +248,7 @@ export class Campaigns {
   @Column({
     length: 50,
     type: "varchar",
-    default: null,
+    default: "Not Approved",
   })
   status: string;
 
