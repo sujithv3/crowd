@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 // import { rmAdmin } from "../../entity/rmAdmin";
 import { Tagged } from "../../entity/tagged";
 import { Campaigns } from "../../entity/campaigns";
+import { Users } from "../../entity/Users";
 const { genToken } = require("../../utils/jsonwebtoken");
 const responseMessage = require("../../configs/response");
 const crypto = require("crypto");
@@ -14,6 +15,7 @@ export class TaggedController {
   //   private userRepository = AppDataSource.getRepository(rmAdmin);
   private taggedRepository = AppDataSource.getRepository(Tagged);
   private campaignRepository = AppDataSource.getRepository(Campaigns);
+  private userRepository = AppDataSource.getRepository(Users);
 
   //   list all users
   async all(request: Request, response: Response, next: NextFunction) {
@@ -78,16 +80,28 @@ export class TaggedController {
 
       const user = Jwt.decode(token);
 
-      const campaign = await this.campaignRepository
-        .createQueryBuilder("campaign")
-        .innerJoinAndSelect("campaign.user", "user")
-        .innerJoin("user.tagged", "tagged")
-        .loadRelationCountAndMap("campaign.fund", "campaign.fund")
-        .innerJoin("tagged.RelationManager", "relationManager")
-        .where("tagged.rm_id = :id AND tagged.is_active=true", {
-          id: user[0].id,
-        })
-        .getMany();
+      const campaign = await this.userRepository
+        .createQueryBuilder("startup")
+        .innerJoin("startup.tagged", "tagged")
+        .innerJoinAndSelect("startup.campaign", "campaign")
+        .addSelect(
+          `(SELECT COUNT(*) FROM funds where funds.campaignId=campaign.id LIMIT 1) as investors`
+        )
+        // .where("tagged.rm_id = :id AND tagged.is_active=true", {
+        //   id: user[0].id,
+        // })
+        .getRawMany();
+
+      // const campaign = await this.campaignRepository
+      //   .createQueryBuilder("campaign")
+      //   .innerJoinAndSelect("campaign.user", "user")
+      //   .innerJoin("user.tagged", "tagged")
+      //   .loadRelationCountAndMap("campaign.fund", "campaign.fund")
+      //   .innerJoin("tagged.RelationManager", "relationManager")
+      //   .where("tagged.rm_id = :id AND tagged.is_active=true", {
+      //     id: user[0].id,
+      //   })
+      //   .getMany();
 
       if (campaign.length === 0) {
         return responseMessage.responseMessage(
