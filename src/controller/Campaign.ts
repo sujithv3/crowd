@@ -59,9 +59,9 @@ export class CampaignController {
         )
         .skip(0)
         .take(20)
-        .leftJoinAndSelect("campaign.category", "category")
-        .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .leftJoinAndSelect("campaign.location", "location")
+        .leftJoin("campaign.category", "category")
+        .leftJoin("campaign.subcategory", "subcategory")
+        .leftJoin("campaign.location", "location")
         .getRawMany();
 
       const raising = await this.campaignRepository
@@ -315,6 +315,58 @@ export class CampaignController {
     try {
       const campaign = await this.campaignRepository
         .createQueryBuilder("campaign")
+        .select([
+          "campaign.id",
+          "campaign.title",
+          "campaign.tag_line",
+          "campaign.tag",
+          "campaign.currency",
+          "campaign.tax",
+          "campaign.project_image",
+          "campaign.project_video",
+          "campaign.demo_url",
+          "campaign.description",
+          "campaign.challenges",
+          "campaign.files",
+          "campaign.business_type",
+          "campaign.goal_amount",
+          "campaign.min_invest",
+          "campaign.max_invest",
+          "campaign.deal_size",
+          "campaign.fund_document",
+          "campaign.duration",
+          "campaign.contact_number",
+          "campaign.raised_fund",
+          "campaign.start_date",
+          "campaign.end_date",
+          "campaign.is_featured",
+          "campaign.contact_email_id",
+          "campaign.status",
+          "campaign.createdDate",
+          "campaign.updatedDate",
+          "campaign.is_active",
+          "campaign.is_deleted",
+          "campaign.is_published",
+          "campaign.tax_location_id",
+          "campaign.bank_location_id",
+          "campaign.user_id",
+          "campaign.manager_id",
+          "campaign.primary_category",
+          "campaign.primary_sub_category",
+          "campaign.category_id",
+          "campaign.sub_category_id",
+          "campaign.staging_id",
+          "campaign.raised_fund_date",
+          "campaign.faq",
+          "campaign.project_location_id ",
+          "location.name",
+          "location.country",
+          "category.name",
+          "subcategory.name",
+          "users.first_name",
+          "users.last_name",
+          "users.company_logo",
+        ])
         .where(
           `campaign.id = :id 
        `,
@@ -322,10 +374,10 @@ export class CampaignController {
             id: id,
           }
         )
-        .leftJoinAndSelect("campaign.tax_location", "tax_location")
-        .leftJoinAndSelect("campaign.category", "category")
-        .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .leftJoinAndSelect("campaign.location", "location")
+        .leftJoin("campaign.category", "category")
+        .leftJoin("campaign.subcategory", "subcategory")
+        .leftJoin("campaign.location", "location")
+        .leftJoin("campaign.user", "users")
         .getOne();
 
       if (!campaign) {
