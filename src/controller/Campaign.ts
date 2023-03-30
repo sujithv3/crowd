@@ -405,4 +405,72 @@ export class CampaignController {
       );
     }
   }
+
+  async getCountry(req: Request, res: Response, next: NextFunction) {
+    try {
+      // @todo get country list from database
+      const data = [
+        {
+          name: "Canada",
+          id: "CA",
+        },
+        {
+          name: "United States",
+          id: "US",
+        },
+      ];
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.userListSuccess,
+        data
+      );
+    } catch (error) {
+      console.log(error);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userListFailed,
+        error
+      );
+    }
+  }
+
+  async getDealSize(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = [
+        {
+          id: "0-100000",
+          name: "0 - 100000 USD",
+        },
+        {
+          id: "100000-500000",
+          name: "100000 USD - 500000 USD",
+        },
+        {
+          id: "500000-2000000",
+          name: "500000 USD - 2000000 USD",
+        },
+        {
+          id: "200000-null",
+          name: "200000 USD +",
+        },
+      ];
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.userListSuccess,
+        data
+      );
+    } catch (error) {
+      console.log(error);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userListFailed,
+        error
+      );
+    }
+  }
 }

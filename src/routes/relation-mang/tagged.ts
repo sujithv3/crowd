@@ -25,6 +25,15 @@ export const Routes = [
     isLogin: true,
     fileUpload: false,
   },
+  {
+    method: "get",
+    route: "/funded",
+    controller: TaggedController,
+    action: "funded",
+    validationField: "",
+    isLogin: true,
+    fileUpload: false,
+  },
 ];
 
 // function routes
