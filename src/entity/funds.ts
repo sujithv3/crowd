@@ -16,7 +16,7 @@ export class Funds {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Users)
+  @ManyToOne(() => Users)
   @JoinColumn()
   investor: Users;
 

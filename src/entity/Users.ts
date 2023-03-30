@@ -13,6 +13,7 @@ import { Roles } from "./roles";
 import { Location } from "./locations";
 import { Campaigns } from "./campaigns";
 import { Tagged } from "./tagged";
+import { Funds } from "./funds";
 
 type FILE_LIST = { name: number; value: any }[];
 
@@ -173,6 +174,9 @@ export class Users {
 
   @OneToMany(() => Campaigns, (Campaigns) => Campaigns.user)
   campaign: Campaigns[];
+
+  @OneToMany(() => Funds, (funds) => funds.investor)
+  investor: Funds[];
 
   @OneToMany(() => Tagged, (Tagged) => Tagged.StartUp)
   tagged: Tagged[];
