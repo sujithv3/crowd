@@ -169,7 +169,7 @@ export class investorController {
           if (arr[1] === "null") {
             deals.push({ id: i, name: arr[0] + " USD+" });
           } else if (arr[0] === "0") {
-            deals.push({ id: i, name: "0 - " + arr[1] + " USD+" });
+            deals.push({ id: i, name: "0 - " + arr[1] + " USD" });
           } else
             deals.push({ id: i, name: arr[0] + " USD - " + arr[1] + " USD" });
         }
