@@ -11,6 +11,14 @@ const { upload } = require("../../utils/file-upload");
 export const Routes = [
   {
     method: "get",
+    route: "/list",
+    controller: InvestorController,
+    action: "getInvestorsList",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
     route: "/interested",
     controller: InvestorController,
     action: "interested",
