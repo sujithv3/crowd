@@ -102,7 +102,7 @@ export class startUpController {
           start_date: null,
           end_date: null,
           is_featured: false,
-          status: null,
+          status: "Not Approve",
           createdDate: new Date(),
           updatedDate: new Date(),
           is_active: true,

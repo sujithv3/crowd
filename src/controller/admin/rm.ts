@@ -20,7 +20,7 @@ export class RelationManager {
 
       const startUpCounts = await this.userRepository
         .createQueryBuilder("user")
-        .where("is_active=true AND role_id=3")
+        .where("user.is_active=true AND user.role_id=3")
         .loadRelationCountAndMap("user.tagged", "user.tagged", "tagged", (qb) =>
           qb.andWhere("tagged.is_active=true")
         )
@@ -38,6 +38,35 @@ export class RelationManager {
         400,
         msg.listDashboardFailed,
         err
+      );
+    }
+  }
+
+  // get one rm details
+
+  async getOneRm(request: Request, response: Response, next: NextFunction) {
+    try {
+      const id = parseInt(request.params.id);
+
+      const investorList = await this.userRepository
+        .createQueryBuilder("user")
+        .where("user.is_active=true AND user.role_id=3 AND id=:id", { id })
+        .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
+        .leftJoinAndSelect("tagged.StartUp", "startUp")
+        .getOne();
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.listDashboard,
+        investorList
+      );
+    } catch (error) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.listDashboardFailed,
+        error
       );
     }
   }

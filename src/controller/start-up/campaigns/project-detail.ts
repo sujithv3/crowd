@@ -29,7 +29,7 @@ export class projectDetailController {
 
       const user = Jwt.decode(token);
       delete user.role;
-      console.log(faq)
+      console.log(faq);
       // find campaign
 
       const campaigns = await this.projectDetailRepository

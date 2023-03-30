@@ -17,7 +17,7 @@ export const Routes = [
     method: "get",
     route: "/list/:id",
     controller: RelationManager,
-    action: "getRmList",
+    action: "getOneRm",
     validationField: "",
     isLogin: true,
   },
