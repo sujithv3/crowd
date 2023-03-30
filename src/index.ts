@@ -26,6 +26,9 @@ const rmInvestor = require("./routes/relation-mang/investors");
 const mydeals = require("./routes/mydeals");
 const dashBoard = require("./routes/admin/dashboard");
 const StartUpAdmin = require("./routes/admin/startup");
+const InvestorAdmin = require("./routes/admin/investor");
+const CampaignAdmin = require("./routes/admin/campaign");
+const RmAdmin = require("./routes/admin/rm");
 
 // mysql database connection initialize
 
@@ -76,3 +79,6 @@ app.use("/api/seed", seed);
 app.use("/api/mydeals", mydeals);
 app.use("/api/admin", dashBoard);
 app.use("/api/admin", StartUpAdmin);
+app.use("/api/admin/investor", InvestorAdmin);
+app.use("/api/admin/campaign", CampaignAdmin);
+app.use("/api/admin/rm", RmAdmin);
