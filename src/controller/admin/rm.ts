@@ -45,7 +45,9 @@ export class RelationManager {
 
       const investorList = await this.userRepository
         .createQueryBuilder("user")
-        .where("user.is_active=true AND user.role_id=3 AND id=:id", { id })
+        .where("user.is_active=true AND user.role_id=3 AND user.id=:id", {
+          id,
+        })
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.StartUp", "startUp")
         .getOne();
