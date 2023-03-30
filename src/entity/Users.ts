@@ -13,6 +13,7 @@ import { Roles } from "./roles";
 import { Location } from "./locations";
 import { Campaigns } from "./campaigns";
 import { Tagged } from "./tagged";
+import { Funds } from "./funds";
 
 type FILE_LIST = { name: number; value: any }[];
 
@@ -176,6 +177,9 @@ export class Users {
 
   @OneToMany(() => Tagged, (Tagged) => Tagged.StartUp)
   tagged: Tagged[];
+
+  @OneToMany(() => Funds, (Funds) => Funds.investor)
+  fund: Funds[];
 
   @CreateDateColumn()
   created_date: Date;

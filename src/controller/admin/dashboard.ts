@@ -61,21 +61,16 @@ export class DashBoard {
         .where("is_active=true AND role_id=2")
         .getCount();
 
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.campaignListSuccess,
-        {
-          campaignCount,
-          startUpCounts,
-          investorCount,
-        }
-      );
+      return responseMessage.responseWithData(true, 200, msg.listDashboard, {
+        campaignCount,
+        startUpCounts,
+        investorCount,
+      });
     } catch (err) {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.categoryListFailed,
+        msg.listDashboardFailed,
         err
       );
     }

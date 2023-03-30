@@ -79,7 +79,7 @@ export class ListStartUp {
       return responseMessage.responseWithData(
         true,
         200,
-        msg.campaignListSuccess,
+        msg.listStartUp,
         startUpList
       );
     } catch (err) {
@@ -88,7 +88,7 @@ export class ListStartUp {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.categoryListFailed,
+        msg.listStartUpFailed,
         err
       );
     }
@@ -104,17 +104,17 @@ export class ListStartUp {
     try {
       const startUpList = await this.userRepository
         .createQueryBuilder("user")
-        .where("user.is_active=true AND id=:id", { id: request.params.id })
-        .leftJoinAndSelect("startUp.campaign", "campaign")
-        .leftJoinAndSelect("startUp.tagged", "tagged")
+        .where("user.is_active=true AND user.id=:id", { id: request.params.id })
+        .leftJoinAndSelect("user.campaign", "campaign")
+        .leftJoinAndSelect("user.tagged", "tagged")
+        .orderBy("tagged.updatedDate", "DESC")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
-        .orderBy("RelationManager.updatedDate", "DESC")
         .getOne();
 
       return responseMessage.responseWithData(
         true,
         200,
-        msg.campaignListSuccess,
+        msg.listStartUp,
         startUpList
       );
     } catch (error) {
@@ -123,7 +123,129 @@ export class ListStartUp {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.categoryListFailed,
+        msg.listStartUpFailed,
+        error
+      );
+    }
+  }
+
+  // assign start up
+  async assignedStartUp(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const startUpQueryBuilder = this.userRepository
+        .createQueryBuilder("user")
+        .where("user.is_active=true AND user.role_id=1");
+
+      if (request.query.country) {
+        startUpQueryBuilder.andWhere("user.country=:country", {
+          country: request.query.country,
+        });
+      }
+
+      const startUpList = await startUpQueryBuilder
+        .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
+        .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+        .leftJoinAndSelect("user.campaign", "campaign")
+        .loadRelationCountAndMap("user.investor_count", "campaign.fund")
+        .loadRelationCountAndMap("user.total_campaigns", "user.campaign")
+        .andWhere("tagged.id IS NOT NULL")
+        .select([
+          "user.id",
+          "user.first_name",
+          "user.last_name",
+          // "user.sectors",
+          "user.country",
+          "RelationManager.id",
+          "RelationManager.first_name",
+          "RelationManager.last_name",
+          "tagged.id",
+          "campaign.id",
+        ])
+
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getManyAndCount();
+
+      return responseMessage.responseWithData(true, 200, msg.listStartUp, {
+        total_count: startUpList[1],
+        data: startUpList[0],
+      });
+    } catch (error) {
+      console.log(error);
+
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.listStartUpFailed,
+        error
+      );
+    }
+  }
+
+  // unassign start up
+  async unAssignedStartUp(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const startUpQueryBuilder = this.userRepository
+        .createQueryBuilder("user")
+        .where("user.is_active=true AND user.role_id=1");
+
+      if (request.query.country) {
+        startUpQueryBuilder.andWhere("user.country=:country", {
+          country: request.query.country,
+        });
+      }
+
+      const startUpList = await startUpQueryBuilder
+        .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
+        .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+        .leftJoinAndSelect("user.campaign", "campaign")
+        .loadRelationCountAndMap("user.investor_count", "campaign.fund")
+        .loadRelationCountAndMap("user.total_campaigns", "user.campaign")
+        .andWhere("tagged.id IS NULL")
+        .select([
+          "user.id",
+          "user.first_name",
+          "user.last_name",
+          // "user.sectors",
+          "user.country",
+          "RelationManager.id",
+          "RelationManager.first_name",
+          "RelationManager.last_name",
+          "campaign.id",
+        ])
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getManyAndCount();
+
+      return responseMessage.responseWithData(true, 200, msg.listStartUp, {
+        total_count: startUpList[1],
+        data: startUpList[0],
+      });
+    } catch (error) {
+      console.log(error);
+
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.listStartUpFailed,
         error
       );
     }

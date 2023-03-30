@@ -1,4 +1,4 @@
-const { ListStartUp } = require("../../controller/admin/list-start-up");
+const { RelationManager } = require("../../controller/admin/rm");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
@@ -7,33 +7,17 @@ const JWT = require("../../utils/jsonwebtoken");
 export const Routes = [
   {
     method: "get",
-    route: "/start-up/list",
-    controller: ListStartUp,
-    action: "getStartUpList",
+    route: "/list",
+    controller: RelationManager,
+    action: "getRmList",
     validationField: "",
     isLogin: true,
   },
   {
     method: "get",
-    route: "/start-up/list/:id",
-    controller: ListStartUp,
-    action: "getStartUpUser",
-    validationField: "",
-    isLogin: true,
-  },
-  {
-    method: "get",
-    route: "/start-up/assign/list",
-    controller: ListStartUp,
-    action: "assignedStartUp",
-    validationField: "",
-    isLogin: true,
-  },
-  {
-    method: "get",
-    route: "/start-up/un-assign/list",
-    controller: ListStartUp,
-    action: "unAssignedStartUp",
+    route: "/list/:id",
+    controller: RelationManager,
+    action: "getRmList",
     validationField: "",
     isLogin: true,
   },

@@ -127,4 +127,16 @@ module.exports = {
   // dashboard
   listDashboard: "successfully listed",
   listDashboardFailed: "dashboard list failed",
+
+  // startup
+  listStartUp: "List Start Up Successfully",
+  listStartUpFailed: "List Start Up Failed",
+
+  // list success
+  list_success: "Successfully listed",
+  list_Failed: " list failed",
+
+  // approved
+  approved_success: "approved successfully",
+  approved_failed: "approved Failed",
 };
