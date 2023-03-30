@@ -175,14 +175,14 @@ export class Users {
   @OneToMany(() => Campaigns, (Campaigns) => Campaigns.user)
   campaign: Campaigns[];
 
-  @OneToMany(() => Funds, (funds) => funds.investor)
-  investor: Funds[];
+  // @OneToMany(() => Funds, (funds) => funds.investor)
+  // investor: Funds[];
 
   @OneToMany(() => Tagged, (Tagged) => Tagged.StartUp)
   tagged: Tagged[];
 
-  @OneToMany(() => Funds, (Funds) => Funds.investor)
-  fund: Funds[];
+  // @OneToMany(() => Funds, (Funds) => Funds.investor)
+  // fund: Funds[];
 
   @CreateDateColumn()
   created_date: Date;

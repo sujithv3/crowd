@@ -42,6 +42,7 @@ export class InvestorController {
           id: user[0].id,
         })
         .select([
+          "user.id",
           "user.first_name",
           "user.last_name",
           "user.city",
@@ -112,6 +113,7 @@ export class InvestorController {
           id: user[0].id,
         })
         .select([
+          "investor.id",
           "investor.first_name",
           "investor.last_name",
           "investor.city",

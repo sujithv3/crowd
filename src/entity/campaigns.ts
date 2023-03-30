@@ -249,6 +249,7 @@ export class Campaigns {
     length: 50,
     type: "varchar",
     default: "Not Approved",
+    nullable: true,
   })
   status: string;
 
