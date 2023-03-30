@@ -59,6 +59,7 @@ export class UserController {
         last_name,
         email_id,
         profile,
+        profile_id: `${country}${('000' + (await this.userRepository.count() + 1)).slice(-4)}`,
         contact_number,
         password: encrypt_password,
         role: role_id,
@@ -164,6 +165,7 @@ export class UserController {
     try {
       const userData = await this.userRepository
         .createQueryBuilder("user")
+        .leftJoinAndSelect("user.role", "role")
         .where("user.is_active=true")
         .getMany();
       //   check user exist
@@ -357,19 +359,21 @@ export class UserController {
 
   //   login user
   async login(request: Request, response: Response, next: NextFunction) {
-    const { email, password } = request.body;
+    const { email, password, role } = request.body;
     console.log("this is from relationship");
-    console.log(email, password);
+    console.log(email, password, role);
     // find user
 
     let user = await this.userRepository
       .createQueryBuilder("user")
+      .leftJoinAndSelect("user.role", "role")
       .where(
-        "user.email_id=:email_id AND is_deleted=:is_deleted AND user.is_active=:is_active AND user.is_deleted=false",
+        "user.email_id=:email_id AND is_deleted=:is_deleted AND user.is_active=:is_active AND user.role_id=:role AND user.is_deleted=false",
         {
           email_id: email,
           is_active: true,
           is_deleted: false,
+          role: role
         }
       )
       .getMany();
@@ -486,7 +490,7 @@ export class UserController {
     next: NextFunction
   ) {
     try {
-      const { email_id } = request.body;
+      const { email_id, role } = request.body;
       console.log("this is from relation forgot");
       console.log(email_id);
       // find user
@@ -494,11 +498,12 @@ export class UserController {
       let user = await this.userRepository
         .createQueryBuilder()
         .where(
-          "email_id=:email AND is_active=:is_active AND is_deleted=:is_deleted",
+          "email_id=:email AND is_active=:is_active AND is_deleted=:is_deleted AND role_id=:role",
           {
             email: email_id,
             is_active: true,
             is_deleted: false,
+            role: role,
           }
         )
         .getOne();
