@@ -134,9 +134,15 @@ module.exports = {
 
   // list success
   list_success: "Successfully listed",
-  list_Failed: " list failed",
+  list_Failed: " List failed",
 
   // approved
-  approved_success: "approved successfully",
-  approved_failed: "approved Failed",
+  approved_success: "Approved successfully",
+  approved_failed: "Approved Failed",
+
+  // tagged
+  tagged_success: "Tagged successfully",
+  tagged_failed: "Tagged failed",
+  un_tagged_success: "Un-tagged successfully",
+  un_tagged_failed: "Un-tagged successfully",
 };

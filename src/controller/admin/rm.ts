@@ -29,16 +29,11 @@ export class RelationManager {
       return responseMessage.responseWithData(
         true,
         200,
-        msg.listDashboard,
+        msg.list_success,
         startUpCounts
       );
     } catch (err) {
-      return responseMessage.responseWithData(
-        false,
-        400,
-        msg.listDashboardFailed,
-        err
-      );
+      return responseMessage.responseWithData(false, 400, msg.list_Failed, err);
     }
   }
 
@@ -58,14 +53,14 @@ export class RelationManager {
       return responseMessage.responseWithData(
         true,
         200,
-        msg.listDashboard,
+        msg.list_success,
         investorList
       );
     } catch (error) {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.listDashboardFailed,
+        msg.list_Failed,
         error
       );
     }
