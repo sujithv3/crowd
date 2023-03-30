@@ -175,6 +175,9 @@ export class Users {
   @OneToMany(() => Campaigns, (Campaigns) => Campaigns.user)
   campaign: Campaigns[];
 
+  @OneToMany(() => Funds, (funds) => funds.investor)
+  investor: Funds[];
+
   @OneToMany(() => Tagged, (Tagged) => Tagged.StartUp)
   tagged: Tagged[];
 
