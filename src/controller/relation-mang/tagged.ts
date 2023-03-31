@@ -153,7 +153,7 @@ export class TaggedController {
           "startup.country",
           "startup.created_date",
           "campaign.id",
-          "campaign.fund_document",
+          "campaign.files",
         ])
         .innerJoin("startup.tagged", "tagged")
         .where(
