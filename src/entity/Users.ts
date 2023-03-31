@@ -172,6 +172,25 @@ export class Users {
   })
   deactivate_reason: string;
 
+  @Column({
+    length: 300,
+    type: "varchar",
+    nullable: true,
+    default: null,
+  })
+  company_name: string;
+
+  @Column({
+    length: 250,
+    type: "varchar",
+    nullable: true,
+    default: null,
+  })
+  stage_of_business: string;
+
+  @Column({ type: "json", nullable: true, default: null })
+  sector: FILE_LIST;
+
   @OneToMany(() => Campaigns, (Campaigns) => Campaigns.user)
   campaign: Campaigns[];
 
