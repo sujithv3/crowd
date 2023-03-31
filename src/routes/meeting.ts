@@ -1,48 +1,38 @@
-const {
-  InvestorController,
-} = require("../../controller/relation-mang/investors");
+/**
+ * Created By Muthu
+ * routers will be blocked after moved the seed
+ */
+const { MeetingController } = require("../controller/meeting");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
-const validationResult = require("../../utils/validations/validation-error");
-const JWT = require("../../utils/jsonwebtoken");
-const { upload } = require("../../utils/file-upload");
+const validationResult = require("../utils/validations/validation-error");
+const JWT = require("../utils/jsonwebtoken");
 
 export const Routes = [
   {
+    method: "post",
+    route: "/add",
+    controller: MeetingController,
+    action: "add",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "post",
+    route: "/remove",
+    controller: MeetingController,
+    action: "remove",
+    validationField: "",
+    isLogin: true,
+  },
+  {
     method: "get",
     route: "/list",
-    controller: InvestorController,
-    action: "getInvestorsList",
+    controller: MeetingController,
+    action: "list",
     validationField: "",
     isLogin: true,
-  },
-  {
-    method: "get",
-    route: "/interested",
-    controller: InvestorController,
-    action: "interested",
-    validationField: "",
-    isLogin: true,
-    fileUpload: false,
-  },
-  {
-    method: "get",
-    route: "/campaign/:id",
-    controller: InvestorController,
-    action: "campaign",
-    validationField: "",
-    isLogin: true,
-    fileUpload: false,
-  },
-  {
-    method: "get",
-    route: "/funded",
-    controller: InvestorController,
-    action: "funded",
-    validationField: "",
-    isLogin: true,
-    fileUpload: false,
   },
 ];
 

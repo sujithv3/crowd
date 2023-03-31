@@ -197,10 +197,9 @@ export class investorController {
       //     }
       //   }
       // }
-      sort.push({ id: "funded", name: "Successfully Funded Deals" });
-      sort.push({ id: "comingsoon", name: "Closing soon Deals" });
       sort.push({ id: "featured", name: "Featured Deals" });
       sort.push({ id: "raising", name: "Raising Fund Deals" });
+      sort.push({ id: "comingsoon", name: "Closing soon Deals" });
 
       const data = {
         category: categoryTre,

@@ -19,6 +19,46 @@ export class InvestorController {
   private userRepository = AppDataSource.getRepository(Users);
   private fundsRepository = AppDataSource.getRepository(Funds);
 
+  //list all investors
+  async getInvestorsList(request: Request, response: Response, next: NextFunction) {
+    try {
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
+      console.log("user", user);
+
+      const investorList = await this.userRepository
+        .createQueryBuilder("investor")
+        .where("investor.is_deleted=false AND investor.role_id=2")
+        .getMany();
+
+
+        return responseMessage.responseWithData(
+        true,
+        200,
+        msg.campaignListSuccess,
+        investorList
+      );
+    } catch (err) {
+      console.log(err);
+
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userListFailed,
+        err
+      );
+    }
+  }
+
   //   list all users
   async interested(request: Request, response: Response, next: NextFunction) {
     try {
@@ -58,7 +98,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -129,7 +169,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -195,7 +235,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
