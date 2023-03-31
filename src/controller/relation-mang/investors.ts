@@ -20,7 +20,11 @@ export class InvestorController {
   private fundsRepository = AppDataSource.getRepository(Funds);
 
   //list all investors
-  async getInvestorsList(request: Request, response: Response, next: NextFunction) {
+  async getInvestorsList(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
     try {
       let token: any;
       if (
@@ -40,8 +44,7 @@ export class InvestorController {
         .where("investor.is_deleted=false AND investor.role_id=2")
         .getMany();
 
-
-        return responseMessage.responseWithData(
+      return responseMessage.responseWithData(
         true,
         200,
         msg.campaignListSuccess,
@@ -78,7 +81,7 @@ export class InvestorController {
       const campaign = await this.userRepository
         .createQueryBuilder("user")
         .innerJoin("user.tagged", "tagged")
-        .where("tagged.id = :id AND tagged.is_active=true", {
+        .where("tagged.rm_id = :id AND tagged.is_active=true", {
           id: user[0].id,
         })
         .select([
@@ -98,7 +101,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -169,7 +172,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -235,7 +238,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
