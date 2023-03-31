@@ -64,9 +64,9 @@ export class paymentVerificationController {
         .createQueryBuilder()
         .update(Campaigns)
         .set({
-          business_type,
-          contact_email_id,
-          status,
+          payment_business_type: business_type,
+          payment_contact_email_id: contact_email_id,
+          citizen_status: status,
         })
         .where("id = :id", { id: id ? id : campaigns.id })
         .execute();
@@ -104,20 +104,17 @@ export class paymentVerificationController {
       delete user.role;
       //   find basic info
       const basicCampaigns = await this.paymentVerificationRepository
-        .createQueryBuilder("campaign")
-        .where(
-          "campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false",
-          {
-            id: user[0].id,
-          }
-        )
+        .createQueryBuilder("")
+        .where("user_id=:id AND is_active=true AND is_published=false", {
+          id: user[0].id,
+        })
         .select([
-          "campaign.id",
-          "campaign.business_type",
-          "campaign.contact_email_id",
-          "campaign.status",
+          "id",
+          "payment_contact_email_id AS contact_email_id",
+          "payment_business_type AS business_type",
+          "citizen_status AS status",
         ])
-        .getOne();
+        .getRawOne();
 
       return responseMessage.responseWithData(
         true,
