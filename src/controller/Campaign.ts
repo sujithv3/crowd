@@ -282,9 +282,9 @@ export class CampaignController {
         .createQueryBuilder("campaign")
         .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
         .where(
-          `campaign.is_published=1
-         AND campaign.is_deleted=0
-         AND campaign.is_active=1
+          `campaign.is_published=true
+         AND campaign.is_deleted=false
+         AND campaign.is_active=true
          `
         )
         .skip(0)

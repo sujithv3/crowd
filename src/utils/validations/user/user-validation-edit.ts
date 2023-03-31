@@ -19,11 +19,7 @@ const signupValidationEdit = [
     .withMessage("must be string")
     .notEmpty()
     .withMessage("code is required"),
-  body("street_name")
-    .isString()
-    .withMessage("must be string")
-    .notEmpty()
-    .withMessage("street_name is required"),
+  body("street_name").isString().withMessage("must be string").optional(),
   body("country")
     .isString()
     .withMessage("must be string")

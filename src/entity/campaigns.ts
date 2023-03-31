@@ -138,6 +138,13 @@ export class Campaigns {
   })
   business_type: businessType;
 
+  @Column({
+    type: "enum",
+    enum: businessType,
+    default: businessType.BUSINESS,
+  })
+  payment_business_type: businessType;
+
   @ManyToOne((type) => Category)
   @JoinColumn({ name: "primary_category", referencedColumnName: "id" })
   primary_category: Category;
@@ -246,11 +253,26 @@ export class Campaigns {
   contact_email_id: string;
 
   @Column({
+    length: 250,
+    type: "varchar",
+    default: null,
+  })
+  payment_contact_email_id: string;
+
+  @Column({
     length: 50,
     type: "varchar",
     default: "Not Approve",
   })
   status: string;
+
+  @Column({
+    length: 50,
+    type: "varchar",
+    nullable: true,
+    default: null,
+  })
+  citizen_status: string;
 
   @CreateDateColumn()
   createdDate: Date;

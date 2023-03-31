@@ -29,6 +29,7 @@ const StartUpAdmin = require("./routes/admin/startup");
 const InvestorAdmin = require("./routes/admin/investor");
 const CampaignAdmin = require("./routes/admin/campaign");
 const RmAdmin = require("./routes/admin/rm");
+const AdminTagged = require("./routes/admin/tagged");
 const Meeting = require("./routes/meeting");
 
 // mysql database connection initialize
@@ -84,3 +85,4 @@ app.use("/api/admin", StartUpAdmin);
 app.use("/api/admin/investor", InvestorAdmin);
 app.use("/api/admin/campaign", CampaignAdmin);
 app.use("/api/admin/rm", RmAdmin);
+app.use("/api/admin/tag", AdminTagged);

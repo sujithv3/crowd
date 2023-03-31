@@ -53,7 +53,9 @@ export class TaggedRM {
           .set({
             is_active: false,
           })
-          .where("StartUp=:StartUp", { StartUp: start_up[i] })
+          .where("StartUp=:StartUp ", {
+            StartUp: start_up[i],
+          })
           .execute();
       }
       return responseMessage.responseWithData(true, 200, msg.un_tagged_success);
