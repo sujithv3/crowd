@@ -358,6 +358,7 @@ export class UserController {
           await deleteS3BucketValues(key);
         }
       }
+      console.log(company_name);
 
       // update user
       await this.userRepository
@@ -375,7 +376,7 @@ export class UserController {
           code,
           city,
           email_id,
-          company_name,
+          company_name: company_name ?? "",
           description,
           stage_of_business,
           sector: sector ? JSON.parse(sector) : [],
