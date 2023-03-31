@@ -143,28 +143,63 @@ export class TaggedController {
 
       const user = Jwt.decode(token);
 
-      const campaign = await this.campaignRepository
-        .createQueryBuilder("campaign")
-        .innerJoinAndSelect("campaign.tagged", "myDeals")
+      const startup = await this.userRepository
+        .createQueryBuilder("startup")
+        .select([
+          "startup.id",
+          "startup.first_name",
+          "startup.last_name",
+          "startup.city",
+          "startup.country",
+          "startup.created_date",
+          "campaign.id",
+          "campaign.files",
+        ])
+        .innerJoin("startup.tagged", "tagged")
         .where(
-          "campaign.id=:id AND tagged.user_id = :userId AND tagged.is_active=true",
+          "startup.id=:id AND tagged.rm_id = :userId AND tagged.is_active=true",
           {
             id: id,
             userId: user[0].id,
           }
         )
-        .leftJoinAndSelect("campaign.category", "category")
-        .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .leftJoinAndSelect("campaign.fund", "fund")
+        .leftJoin("startup.campaign", "campaign")
+        .leftJoin("campaign.fund", "fund")
+        .leftJoin("fund.investor", "investor")
         .getOne();
 
-      if (!campaign) {
-        return responseMessage.responseMessage(
-          false,
-          400,
-          msg.campaignListFailed
-        );
-      }
+      const investor = await this.userRepository
+        .createQueryBuilder("investor")
+        .select("investor.id")
+        .distinct(true)
+        .addSelect([
+          // "fund.id",
+          // "fund.fund_amount",
+          // "fund.investor",
+          "investor.id",
+          "investor.first_name",
+          "investor.last_name",
+          "investor.city",
+          "investor.country",
+          "investor.is_active",
+          "investor.created_date",
+        ])
+        .innerJoin("investor.fund", "fund")
+        .innerJoin("fund.campaign", "campaign")
+        .innerJoin("campaign.user", "campaignowner")
+        .innerJoin("campaignowner.tagged", "tagged")
+        .where(
+          "campaignowner.id=:id AND tagged.rm_id = :userId AND tagged.is_active=true",
+          {
+            id: id,
+            userId: user[0].id,
+          }
+        )
+        .getMany();
+      const campaign = {
+        startup,
+        investor,
+      };
       return responseMessage.responseWithData(
         true,
         200,
