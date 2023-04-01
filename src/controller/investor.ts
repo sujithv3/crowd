@@ -7,6 +7,7 @@ import { Category } from "../entity/category";
 import { Location } from "../entity/locations";
 import { Staging } from "../entity/staging";
 import { Campaigns } from "../entity/campaigns";
+import { Funds } from "../entity/funds";
 const Jwt = require("./../utils/jsonwebtoken");
 const responseMessage = require("./../configs/response");
 const msg = require("../configs/message");
@@ -35,6 +36,7 @@ export class investorController {
   private locationRepository = AppDataSource.getRepository(Location);
   private StagingRepository = AppDataSource.getTreeRepository(Staging);
   private campaignRepository = AppDataSource.getTreeRepository(Campaigns);
+  private FundRepository = AppDataSource.getTreeRepository(Funds);
   private manager = AppDataSource.manager;
 
   // list all
@@ -476,7 +478,6 @@ export class investorController {
             id: user[0].id,
           }
         )
-
         .getMany();
 
       const total_count = await totalQuery.getCount();
@@ -493,6 +494,48 @@ export class investorController {
         false,
         400,
         msg.campaignListFailed,
+        err
+      );
+    }
+  }
+
+  async addFund(request: Request, response: Response, next: NextFunction) {
+    try {
+      const { campaign_id } = request.body;
+
+      // get user id
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+      const user = Jwt.decode(token);
+      // create my_deals
+
+      await this.FundRepository.createQueryBuilder()
+        .insert()
+        .values({
+          investor: user[0].id,
+          campaign: campaign_id,
+          fund_amount: request.body.fund_amount,
+          expected_invest_date: request.body.expected_invest_date,
+          remark: request.body.remark,
+          req_meeting: request.body.req_meeting,
+          is_active: false,
+          is_deleted: false,
+        })
+        .orIgnore()
+        .execute();
+      return responseMessage.responseWithData(true, 200, msg.createFund);
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.createFundFail,
         err
       );
     }

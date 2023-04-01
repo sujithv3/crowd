@@ -123,6 +123,10 @@ module.exports = {
   ListMyDealSuccess: "List my deals success",
   ListMyDealFail: "List my deals failed",
 
+  // fund success
+  createFund: "Investment Request success",
+  createFundFail: "Investment Request failed",
+
   // admin
   // dashboard
   listDashboard: "successfully listed",

@@ -363,8 +363,10 @@ export class CampaignController {
           "location.country",
           "category.name",
           "subcategory.name",
+          "users.id",
           "users.first_name",
           "users.last_name",
+          "users.company_name",
           "users.company_logo",
         ])
         .where(
