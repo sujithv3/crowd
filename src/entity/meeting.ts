@@ -29,6 +29,19 @@ export class Meeting {
   campaign: Campaigns;
 
   @Column({
+    length: 200,
+    type: "varchar",
+    default: null,
+  })
+  query: string;
+
+  @Column({
+    type: "text",
+    default: null,
+  })
+  feedback: string;
+
+  @Column({
     type: "enum",
     enum: status,
     default: status.PENDING,

@@ -44,6 +44,15 @@ export const Routes = [
     isLogin: true,
     fileUpload: false,
   },
+  {
+    method: "get",
+    route: "/meeting",
+    controller: InvestorController,
+    action: "meetingList",
+    validationField: "",
+    isLogin: true,
+    fileUpload: false,
+  },
 ];
 
 // function routes

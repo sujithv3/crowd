@@ -17,6 +17,7 @@ import { Teams } from "./teams";
 import { BankInfo } from "./bankinfo";
 import { Staging } from "./staging";
 import { MyDeals } from "./mydeals";
+import { Meeting } from "./meeting";
 
 export enum businessType {
   BUSINESS = "business",
@@ -172,6 +173,9 @@ export class Campaigns {
 
   @OneToMany(() => MyDeals, (myDeal) => myDeal.campaign)
   myDeals: MyDeals[];
+
+  @OneToMany(() => Meeting, (meeting) => meeting.campaign)
+  meeting: Meeting[];
 
   @Column({
     type: "float",

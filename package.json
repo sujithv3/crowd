@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.13",
+    "archiver": "^5.3.1",
     "aws-sdk": "^2.1322.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.19.1",
@@ -31,6 +32,7 @@
     "nodemailer": "^6.9.1",
     "nodemon": "^2.0.20",
     "reflect-metadata": "^0.1.13",
+    "request": "^2.88.2",
     "twilio": "^4.8.0",
     "typeorm": "0.3.12"
   },

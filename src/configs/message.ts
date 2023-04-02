@@ -123,6 +123,12 @@ module.exports = {
   ListMyDealSuccess: "List my deals success",
   ListMyDealFail: "List my deals failed",
 
+  // meeting
+  createMeeting: "Meeting Request success",
+  createMeetingFail: "Meeting Request failed",
+  ListMeetingSuccess: "List Meeting Requests success",
+  ListMeetingFail: "List Meeting Requests failed",
+
   // fund success
   createFund: "Investment Request success",
   createFundFail: "Investment Request failed",
