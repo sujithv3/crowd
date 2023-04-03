@@ -62,27 +62,26 @@ export class Verifications {
 
       const user = Jwt.decode(token);
 
-      await this.userRepository.update(
-        {
-          id: user[0].id,
-        },
-        {
-          contact_number_verified: true,
-        }
-      );
-
       await client.verify.v2
         .services(process.env.SERVICE_TOKEN)
         .verificationChecks.create({
           to: `+${process.env.COUNTRY_CODE}${req.body.contact_number}`,
           code: req.body.otp,
         })
-        .then((data) => {
+        .then(async (data) => {
           if (!data.valid) {
             return res.send(
               responseMessage.responseMessage(false, 400, msg.invalidOTP)
             );
           }
+          await this.userRepository.update(
+            {
+              id: user[0].id,
+            },
+            {
+              contact_number_verified: true,
+            }
+          );
           return res.send(
             responseMessage.responseMessage(true, 200, msg.verifySuccess)
           );
