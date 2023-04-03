@@ -155,4 +155,8 @@ module.exports = {
   tagged_failed: "Tagged failed",
   un_tagged_success: "Un-tagged successfully",
   un_tagged_failed: "Un-tagged successfully",
+
+  // profile
+  profile_updated_successfully: "Update Successfully",
+  profile_updated_failed: "Update Failed",
 };

@@ -16,7 +16,7 @@ export class UserController {
   public forgetTokenRepository = AppDataSource.getRepository(rmForgetToken);
 
   //   create user
-  async create(request: Request, response: Response, next: NextFunction) {
+  async create(request: any, response: Response, next: NextFunction) {
     try {
       const {
         first_name,
@@ -26,7 +26,7 @@ export class UserController {
         contact_number,
         password,
         sector,
-        role_id,
+        role_id = 3,
         country,
         state,
         city,
@@ -53,12 +53,16 @@ export class UserController {
         );
       }
 
+      // console.log(request.files);
+
       // create user
       const users: any = await this.userRepository.save({
         first_name,
         last_name,
         email_id,
-        profile,
+        profile: request.files.profile
+          ? request.files.profile[0].location
+          : profile,
         profile_id: `${country}${(
           "000" +
           ((await this.userRepository.count()) + 1)
@@ -70,7 +74,7 @@ export class UserController {
         country,
         state,
         city,
-        sector: sector ? sector : [],
+        sector: sector ? JSON.parse(sector) : [],
         created_date: new Date(),
         updated_date: new Date(),
       });
