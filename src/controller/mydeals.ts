@@ -99,6 +99,7 @@ export class MydealsController {
         .createQueryBuilder("campaign")
         .innerJoinAndSelect("campaign.myDeals", "myDeals")
         .where("myDeals.user_id = :id", { id: user[0].id })
+        .leftJoinAndSelect("campaign.user", "startup")
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .loadRelationCountAndMap("campaign.fund", "campaign.fund")

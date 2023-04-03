@@ -80,6 +80,106 @@ export class TaggedController {
 
       const user = Jwt.decode(token);
 
+      // const campaign = await this.campaignRepository
+      //   .createQueryBuilder("campaign")
+      //   .select([
+      //     "campaign.title",
+      //     "startup.first_name",
+      //     "startup.last_name",
+      //     "location.name",
+      //     "location.country",
+      //     "campaign.createdDate",
+      //     "campaign.goal_amount",
+      //     "SUM(fund.fund_amount) as total_funded_amount",
+      //   ])
+      //   .leftJoin("campaign.location", "location")
+      //   .innerJoin("campaign.user", "startup")
+      //   .leftJoin("campaign.fund", "fund")
+      //   .innerJoin("startup.tagged", "tagged")
+      //   .loadRelationCountAndMap("campaign.fund", "campaign.fund")
+      //   .where("tagged.rm_id = :id AND tagged.is_active=true", {
+      //     id: user[0].id,
+      //   })
+      //   .getMany();
+
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .select([
+          "campaign.id",
+          "campaign.title",
+          "startup.first_name",
+          "startup.last_name",
+          "location.name",
+          "location.country",
+          "campaign.createdDate",
+          "campaign.goal_amount",
+        ])
+        .leftJoin("campaign.location", "location")
+        .innerJoin("campaign.user", "startup")
+        .leftJoin("campaign.fund", "fund")
+        .innerJoin("startup.tagged", "tagged")
+        .addSelect(
+          "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.campaignId=campaign.id)",
+          "fund_amount"
+        )
+        .addSelect(
+          "(SELECT COUNT(*) FROM funds WHERE funds.campaignId=campaign.id)",
+          "fund_count"
+        )
+        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+          id: user[0].id,
+        })
+        .getRawMany();
+
+      // const campaign = await this.campaignRepository
+      //   .createQueryBuilder("campaign")
+      //   .innerJoinAndSelect("campaign.user", "user")
+      //   .innerJoin("user.tagged", "tagged")
+      //   .loadRelationCountAndMap("campaign.fund", "campaign.fund")
+      //   .innerJoin("tagged.RelationManager", "relationManager")
+      //   .where("tagged.rm_id = :id AND tagged.is_active=true", {
+      //     id: user[0].id,
+      //   })
+      //   .getMany();
+
+      if (campaign.length === 0) {
+        return responseMessage.responseMessage(
+          false,
+          400,
+          msg.campaignListFailed
+        );
+      }
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.campaignListSuccess,
+        campaign
+      );
+    } catch (err) {
+      console.log(err);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userListFailed,
+        err
+      );
+    }
+  }
+
+  async fundedDetail(request: Request, response: Response, next: NextFunction) {
+    try {
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
+
       const campaign = await this.userRepository
         .createQueryBuilder("startup")
         .innerJoin("startup.tagged", "tagged")

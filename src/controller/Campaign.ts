@@ -7,6 +7,38 @@ import { Campaigns } from "../entity/campaigns";
 const responseMessage = require("../configs/response");
 const msg = require("../configs/message");
 const Jwt = require("./../utils/jsonwebtoken");
+var async = require("async");
+var request = require("request");
+var archiver = require("archiver");
+
+function zipURLs(urls, outStream) {
+  var zipArchive = archiver.create("zip");
+
+  async.eachLimit(
+    urls,
+    3,
+    function (url, done) {
+      var stream = request.get(url.value);
+
+      stream
+        .on("error", function (err) {
+          return done(err);
+        })
+        .on("end", function () {
+          return done();
+        });
+
+      // Use the last part of the URL as a filename within the ZIP archive.
+      console.log("stream", url);
+      zipArchive.append(stream, { name: url.name });
+    },
+    async function (err) {
+      if (err) throw err;
+      const res = await zipArchive.finalize();
+      console.log("res", res);
+    }
+  );
+}
 
 export class CampaignController {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
@@ -363,8 +395,10 @@ export class CampaignController {
           "location.country",
           "category.name",
           "subcategory.name",
+          "users.id",
           "users.first_name",
           "users.last_name",
+          "users.company_name",
           "users.company_logo",
         ])
         .where(
@@ -395,6 +429,35 @@ export class CampaignController {
         msg.userListSuccess,
         campaign
       );
+    } catch (error) {
+      console.log(error);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.userListFailed,
+        error
+      );
+    }
+  }
+
+  async download(req: Request, res: Response, next: NextFunction) {
+    const id = parseInt(req.params.id);
+    try {
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .select(["campaign.files"])
+        .where(
+          `campaign.id = :id 
+       `,
+          {
+            id: id,
+          }
+        )
+        .getOne();
+
+      console.log("files", campaign.files);
+
+      zipURLs(campaign.files, res);
     } catch (error) {
       console.log(error);
       return responseMessage.responseWithData(

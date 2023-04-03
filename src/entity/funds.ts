@@ -28,6 +28,23 @@ export class Funds {
   @ManyToOne(() => Campaigns, (campaign) => campaign.fund)
   campaign: Campaigns;
 
+  @Column({
+    type: "date",
+    default: null,
+  })
+  expected_invest_date: Date;
+
+  @Column({
+    type: "text",
+    default: null,
+  })
+  remark: string;
+
+  @Column({
+    default: false,
+  })
+  req_meeting: boolean;
+
   @CreateDateColumn()
   createdDate: Date;
 

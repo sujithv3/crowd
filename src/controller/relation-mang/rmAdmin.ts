@@ -59,7 +59,10 @@ export class UserController {
         last_name,
         email_id,
         profile,
-        profile_id: `${country}${('000' + (await this.userRepository.count() + 1)).slice(-4)}`,
+        profile_id: `${country}${(
+          "000" +
+          ((await this.userRepository.count()) + 1)
+        ).slice(-4)}`,
         contact_number,
         password: encrypt_password,
         role: role_id,
@@ -373,7 +376,7 @@ export class UserController {
           email_id: email,
           is_active: true,
           is_deleted: false,
-          role: role
+          role: role,
         }
       )
       .getMany();

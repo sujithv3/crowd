@@ -41,12 +41,12 @@ export class MeetingController {
         })
         .orIgnore()
         .execute();
-      return responseMessage.responseWithData(true, 200, msg.createMyDeals);
+      return responseMessage.responseWithData(true, 200, msg.createMeeting);
     } catch (err) {
       return responseMessage.responseWithData(
         false,
         400,
-        msg.createMyDealFail,
+        msg.createMeetingFail,
         err
       );
     }

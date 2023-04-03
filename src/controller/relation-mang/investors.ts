@@ -5,6 +5,7 @@ import { Tagged } from "../../entity/tagged";
 import { Campaigns } from "../../entity/campaigns";
 import { Funds } from "../../entity/funds";
 import { Users } from "../../entity/Users";
+import { Meeting } from "../../entity/meeting";
 const { genToken } = require("../../utils/jsonwebtoken");
 const responseMessage = require("../../configs/response");
 const crypto = require("crypto");
@@ -18,6 +19,7 @@ export class InvestorController {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
   private userRepository = AppDataSource.getRepository(Users);
   private fundsRepository = AppDataSource.getRepository(Funds);
+  private MeetingRepository = AppDataSource.getRepository(Meeting);
 
   //list all investors
   async getInvestorsList(
@@ -81,9 +83,12 @@ export class InvestorController {
       const campaign = await this.userRepository
         .createQueryBuilder("user")
         .innerJoin("user.tagged", "tagged")
-        .where("tagged.rm_id = :id AND tagged.is_active=true", {
-          id: user[0].id,
-        })
+        .where(
+          "tagged.rm_id = :id AND tagged.is_active=true AND user.is_deleted=false",
+          {
+            id: user[0].id,
+          }
+        )
         .select([
           "user.id",
           "user.first_name",
@@ -151,9 +156,10 @@ export class InvestorController {
         .innerJoinAndSelect("fund.investor", "investor")
         .innerJoinAndSelect("fund.campaign", "campaign")
         .innerJoinAndSelect("campaign.location", "location")
-        .innerJoin("investor.tagged", "tagged")
-        .where("tagged.id = :id AND tagged.is_active=true", {
-          id: user[0].id,
+        .innerJoin("campaign.user", "startup")
+        .innerJoin("startup.tagged", "tagged")
+        .where("tagged.rm_id = :userId AND tagged.is_active=true", {
+          userId: user[0].id,
         })
         .select([
           "investor.id",
@@ -263,6 +269,62 @@ export class InvestorController {
         false,
         400,
         msg.userListFailed,
+        err
+      );
+    }
+  }
+
+  async meetingList(request: Request, response: Response, next: NextFunction) {
+    try {
+      // get user id
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+      const user = Jwt.decode(token);
+
+      const campaign = await this.MeetingRepository.createQueryBuilder(
+        "meeting"
+      )
+        .select([
+          "meeting.id",
+          "meeting.query",
+          "meeting.feedback",
+          "meeting.createdDate",
+          "campaign.id",
+          "campaign.title",
+          "investor.company_name",
+          "investor.id",
+          "investor.city",
+          "investor.country",
+        ])
+        .innerJoin("meeting.campaign", "campaign")
+        .innerJoin("meeting.user", "investor")
+        .innerJoin("campaign.user", "startup")
+        .innerJoin("startup.tagged", "tagged")
+        .where("tagged.rm_id = :userId AND tagged.is_active=true", {
+          userId: user[0].id,
+        })
+        .getMany();
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.ListMeetingSuccess,
+        campaign
+      );
+    } catch (err) {
+      console.log(err);
+
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.ListMeetingFail,
         err
       );
     }

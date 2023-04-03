@@ -23,6 +23,14 @@ export const Routes = [
     validationField: "",
     isLogin: true,
   },
+  {
+    method: "post",
+    route: "/add-fund",
+    controller: investorController,
+    action: "addFund",
+    validationField: "",
+    isLogin: true,
+  },
 ];
 
 // function routes
