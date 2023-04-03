@@ -110,7 +110,7 @@ export class ListInvestor {
     try {
       const InvestorData = await this.campaignRepository
         .createQueryBuilder("investors")
-        .where("investors.investor=17", { id: request.params.id })
+        .where("investors.investor=:id", { id: request.params.id })
         .leftJoinAndSelect(
           "investors.campaign",
           "campaign",
