@@ -6,6 +6,7 @@ import { Campaigns } from "../../entity/campaigns";
 import { Funds } from "../../entity/funds";
 import { Users } from "../../entity/Users";
 import { Meeting } from "../../entity/meeting";
+import { MyDeals } from "../../entity/mydeals";
 const { genToken } = require("../../utils/jsonwebtoken");
 const responseMessage = require("../../configs/response");
 const crypto = require("crypto");
@@ -15,11 +16,11 @@ const sendEmail = require("../../utils/nodemailer/email");
 
 export class InvestorController {
   //   private userRepository = AppDataSource.getRepository(rmAdmin);
-  private taggedRepository = AppDataSource.getRepository(Tagged);
   private campaignRepository = AppDataSource.getRepository(Campaigns);
   private userRepository = AppDataSource.getRepository(Users);
   private fundsRepository = AppDataSource.getRepository(Funds);
   private MeetingRepository = AppDataSource.getRepository(Meeting);
+  private MyDealsRepository = AppDataSource.getRepository(MyDeals);
 
   //list all investors
   async getInvestorsList(
@@ -317,6 +318,141 @@ export class InvestorController {
         200,
         msg.ListMeetingSuccess,
         campaign
+      );
+    } catch (err) {
+      console.log(err);
+
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.ListMeetingFail,
+        err
+      );
+    }
+  }
+
+  async dashboard(request: Request) {
+    try {
+      // get user id
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+      const user = Jwt.decode(token);
+
+      const meetingCount = await this.MeetingRepository.createQueryBuilder(
+        "meeting"
+      )
+        .innerJoin("meeting.campaign", "campaign")
+        .innerJoin("meeting.user", "investor")
+        .innerJoin("campaign.user", "startup")
+        .innerJoin("startup.tagged", "tagged")
+        .where("tagged.rm_id = :userId AND tagged.is_active=true", {
+          userId: user[0].id,
+        })
+        .getCount();
+
+      const taggedCount = await this.userRepository
+        .createQueryBuilder("startup")
+        .innerJoin("startup.tagged", "tagged")
+        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+          id: user[0].id,
+        })
+        .getCount();
+
+      const interestedCount = await this.MyDealsRepository.createQueryBuilder(
+        "mydeals"
+      )
+        .innerJoin("mydeals.user", "investor")
+        .innerJoin("investor.tagged", "tagged")
+        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+          id: user[0].id,
+        })
+        .getCount();
+
+      const data = {
+        meetingCount: meetingCount,
+        taggedCount: taggedCount,
+        interestedCount: interestedCount,
+      };
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.ListMeetingSuccess,
+        data
+      );
+    } catch (err) {
+      console.log(err);
+
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.ListMeetingFail,
+        err
+      );
+    }
+  }
+
+  async graph(request: Request) {
+    try {
+      // get user id
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+      const user = Jwt.decode(token);
+
+      const graphTagged = await this.userRepository
+        .createQueryBuilder("startup")
+        .select([
+          "YEAR(startup.created_date) as year",
+          "MONTH(startup.created_date) as month",
+          "COUNT(startup.id) as count",
+        ])
+        .innerJoin("startup.tagged", "tagged")
+        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+          id: user[0].id,
+        })
+        .groupBy("YEAR(startup.created_date), MONTH(startup.created_date)")
+        .getRawMany();
+
+      //@todo: Closed logic need to change
+
+      const closed = await this.userRepository
+        .createQueryBuilder("startup")
+        .select([
+          "YEAR(startup.created_date) as year",
+          "MONTH(startup.created_date) as month",
+          "COUNT(startup.id) as count",
+        ])
+        .innerJoin("startup.tagged", "tagged")
+        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+          id: user[0].id,
+        })
+        .groupBy("YEAR(startup.created_date), MONTH(startup.created_date)")
+        .getRawMany();
+
+      const data = {
+        tagged: graphTagged,
+        closed,
+      };
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.ListMeetingSuccess,
+        data
       );
     } catch (err) {
       console.log(err);
