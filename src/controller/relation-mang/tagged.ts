@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { Tagged } from "../../entity/tagged";
 import { Campaigns } from "../../entity/campaigns";
 import { Users } from "../../entity/Users";
+import { Funds } from "../../entity/funds";
 const { genToken } = require("../../utils/jsonwebtoken");
 const responseMessage = require("../../configs/response");
 const crypto = require("crypto");
@@ -16,6 +17,7 @@ export class TaggedController {
   private taggedRepository = AppDataSource.getRepository(Tagged);
   private campaignRepository = AppDataSource.getRepository(Campaigns);
   private userRepository = AppDataSource.getRepository(Users);
+  private fundsRepository = AppDataSource.getRepository(Funds);
 
   //   list all users
   async all(request: Request, response: Response, next: NextFunction) {
@@ -152,17 +154,6 @@ export class TaggedController {
         })
         .getRawMany();
 
-      // const campaign = await this.campaignRepository
-      //   .createQueryBuilder("campaign")
-      //   .innerJoinAndSelect("campaign.user", "user")
-      //   .innerJoin("user.tagged", "tagged")
-      //   .loadRelationCountAndMap("campaign.fund", "campaign.fund")
-      //   .innerJoin("tagged.RelationManager", "relationManager")
-      //   .where("tagged.rm_id = :id AND tagged.is_active=true", {
-      //     id: user[0].id,
-      //   })
-      //   .getMany();
-
       if (campaign.length === 0) {
         return responseMessage.responseMessage(
           false,
@@ -238,6 +229,16 @@ export class TaggedController {
         )
         .getRawOne();
 
+      const funds = await this.fundsRepository
+        .createQueryBuilder("funds")
+        .where("funds.campaignId=:id", { id })
+        .getMany();
+
+      const data = {
+        items: campaign,
+        funds: funds,
+      };
+
       // const campaign = await this.campaignRepository
       //   .createQueryBuilder("campaign")
       //   .innerJoinAndSelect("campaign.user", "user")
@@ -260,7 +261,7 @@ export class TaggedController {
         true,
         200,
         msg.campaignListSuccess,
-        campaign
+        data
       );
     } catch (err) {
       console.log(err);
