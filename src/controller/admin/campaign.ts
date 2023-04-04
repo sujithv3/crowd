@@ -56,23 +56,24 @@ export class CampaignController {
         });
       }
       if (request.query.from_date && request.query.to_date) {
-        campaignQueryBuilder.andWhere(
-          "campaign.start_date >= :start_date AND campaign.start_date <=: end_date",
-          {
-            start_date: request.query.from_date,
-            end_date: request.query.to_date,
-          }
-        );
+        const formatDate = (date) => {
+          let convertedDate = new Date(date);
+          // .toISOString();
+          // .replace(/T/, " ") // replace T with a space
+          // .replace(/\..+/, "");
+          return convertedDate;
+        };
+
+        campaignQueryBuilder.andWhere("campaign.start_date > :start_dates  ", {
+          start_dates: formatDate(request.query.from_date),
+        });
+        campaignQueryBuilder.andWhere("campaign.start_date < :end_date ", {
+          end_date: formatDate(request.query.to_date),
+        });
       }
 
       const data = await campaignQueryBuilder
-        .skip(
-          request.query.page
-            ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
-            : 0
-        )
-        .take(request.query.limit ? Number(request.query.limit) : 10)
+
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.bank_location", "bank_location")
         .leftJoinAndSelect("campaign.location", "location")
@@ -81,6 +82,13 @@ export class CampaignController {
         .leftJoin("campaign.fund", "fund")
         .addSelect("SUM(fund.fund_amount)", "received_funds")
         .groupBy("campaign.id")
+        .offset(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .limit(request.query.limit ? Number(request.query.limit) : 10)
         .getRawMany();
 
       const total_count = await this.campaignRepository

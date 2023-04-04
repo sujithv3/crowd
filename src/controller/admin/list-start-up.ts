@@ -47,15 +47,25 @@ export class ListStartUp {
       // featured
       // AND campaign.is_featured=1
 
-      const startUpList = await this.userRepository
+      const startUpListRepository = await this.userRepository
         .createQueryBuilder("startUp")
         .where("startUp.is_active=true AND startUp.role_id=1")
-
         .leftJoinAndSelect("startUp.campaign", "campaign")
         .loadRelationCountAndMap("campaign.fund_count", "campaign.fund")
         .loadRelationCountAndMap("startUp.campaign_count", "startUp.campaign")
         .leftJoinAndSelect("startUp.tagged", "tagged", "tagged.is_active=true")
-        .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+        .leftJoinAndSelect("tagged.RelationManager", "RelationManager");
+
+      if (request.query.status) {
+        startUpListRepository.andWhere(
+          `tagged.id IS ${
+            request.query.status === "tagged" ? "NOT NULL" : "NULL"
+          }`
+        );
+      }
+
+      const startUpList = await startUpListRepository
+
         .select([
           "startUp.id",
           "startUp.first_name",
@@ -145,6 +155,11 @@ export class ListStartUp {
           country: request.query.country,
         });
       }
+      if (request.query.sector) {
+        startUpQueryBuilder.andWhere("user.sector  LIKE :sector", {
+          sector: `%${request.query.sector}%`,
+        });
+      }
 
       const startUpList = await startUpQueryBuilder
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
@@ -204,6 +219,12 @@ export class ListStartUp {
       if (request.query.country) {
         startUpQueryBuilder.andWhere("user.country=:country", {
           country: request.query.country,
+        });
+      }
+
+      if (request.query.sector) {
+        startUpQueryBuilder.andWhere("user.sector  LIKE :sector", {
+          sector: `%${request.query.sector}%`,
         });
       }
 
