@@ -413,6 +413,8 @@ export class InvestorController {
       }
       const user = Jwt.decode(token);
 
+      const year = request.query.year;
+
       const graphTagged = await this.userRepository
         .createQueryBuilder("startup")
         .select([
@@ -421,9 +423,13 @@ export class InvestorController {
           "COUNT(startup.id) as count",
         ])
         .innerJoin("startup.tagged", "tagged")
-        .where("tagged.rm_id = :id AND tagged.is_active=true", {
-          id: user[0].id,
-        })
+        .where(
+          "tagged.rm_id = :id AND tagged.is_active=true AND YEAR(startup.created_date)=:year",
+          {
+            id: user[0].id,
+            year: year,
+          }
+        )
         .groupBy("YEAR(startup.created_date), MONTH(startup.created_date)")
         .getRawMany();
 
@@ -437,9 +443,13 @@ export class InvestorController {
           "COUNT(startup.id) as count",
         ])
         .innerJoin("startup.tagged", "tagged")
-        .where("tagged.rm_id = :id AND tagged.is_active=true", {
-          id: user[0].id,
-        })
+        .where(
+          "tagged.rm_id = :id AND tagged.is_active=true AND YEAR(startup.created_date)=:year",
+          {
+            id: user[0].id,
+            year: year,
+          }
+        )
         .groupBy("YEAR(startup.created_date), MONTH(startup.created_date)")
         .getRawMany();
 

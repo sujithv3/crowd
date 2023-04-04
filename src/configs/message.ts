@@ -129,6 +129,10 @@ module.exports = {
   ListMeetingSuccess: "List Meeting Requests success",
   ListMeetingFail: "List Meeting Requests failed",
 
+  // stage
+  stageSuccess: "Staging Listed successfully",
+  stageFail: "Staging List Failed",
+
   // fund success
   createFund: "Investment Request success",
   createFundFail: "Investment Request failed",

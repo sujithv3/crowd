@@ -14,7 +14,7 @@ export const Routes = [
     isLogin: true,
   },
   {
-    method: "get",
+    method: "post",
     route: "/approve/:id",
     controller: CampaignController,
     action: "approve",

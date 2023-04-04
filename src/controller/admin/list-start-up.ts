@@ -157,7 +157,7 @@ export class ListStartUp {
           "user.id",
           "user.first_name",
           "user.last_name",
-          // "user.sectors",
+          "user.sector",
           "user.country",
           "RelationManager.id",
           "RelationManager.first_name",
@@ -165,7 +165,6 @@ export class ListStartUp {
           "tagged.id",
           "campaign.id",
         ])
-
         .skip(
           request.query.page
             ? Number(request.query.page) *
@@ -219,7 +218,7 @@ export class ListStartUp {
           "user.id",
           "user.first_name",
           "user.last_name",
-          // "user.sectors",
+          "user.sector",
           "user.country",
           "RelationManager.id",
           "RelationManager.first_name",
