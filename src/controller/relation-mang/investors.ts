@@ -168,6 +168,8 @@ export class InvestorController {
           "investor.last_name",
           "investor.city",
           "investor.country",
+          "startup.company_name",
+          "startup.stage_of_business",
           "campaign.title",
           "location.name",
           "location.country",
