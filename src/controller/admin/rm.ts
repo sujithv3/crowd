@@ -26,12 +26,10 @@ export class RelationManager {
         )
         .getManyAndCount();
 
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.list_success,
-        startUpCounts
-      );
+      return responseMessage.responseWithData(true, 200, msg.list_success, {
+        total_count: startUpCounts[1],
+        data: startUpCounts[0],
+      });
     } catch (err) {
       return responseMessage.responseWithData(false, 400, msg.list_Failed, err);
     }
@@ -50,6 +48,25 @@ export class RelationManager {
         })
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.StartUp", "startUp")
+        .loadRelationCountAndMap(
+          "user.tagged_count",
+          "user.tagged",
+          "tagged",
+          (qb) => qb.andWhere("tagged.is_active=true")
+        )
+        .loadRelationCountAndMap(
+          "user.campaign_count",
+          "startUp.campaign",
+          "campaign",
+          (qb) => qb.andWhere("campaign.is_active=true")
+        )
+        .leftJoinAndSelect("startUp.campaign", "campaign")
+        .loadRelationCountAndMap(
+          "user.investor_count",
+          "campaign.fund",
+          "fund",
+          (qb) => qb.andWhere("fund.is_active=true")
+        )
         .getOne();
 
       return responseMessage.responseWithData(
