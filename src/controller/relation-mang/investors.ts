@@ -300,6 +300,8 @@ export class InvestorController {
           "campaign.id",
           "campaign.title",
           "investor.company_name",
+          "investor.first_name",
+          "investor.last_name",
           "investor.id",
           "investor.city",
           "investor.country",
