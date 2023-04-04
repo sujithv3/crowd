@@ -53,6 +53,24 @@ export const Routes = [
     isLogin: true,
     fileUpload: false,
   },
+  {
+    method: "get",
+    route: "/dashboard",
+    controller: InvestorController,
+    action: "dashboard",
+    validationField: "",
+    isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "get",
+    route: "/graph",
+    controller: InvestorController,
+    action: "graph",
+    validationField: "",
+    isLogin: true,
+    fileUpload: false,
+  },
 ];
 
 // function routes

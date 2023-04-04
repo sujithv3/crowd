@@ -10,6 +10,7 @@ const Jwt = require("./../utils/jsonwebtoken");
 var async = require("async");
 var request = require("request");
 var archiver = require("archiver");
+import { Staging } from "../entity/staging";
 
 function zipURLs(urls, outStream) {
   var zipArchive = archiver.create("zip");
@@ -42,7 +43,7 @@ function zipURLs(urls, outStream) {
 
 export class CampaignController {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
-
+  private StagingRepository = AppDataSource.getTreeRepository(Staging);
   async getUserBased(request: Request, response: Response, next: NextFunction) {
     try {
       let token: any;
@@ -534,6 +535,25 @@ export class CampaignController {
         msg.userListFailed,
         error
       );
+    }
+  }
+
+  async getStages(req: Request, res: Response, next: NextFunction) {
+    try {
+      const stages = await this.StagingRepository.createQueryBuilder()
+        .where(
+          "id IN (SELECT `campaign`.`staging_id` FROM `campaigns` `campaign` WHERE `campaign`.`is_deleted`=0 AND `campaign`.`is_active`=1 GROUP BY `campaign`.`staging_id`)"
+        )
+        .getMany();
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.stageSuccess,
+        stages
+      );
+    } catch (error) {
+      console.log(error);
+      return responseMessage.responseWithData(false, 400, msg.stageFail, error);
     }
   }
 }

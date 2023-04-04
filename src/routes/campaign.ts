@@ -62,6 +62,14 @@ export const Routes = [
     validationField: "",
     isLogin: false,
   },
+  {
+    method: "get",
+    route: "/stage",
+    controller: CampaignController,
+    action: "getStages",
+    validationField: "",
+    isLogin: false,
+  },
 ];
 
 // function routes
