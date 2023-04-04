@@ -381,11 +381,15 @@ export class UserController {
           stage_of_business,
           sector: sector ? JSON.parse(sector) : [],
           summary,
-          linked_in: linked_in ?? null,
-          facebook: facebook ?? null,
-          twitter: twitter ?? null,
-          you_tube: you_tube ?? null,
-          website: website ?? null,
+          linked_in: linked_in
+            ? linked_in === "null"
+              ? null
+              : linked_in
+            : null,
+          facebook: facebook ? (facebook === "null" ? null : facebook) : null,
+          twitter: twitter ? (twitter === "null" ? null : twitter) : null,
+          you_tube: you_tube ? (you_tube === "null" ? null : you_tube) : null,
+          website: website ? (website === "null" ? null : website) : null,
           extra_links: extra_links ? JSON.parse(extra_links) : [],
           updated_date: new Date(),
           is_verify: true,
