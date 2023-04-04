@@ -64,8 +64,8 @@ export const Routes = [
     controller: UserController,
     action: "create",
     validationField: UserValidation,
-    isLogin: false,
-    fileUpload: false,
+    isLogin: true,
+    fileUpload: true,
   },
   {
     method: "put",
@@ -187,10 +187,7 @@ Routes.forEach((route) => {
           return next();
         },
     route.fileUpload
-      ? upload.fields([
-          { name: "profile", maxCount: 1 },
-          { name: "company_logo", maxCount: 1 },
-        ])
+      ? upload.fields([{ name: "profile", maxCount: 1 }])
       : (req: Request, res: Response, next: Function) => {
           return next();
         },

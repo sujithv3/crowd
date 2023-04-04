@@ -1,6 +1,7 @@
 const { User } = require("../../controller/admin/user");
 const express = require("express");
 const app = express();
+const { upload } = require("../../utils/file-upload");
 import { Request, Response } from "express";
 const validationResult = require("../../utils/validations/validation-error");
 const JWT = require("../../utils/jsonwebtoken");
@@ -12,6 +13,16 @@ export const Routes = [
     action: "listAdmin",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "put",
+    route: "/update",
+    controller: User,
+    action: "edit",
+    validationField: "",
+    isLogin: true,
+    fileUpload: true,
   },
 ];
 
@@ -21,6 +32,11 @@ Routes.forEach((route) => {
     route.route,
     route.isLogin
       ? JWT.verify
+      : (req: Request, res: Response, next: Function) => {
+          return next();
+        },
+    route.fileUpload
+      ? upload.any()
       : (req: Request, res: Response, next: Function) => {
           return next();
         },

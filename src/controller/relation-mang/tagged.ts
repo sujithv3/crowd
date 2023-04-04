@@ -109,10 +109,15 @@ export class TaggedController {
           "campaign.title",
           "startup.first_name",
           "startup.last_name",
+          "startup.company_name",
+          "startup.stage_of_business",
+          "startup.sector",
           "location.name",
           "location.country",
           "campaign.createdDate",
           "campaign.goal_amount",
+          "campaign.start_date",
+          "campaign.deal_size",
         ])
         .leftJoin("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
@@ -179,18 +184,42 @@ export class TaggedController {
       }
 
       const user = Jwt.decode(token);
-
-      const campaign = await this.userRepository
-        .createQueryBuilder("startup")
+      const id = request.params.id;
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .select([
+          "startup.first_name",
+          "startup.last_name",
+          "startup.company_name",
+          "startup.stage_of_business",
+          "startup.sector",
+          "location.name",
+          "location.country",
+          "campaign.goal_amount",
+          "campaign.start_date",
+          "campaign.deal_size",
+        ])
+        .leftJoin("campaign.location", "location")
+        .innerJoin("campaign.user", "startup")
+        .leftJoin("campaign.fund", "fund")
         .innerJoin("startup.tagged", "tagged")
-        .innerJoinAndSelect("startup.campaign", "campaign")
         .addSelect(
-          `(SELECT COUNT(*) FROM funds where funds.campaignId=campaign.id LIMIT 1) as investors`
+          "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.campaignId=campaign.id)",
+          "fund_amount"
         )
-        // .where("tagged.rm_id = :id AND tagged.is_active=true", {
-        //   id: user[0].id,
-        // })
-        .getRawMany();
+        .addSelect(
+          "(SELECT COUNT(*) FROM funds WHERE funds.campaignId=campaign.id)",
+          "fund_count"
+        )
+
+        .where(
+          "campaign.id = :id AND tagged.rm_id = :userId AND tagged.is_active=true",
+          {
+            id: id,
+            userId: user[0].id,
+          }
+        )
+        .getRawOne();
 
       // const campaign = await this.campaignRepository
       //   .createQueryBuilder("campaign")
@@ -203,7 +232,7 @@ export class TaggedController {
       //   })
       //   .getMany();
 
-      if (campaign.length === 0) {
+      if (!campaign) {
         return responseMessage.responseMessage(
           false,
           400,
