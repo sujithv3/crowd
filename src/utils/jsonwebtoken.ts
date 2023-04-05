@@ -22,6 +22,7 @@ module.exports = {
         req.cookies.token === null
       ) {
         if (!req.headers.authorization) {
+          res.redirect(`/?auth=""`);
           return res
             .status(412)
             .send(
@@ -37,6 +38,7 @@ module.exports = {
       const verify = jwt.verify(token, process.env.JWT_SECRET_KEY);
       // console.log(verify);
       if (!verify) {
+        res.redirect(`/?auth=""`);
         return res
           .status(402)
           .send(
@@ -47,6 +49,7 @@ module.exports = {
       }
       return next();
     } catch (error) {
+      res.redirect(`/?auth=""`);
       console.log(error);
       return res.status(412).send(response.responseWithData(false, 402, error));
     }
