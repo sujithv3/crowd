@@ -231,6 +231,13 @@ export class TaggedController {
 
       const funds = await this.fundsRepository
         .createQueryBuilder("funds")
+        .select([
+          "funds.id",
+          "funds.fund_amount",
+          "investor.first_name",
+          "investor.last_name",
+        ])
+        .leftJoin("funds.investor", "investor")
         .where("funds.campaignId=:id", { id })
         .getMany();
 
