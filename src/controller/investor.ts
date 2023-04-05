@@ -8,6 +8,7 @@ import { Location } from "../entity/locations";
 import { Staging } from "../entity/staging";
 import { Campaigns } from "../entity/campaigns";
 import { Funds } from "../entity/funds";
+import { Meeting } from "../entity/meeting";
 const Jwt = require("./../utils/jsonwebtoken");
 const responseMessage = require("./../configs/response");
 const msg = require("../configs/message");
@@ -37,6 +38,7 @@ export class investorController {
   private StagingRepository = AppDataSource.getTreeRepository(Staging);
   private campaignRepository = AppDataSource.getTreeRepository(Campaigns);
   private FundRepository = AppDataSource.getTreeRepository(Funds);
+  private MeetingRepository = AppDataSource.getTreeRepository(Meeting);
   private manager = AppDataSource.manager;
 
   // list all
@@ -514,6 +516,77 @@ export class investorController {
         token = request.cookies.token;
       }
       const user = Jwt.decode(token);
+
+      let meeting_id = null;
+
+      if (request.body.req_meeting === "1") {
+        let date1 = new Date(request.body.start_time).getTime();
+        let date2 = new Date(request.body.end_time).getTime();
+        let meeting_date = new Date(request.body.meeting_date).getTime();
+
+        let diff = new Date().getTime() - meeting_date;
+        if (diff > 0) {
+          return responseMessage.responseWithData(
+            false,
+            400,
+            msg.createFundFail,
+            "Meeting Date cannot be past"
+          );
+        }
+
+        if (date1 > date2) {
+          return responseMessage.responseWithData(
+            false,
+            400,
+            msg.createFundFail,
+            "End Time Should be greater than start time"
+          );
+        }
+
+        const meetingExists =
+          await this.MeetingRepository.createQueryBuilder().where(
+            "user_id=:userid AND meeting_date > NOW() AND campaign_id=:campaignId AND is_active=true",
+            {
+              userid: user[0].id,
+              campaignId: campaign_id,
+            }
+          );
+
+        if (meetingExists) {
+          // reschedule meeting
+          // change active meeting to inactive
+
+          await this.MeetingRepository.createQueryBuilder()
+            .update()
+            .set({
+              is_active: false,
+            })
+            .where(
+              "user_id=:userid AND campaign_id=:campaignId AND is_active=true",
+              {
+                userid: user[0].id,
+                campaignId: campaign_id,
+              }
+            )
+            .execute();
+        }
+
+        const meeting = await this.MeetingRepository.createQueryBuilder()
+          .insert()
+          .values({
+            user: user[0].id,
+            campaign: campaign_id,
+            meeting_date: request.body.meeting,
+            start_time: request.body.start_time,
+            end_time: request.body.end_time,
+            is_active: true,
+            is_deleted: false,
+          })
+          .execute();
+
+        meeting_id = meeting.raw.insertId;
+      }
+
       // create my_deals
 
       await this.FundRepository.createQueryBuilder()
@@ -525,6 +598,7 @@ export class investorController {
           expected_invest_date: request.body.expected_invest_date,
           remark: request.body.remark,
           req_meeting: request.body.req_meeting,
+          meeting: meeting_id,
           is_active: false,
           is_deleted: false,
         })
@@ -532,6 +606,7 @@ export class investorController {
         .execute();
       return responseMessage.responseWithData(true, 200, msg.createFund);
     } catch (err) {
+      console.log("err", err);
       return responseMessage.responseWithData(
         false,
         400,
