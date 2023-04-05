@@ -91,7 +91,7 @@ export class CampaignController {
         .limit(request.query.limit ? Number(request.query.limit) : 10)
         .getRawMany();
 
-      const total_count = await this.campaignRepository
+      const total_countRepository = await this.campaignRepository
         .createQueryBuilder("campaign")
         .where(
           `
@@ -103,8 +103,29 @@ export class CampaignController {
             is_deleted: false,
             is_active: true,
           }
-        )
-        .getCount();
+        );
+      if (request.query.status) {
+        total_countRepository.andWhere("campaign.status=:status", {
+          status: request.query.status,
+        });
+      }
+      if (request.query.from_date && request.query.to_date) {
+        const formatDate = (date) => {
+          let convertedDate = new Date(date);
+          // .toISOString();
+          // .replace(/T/, " ") // replace T with a space
+          // .replace(/\..+/, "");
+          return convertedDate;
+        };
+
+        total_countRepository.andWhere("campaign.start_date > :start_dates  ", {
+          start_dates: formatDate(request.query.from_date),
+        });
+        total_countRepository.andWhere("campaign.start_date < :end_date ", {
+          end_date: formatDate(request.query.to_date),
+        });
+      }
+      const total_count = await total_countRepository.getCount();
 
       return responseMessage.responseWithData(
         true,

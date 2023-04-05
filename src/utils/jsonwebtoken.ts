@@ -22,11 +22,12 @@ module.exports = {
         req.cookies.token === null
       ) {
         if (!req.headers.authorization) {
-          return res
-            .status(412)
-            .send(
-              response.responseMessage(false, 402, msg.user_login_required)
-            );
+          return (
+            res
+              .status(401)
+              // .send(response.responseMessage(false, 402, msg.user_login_required))
+              .redirect(`/?auth=""`)
+          );
         } else {
           token = req.headers.authorization.slice(7);
         }
@@ -37,18 +38,26 @@ module.exports = {
       const verify = jwt.verify(token, process.env.JWT_SECRET_KEY);
       // console.log(verify);
       if (!verify) {
-        return res
-          .status(402)
-          .send(
-            res.json(
-              response.responseMessage(false, 402, msg.userCreationFailed)
-            )
-          );
+        return (
+          res
+            .status(401)
+            // .send(
+            //   res.json(
+            //     response.responseMessage(false, 402, msg.userCreationFailed)
+            //   )
+            // )
+            .redirect(`/?auth=""`)
+        );
       }
       return next();
     } catch (error) {
       console.log(error);
-      return res.status(412).send(response.responseWithData(false, 402, error));
+      return (
+        res
+          .status(401)
+          // .send(response.responseWithData(false, 402, error))
+          .redirect(`/?auth=""`)
+      );
     }
   },
   decode(data: string) {
