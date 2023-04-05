@@ -18,12 +18,38 @@ export class RelationManager {
       // featured
       // AND campaign.is_featured=1
 
-      const startUpCounts = await this.userRepository
+      const startUpCountsRepository = await this.userRepository
         .createQueryBuilder("user")
         .where("user.is_active=true AND user.role_id=3")
-        .loadRelationCountAndMap("user.tagged", "user.tagged", "tagged", (qb) =>
-          qb.andWhere("tagged.is_active=true")
+        .leftJoin("user.tagged", "tagged")
+        .loadRelationCountAndMap(
+          "user.tagged_count",
+          "user.tagged",
+          "tagged",
+          (qb) => qb.andWhere("tagged.is_active=true")
+        );
+
+      if (request.query.tagged_status) {
+        startUpCountsRepository.andWhere(
+          `tagged.id IS ${
+            request.query.tagged_status === "tagged" ? "NOT NULL" : "NULL"
+          }`
+        );
+      }
+      if (request.query.country) {
+        startUpCountsRepository.andWhere(`user.country =:country`, {
+          country: request.query.country,
+        });
+      }
+
+      const startUpCounts = await startUpCountsRepository
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
         )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
         .getManyAndCount();
 
       return responseMessage.responseWithData(true, 200, msg.list_success, {
