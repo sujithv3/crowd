@@ -47,7 +47,7 @@ export class ListInvestor {
       // featured
       // AND campaign.is_featured=1
 
-      const startUpList = await this.userRepository
+      const investorListRepository = await this.userRepository
         .createQueryBuilder("investors")
         .where("investors.is_active=true AND investors.role_id=2")
         .leftJoinAndSelect("investors.fund", "fund")
@@ -59,7 +59,13 @@ export class ListInvestor {
           "fund.campaign",
           "campaign",
           `campaign.end_date >= ${new Date().toISOString().slice(0, 10)}`
-        )
+        );
+      if (request.query.country) {
+        investorListRepository.andWhere("investors.country=:country", {
+          country: request.query.country,
+        });
+      }
+      const investorList = await investorListRepository
         .select([
           "investors.id",
           "investors.first_name",
@@ -77,9 +83,9 @@ export class ListInvestor {
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
-        .getMany();
+        .getManyAndCount();
 
-      const data = await startUpList.map((e: any) => {
+      const data = await investorList[0].map((e: any) => {
         let current_invest_count = 0;
         e.fund.forEach((a: any) => {
           if (a.campaign) {
@@ -91,12 +97,10 @@ export class ListInvestor {
         return e;
       });
 
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.list_success,
-        data
-      );
+      return responseMessage.responseWithData(true, 200, msg.list_success, {
+        totalCount: investorList[1],
+        data,
+      });
     } catch (err) {
       console.log(err);
 

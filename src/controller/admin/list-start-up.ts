@@ -84,14 +84,12 @@ export class ListStartUp {
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
-        .getMany();
+        .getManyAndCount();
 
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.listStartUp,
-        startUpList
-      );
+      return responseMessage.responseWithData(true, 200, msg.listStartUp, {
+        total_count: startUpList[1],
+        data: startUpList[0],
+      });
     } catch (err) {
       console.log(err);
 
