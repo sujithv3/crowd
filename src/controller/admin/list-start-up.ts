@@ -117,6 +117,12 @@ export class ListStartUp {
         .leftJoinAndSelect("user.tagged", "tagged")
         .orderBy("tagged.updatedDate", "DESC")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+        .loadRelationCountAndMap(
+          "RelationManager.rm_tagged_count",
+          "RelationManager.tagged",
+          "tagged",
+          (qb) => qb.andWhere("tagged.is_active=true")
+        )
         .getOne();
 
       return responseMessage.responseWithData(

@@ -98,7 +98,7 @@ export class ListInvestor {
       });
 
       return responseMessage.responseWithData(true, 200, msg.list_success, {
-        totalCount: investorList[1],
+        total_count: investorList[1],
         data,
       });
     } catch (err) {
