@@ -29,8 +29,8 @@ export class Funds {
   @ManyToOne(() => Campaigns, (campaign) => campaign.fund)
   campaign: Campaigns;
 
-  @Column({
-    type: "date",
+  @CreateDateColumn({
+    type: "timestamp",
     default: null,
   })
   expected_invest_date: Date;
