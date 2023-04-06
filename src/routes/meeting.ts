@@ -34,6 +34,14 @@ export const Routes = [
     validationField: "",
     isLogin: true,
   },
+  {
+    method: "get",
+    route: "/get/:id",
+    controller: MeetingController,
+    action: "getone",
+    validationField: "",
+    isLogin: true,
+  },
 ];
 
 // function routes

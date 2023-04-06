@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { Users } from "./Users";
 import { Campaigns } from "./campaigns";
+import { Meeting } from "./meeting";
 
 @Entity()
 export class Funds {
@@ -28,8 +29,8 @@ export class Funds {
   @ManyToOne(() => Campaigns, (campaign) => campaign.fund)
   campaign: Campaigns;
 
-  @Column({
-    type: "date",
+  @CreateDateColumn({
+    type: "timestamp",
     default: null,
   })
   expected_invest_date: Date;
@@ -44,6 +45,10 @@ export class Funds {
     default: false,
   })
   req_meeting: boolean;
+
+  @ManyToOne(() => Meeting, (meeting) => meeting.id)
+  @JoinColumn({ name: "meeting_id", referencedColumnName: "id" })
+  meeting: Meeting;
 
   @CreateDateColumn()
   createdDate: Date;
