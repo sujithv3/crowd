@@ -42,27 +42,39 @@ export class TaggedController {
         .where("relationManager.id = :id AND tagged.is_active=true", {
           id: user[0].id,
         });
-      if (request.query.staging) {
+      if (request.query.stage) {
+        console.log(request.query.stage);
         dbQuery.andWhere("stage_of_business=:stage", {
-          stage: request.query.staging,
+          stage: request.query.stage,
         });
       }
-      if (request.query.start_date || request.query.end_date) {
-        // const start_date = request.query.start_date || "2000-01-01"
-        // const end_date = request.query.start_date || "2000-01-01"
-        dbQuery.andWhere(
-          "DATE(us_reg_date) BETWEEN '2000-07-05' AND '2011-11-10'"
-          // {
-          //   start_date,
-          //   end_date
-          // }
-        );
+      if (request.query.country) {
+        console.log(request.query.country);
+        dbQuery.andWhere("startup.country=:country", {
+          country: request.query.country,
+        });
+      }
+      if (request.query.from_date && request.query.to_date) {
+        const formatDate = (date) => {
+          let convertedDate = new Date(date);
+          // .toISOString();
+          // .replace(/T/, " ") // replace T with a space
+          // .replace(/\..+/, "");
+          return convertedDate;
+        };
+
+        dbQuery.andWhere("startup.created_date > :start_dates  ", {
+          start_dates: formatDate(request.query.from_date),
+        });
+        dbQuery.andWhere("startup.created_date < :end_date ", {
+          end_date: formatDate(request.query.to_date),
+        });
       }
       const campaign = await dbQuery
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -131,7 +143,7 @@ export class TaggedController {
       //   })
       //   .getMany();
 
-      const campaign = this.campaignRepository
+      const campaignQuery = this.campaignRepository
         .createQueryBuilder("campaign")
         .select([
           "campaign.id",
@@ -163,13 +175,46 @@ export class TaggedController {
         .where("tagged.rm_id = :id AND tagged.is_active=true", {
           id: user[0].id,
         });
+      if (request.query.country) {
+        campaignQuery.andWhere("location.country=:country", {
+          country: request.query.country,
+        });
+      }
+      if (request.query.from_date && request.query.to_date) {
+        const formatDate = (date) => {
+          let convertedDate = new Date(date);
+          // .toISOString();
+          // .replace(/T/, " ") // replace T with a space
+          // .replace(/\..+/, "");
+          return convertedDate;
+        };
+
+        console.log(request.query.from_date, request.query.to_date);
+
+        campaignQuery.andWhere("campaign.start_date > :start_dates  ", {
+          start_dates: formatDate(request.query.from_date),
+        });
+        campaignQuery.andWhere("campaign.start_date < :end_date ", {
+          end_date: formatDate(request.query.to_date),
+        });
+      }
+      if (typeof request.query.goal_amount === "string") {
+        console.log(request.query.goal_amount);
+        const range = request.query.goal_amount.split('-');
+        const min = Number(range[0]);
+        const max = Number(range[1]);
+        campaignQuery.andWhere("campaign.goal_amount BETWEEN :min AND :max", {
+          min: min,
+          max: max,
+        });
+      }
       // .getRawMany();
-      const total_count = await campaign.getCount();
-      const data = await campaign
+      const total_count = await campaignQuery.getCount();
+      const data = await campaignQuery
         .offset(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .limit(request.query.limit ? Number(request.query.limit) : 10)

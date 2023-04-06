@@ -111,6 +111,21 @@ export class InvestorController {
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.investorId=user.id)",
           "fund_amount"
         );
+      if (request.query.country) {
+        campaign.andWhere("user.country=:country", {
+          country: request.query.country,
+        });
+      }
+      if (typeof request.query.fund_amount === "string") {
+        console.log(request.query.fund_amount);
+        const range = request.query.fund_amount.split('-');
+        const min = Number(range[0]);
+        const max = Number(range[1]);
+        campaign.andWhere("funds.fund_amount BETWEEN :min AND :max", {
+          min: min,
+          max: max,
+        });
+      }
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
         campaign
@@ -184,7 +199,23 @@ export class InvestorController {
           "location.name",
           "location.country",
           "fund.fund_amount",
-        ]);
+        ])
+      if (request.query.stage) {
+        console.log(request.query.stage);
+        campaign.andWhere("startup.stage_of_business=:stage", {
+          stage: request.query.stage,
+        });
+      }
+      if (typeof request.query.fund_amount === "string") {
+        console.log(request.query.fund_amount);
+        const range = request.query.fund_amount.split('-');
+        const min = Number(range[0]);
+        const max = Number(range[1]);
+        campaign.andWhere("fund.fund_amount BETWEEN :min AND :max", {
+          min: min,
+          max: max,
+        });
+      }
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
         campaign
@@ -301,7 +332,7 @@ export class InvestorController {
       }
       const user = Jwt.decode(token);
 
-      const campaign = await this.MeetingRepository.createQueryBuilder(
+      const campaignQuery = await this.MeetingRepository.createQueryBuilder(
         "meeting"
       )
         .select([
@@ -325,6 +356,29 @@ export class InvestorController {
         .where("tagged.rm_id = :userId AND tagged.is_active=true", {
           userId: user[0].id,
         })
+      if (request.query.country) {
+        campaignQuery.andWhere("investor.country=:country", {
+          country: request.query.country,
+        });
+      }
+      if (request.query.from_date && request.query.to_date) {
+        const formatDate = (date) => {
+          let convertedDate = new Date(date);
+          // .toISOString();
+          // .replace(/T/, " ") // replace T with a space
+          // .replace(/\..+/, "");
+          return convertedDate;
+        };
+
+        campaignQuery.andWhere("meeting.createdDate > :start_dates  ", {
+          start_dates: formatDate(request.query.from_date),
+        });
+        campaignQuery.andWhere("meeting.createdDate < :end_date ", {
+          end_date: formatDate(request.query.to_date),
+        });
+      }
+
+      const campaign = await campaignQuery
         .skip(
           request.query.page
             ? Number(request.query.page) *
