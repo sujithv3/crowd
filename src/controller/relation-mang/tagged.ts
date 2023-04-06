@@ -62,7 +62,7 @@ export class TaggedController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -131,7 +131,7 @@ export class TaggedController {
       //   })
       //   .getMany();
 
-      const campaign = await this.campaignRepository
+      const campaign = this.campaignRepository
         .createQueryBuilder("campaign")
         .select([
           "campaign.id",
@@ -162,31 +162,26 @@ export class TaggedController {
         )
         .where("tagged.rm_id = :id AND tagged.is_active=true", {
           id: user[0].id,
-        })
-        // .getRawMany();
-        .skip(
+        });
+      // .getRawMany();
+      const total_count = await campaign.getCount();
+      const data = await campaign
+        .offset(
           request.query.page
-            ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+            ? (Number(request.query.page) - 1) *
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
-        .take(request.query.limit ? Number(request.query.limit) : 10)
-        .getRawAndEntities();
+        .limit(request.query.limit ? Number(request.query.limit) : 10)
+        .getRawMany();
 
-      if (campaign.entities.length === 0) {
-        return responseMessage.responseMessage(
-          false,
-          400,
-          msg.campaignListFailed
-        );
-      }
       return responseMessage.responseWithData(
         true,
         200,
         msg.campaignListSuccess,
         {
-          total_count: campaign.entities.length,
-          data: campaign.raw,
+          total_count: total_count,
+          data: data,
         }
       );
     } catch (err) {

@@ -48,7 +48,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -60,7 +60,7 @@ export class InvestorController {
         msg.campaignListSuccess,
         {
           total_count: investorList[1],
-          data: investorList[0]
+          data: investorList[0],
         }
       );
     } catch (err) {
@@ -117,7 +117,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -188,13 +188,13 @@ export class InvestorController {
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
         campaign
-          .skip(
+          .offset(
             request.query.page
               ? (Number(request.query.page) - 1) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
-          .take(request.query.limit ? Number(request.query.limit) : 10);
+          .limit(request.query.limit ? Number(request.query.limit) : 10);
       }
 
       const data = await campaign.getRawMany();
@@ -257,7 +257,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -328,7 +328,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
