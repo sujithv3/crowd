@@ -50,6 +50,24 @@ export class Meeting {
 
   @CreateDateColumn({
     type: "timestamp",
+    default: null,
+  })
+  meeting_date: Date;
+
+  @CreateDateColumn({
+    type: "timestamp",
+    default: null,
+  })
+  start_time: Date;
+
+  @CreateDateColumn({
+    type: "timestamp",
+    default: null,
+  })
+  end_time: Date;
+
+  @CreateDateColumn({
+    type: "timestamp",
     default: () => "CURRENT_TIMESTAMP(6)",
   })
   createdDate: Date;

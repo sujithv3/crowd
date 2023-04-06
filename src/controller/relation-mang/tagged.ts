@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { Tagged } from "../../entity/tagged";
 import { Campaigns } from "../../entity/campaigns";
 import { Users } from "../../entity/Users";
+import { Funds } from "../../entity/funds";
 const { genToken } = require("../../utils/jsonwebtoken");
 const responseMessage = require("../../configs/response");
 const crypto = require("crypto");
@@ -16,6 +17,7 @@ export class TaggedController {
   private taggedRepository = AppDataSource.getRepository(Tagged);
   private campaignRepository = AppDataSource.getRepository(Campaigns);
   private userRepository = AppDataSource.getRepository(Users);
+  private fundsRepository = AppDataSource.getRepository(Funds);
 
   //   list all users
   async all(request: Request, response: Response, next: NextFunction) {
@@ -56,9 +58,17 @@ export class TaggedController {
           // }
         );
       }
-      const campaign = await dbQuery.getMany();
+      const campaign = await dbQuery
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+            (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getManyAndCount();
 
-      if (campaign.length === 0) {
+      if (campaign[0].length === 0) {
         return responseMessage.responseMessage(
           false,
           400,
@@ -69,7 +79,10 @@ export class TaggedController {
         true,
         200,
         msg.campaignListSuccess,
-        campaign
+        {
+          total_count: campaign[1],
+          data: campaign[0],
+        }
       );
     } catch (err) {
       console.log(err);
@@ -150,20 +163,17 @@ export class TaggedController {
         .where("tagged.rm_id = :id AND tagged.is_active=true", {
           id: user[0].id,
         })
-        .getRawMany();
+        // .getRawMany();
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+            (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getRawAndEntities();
 
-      // const campaign = await this.campaignRepository
-      //   .createQueryBuilder("campaign")
-      //   .innerJoinAndSelect("campaign.user", "user")
-      //   .innerJoin("user.tagged", "tagged")
-      //   .loadRelationCountAndMap("campaign.fund", "campaign.fund")
-      //   .innerJoin("tagged.RelationManager", "relationManager")
-      //   .where("tagged.rm_id = :id AND tagged.is_active=true", {
-      //     id: user[0].id,
-      //   })
-      //   .getMany();
-
-      if (campaign.length === 0) {
+      if (campaign.entities.length === 0) {
         return responseMessage.responseMessage(
           false,
           400,
@@ -174,7 +184,10 @@ export class TaggedController {
         true,
         200,
         msg.campaignListSuccess,
-        campaign
+        {
+          total_count: campaign.entities.length,
+          data: campaign.raw,
+        }
       );
     } catch (err) {
       console.log(err);
@@ -238,6 +251,23 @@ export class TaggedController {
         )
         .getRawOne();
 
+      const funds = await this.fundsRepository
+        .createQueryBuilder("funds")
+        .select([
+          "funds.id",
+          "funds.fund_amount",
+          "investor.first_name",
+          "investor.last_name",
+        ])
+        .leftJoin("funds.investor", "investor")
+        .where("funds.campaignId=:id", { id })
+        .getMany();
+
+      const data = {
+        items: campaign,
+        funds: funds,
+      };
+
       // const campaign = await this.campaignRepository
       //   .createQueryBuilder("campaign")
       //   .innerJoinAndSelect("campaign.user", "user")
@@ -260,7 +290,7 @@ export class TaggedController {
         true,
         200,
         msg.campaignListSuccess,
-        campaign
+        data
       );
     } catch (err) {
       console.log(err);

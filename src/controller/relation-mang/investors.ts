@@ -45,13 +45,23 @@ export class InvestorController {
       const investorList = await this.userRepository
         .createQueryBuilder("investor")
         .where("investor.is_deleted=false AND investor.role_id=2")
-        .getMany();
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+            (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getManyAndCount();
 
       return responseMessage.responseWithData(
         true,
         200,
         msg.campaignListSuccess,
-        investorList
+        {
+          total_count: investorList[1],
+          data: investorList[0]
+        }
       );
     } catch (err) {
       console.log(err);
@@ -107,7 +117,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -168,6 +178,8 @@ export class InvestorController {
           "investor.last_name",
           "investor.city",
           "investor.country",
+          "startup.company_name",
+          "startup.stage_of_business",
           "campaign.title",
           "location.name",
           "location.country",
@@ -179,7 +191,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -245,7 +257,7 @@ export class InvestorController {
           .skip(
             request.query.page
               ? (Number(request.query.page) - 1) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
@@ -300,6 +312,8 @@ export class InvestorController {
           "campaign.id",
           "campaign.title",
           "investor.company_name",
+          "investor.first_name",
+          "investor.last_name",
           "investor.id",
           "investor.city",
           "investor.country",
@@ -311,13 +325,23 @@ export class InvestorController {
         .where("tagged.rm_id = :userId AND tagged.is_active=true", {
           userId: user[0].id,
         })
-        .getMany();
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+            (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getManyAndCount();
 
       return responseMessage.responseWithData(
         true,
         200,
         msg.ListMeetingSuccess,
-        campaign
+        {
+          total_count: campaign[1],
+          data: campaign[0],
+        }
       );
     } catch (err) {
       console.log(err);
