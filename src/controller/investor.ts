@@ -471,6 +471,7 @@ export class investorController {
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.category", "Category")
+        .leftJoinAndSelect("campaign.user", "user")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .leftJoinAndSelect(
           "campaign.myDeals",
