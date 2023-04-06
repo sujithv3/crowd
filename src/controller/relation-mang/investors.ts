@@ -114,13 +114,13 @@ export class InvestorController {
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
         campaign
-          .skip(
+          .offset(
             request.query.page
-              ? (Number(request.query.page) - 1) *
+              ? Number(request.query.page) *
                   (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
-          .take(request.query.limit ? Number(request.query.limit) : 10);
+          .limit(request.query.limit ? Number(request.query.limit) : 10);
       }
 
       const data = await campaign.getRawMany();
@@ -190,7 +190,7 @@ export class InvestorController {
         campaign
           .offset(
             request.query.page
-              ? (Number(request.query.page) - 1) *
+              ? Number(request.query.page) *
                   (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
@@ -254,13 +254,13 @@ export class InvestorController {
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
         campaign
-          .skip(
+          .offset(
             request.query.page
-              ? (Number(request.query.page) - 1) *
+              ? Number(request.query.page) *
                   (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
-          .take(request.query.limit ? Number(request.query.limit) : 10);
+          .limit(request.query.limit ? Number(request.query.limit) : 10);
       }
 
       const data = await campaign.getRawMany();

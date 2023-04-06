@@ -168,7 +168,7 @@ export class TaggedController {
       const data = await campaign
         .offset(
           request.query.page
-            ? (Number(request.query.page) - 1) *
+            ? Number(request.query.page) *
                 (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
