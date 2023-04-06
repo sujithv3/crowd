@@ -58,9 +58,17 @@ export class TaggedController {
           // }
         );
       }
-      const campaign = await dbQuery.getMany();
+      const campaign = await dbQuery
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+            (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getManyAndCount();
 
-      if (campaign.length === 0) {
+      if (campaign[0].length === 0) {
         return responseMessage.responseMessage(
           false,
           400,
@@ -71,7 +79,10 @@ export class TaggedController {
         true,
         200,
         msg.campaignListSuccess,
-        campaign
+        {
+          total_count: campaign[1],
+          data: campaign[0],
+        }
       );
     } catch (err) {
       console.log(err);
@@ -152,9 +163,17 @@ export class TaggedController {
         .where("tagged.rm_id = :id AND tagged.is_active=true", {
           id: user[0].id,
         })
-        .getRawMany();
+        // .getRawMany();
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+            (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getRawAndEntities();
 
-      if (campaign.length === 0) {
+      if (campaign.entities.length === 0) {
         return responseMessage.responseMessage(
           false,
           400,
@@ -165,7 +184,10 @@ export class TaggedController {
         true,
         200,
         msg.campaignListSuccess,
-        campaign
+        {
+          total_count: campaign.entities.length,
+          data: campaign.raw,
+        }
       );
     } catch (err) {
       console.log(err);
