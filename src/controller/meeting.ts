@@ -5,6 +5,7 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Meeting } from "../entity/meeting";
 import { Campaigns } from "../entity/campaigns";
+import { MyDeals } from "../entity/mydeals";
 const responseMessage = require("../configs/response");
 const Jwt = require("../utils/jsonwebtoken");
 const msg = require("../configs/message");
@@ -12,6 +13,7 @@ const msg = require("../configs/message");
 export class MeetingController {
   private MeetingRepository = AppDataSource.getRepository(Meeting);
   private campaignRepository = AppDataSource.getRepository(Campaigns);
+  private MyDealsRepository = AppDataSource.getRepository(MyDeals);
 
   // list all
   async getone(request: Request, response: Response, next: NextFunction) {
@@ -130,7 +132,7 @@ export class MeetingController {
 
       if (meetingExists) {
         // reschedule meeting
-        // change active meeting to inactive
+        // change all active meeting to inactive
 
         await this.MeetingRepository.createQueryBuilder()
           .update()
@@ -159,6 +161,30 @@ export class MeetingController {
           is_deleted: false,
         })
         .execute();
+
+      // check if meeting exists
+      const mydelas = await this.MyDealsRepository.createQueryBuilder()
+        .where(
+          "user_id=:userid AND campaign_id=:id AND is_active=true AND is_deleted=false",
+          {
+            userid: user[0].id,
+            id: campaign_id,
+          }
+        )
+        .getOne();
+      // Add to My Deals
+      if (!mydelas) {
+        await this.MyDealsRepository.createQueryBuilder()
+          .insert()
+          .values({
+            campaign: campaign_id,
+            user: user[0].id,
+            is_active: true,
+            is_deleted: false,
+          })
+          .orIgnore()
+          .execute();
+      }
 
       return responseMessage.responseWithData(true, 200, msg.createMeeting);
     } catch (err) {
