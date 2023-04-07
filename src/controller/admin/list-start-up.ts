@@ -51,7 +51,12 @@ export class ListStartUp {
         .createQueryBuilder("startUp")
         .where("startUp.is_active=true AND startUp.role_id=1")
         .leftJoinAndSelect("startUp.campaign", "campaign")
-        .loadRelationCountAndMap("campaign.fund_count", "campaign.fund")
+        .loadRelationCountAndMap(
+          "campaign.fund_count",
+          "campaign.fund",
+          "fund",
+          (qb) => qb.andWhere("fund.is_active=true")
+        )
         .loadRelationCountAndMap("startUp.campaign_count", "startUp.campaign")
         .leftJoinAndSelect("startUp.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager");
@@ -117,12 +122,26 @@ export class ListStartUp {
         .leftJoinAndSelect("user.tagged", "tagged")
         .orderBy("tagged.updatedDate", "DESC")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+        .leftJoinAndSelect("campaign.fund", "fund", "fund.is_active=true")
+        .leftJoinAndSelect("fund.investor", "investor")
         .loadRelationCountAndMap(
           "RelationManager.rm_tagged_count",
           "RelationManager.tagged",
           "tagged",
+
           (qb) => qb.andWhere("tagged.is_active=true")
         )
+        .select([
+          "user",
+          "campaign",
+          "tagged",
+          "RelationManager",
+          "fund.id",
+          "investor.id",
+          "investor.first_name",
+          "investor.last_name",
+          "investor.country",
+        ])
         .getOne();
 
       return responseMessage.responseWithData(
@@ -169,7 +188,12 @@ export class ListStartUp {
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
         .leftJoinAndSelect("user.campaign", "campaign")
-        .loadRelationCountAndMap("user.investor_count", "campaign.fund")
+        .loadRelationCountAndMap(
+          "user.investor_count",
+          "campaign.fund",
+          "fund",
+          (qb) => qb.andWhere("fund.is_active=true")
+        )
         .loadRelationCountAndMap("user.total_campaigns", "user.campaign")
         .andWhere("tagged.id IS NOT NULL")
         .select([
@@ -236,7 +260,12 @@ export class ListStartUp {
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
         .leftJoinAndSelect("user.campaign", "campaign")
-        .loadRelationCountAndMap("user.investor_count", "campaign.fund")
+        .loadRelationCountAndMap(
+          "user.investor_count",
+          "campaign.fund",
+          "fund",
+          (qb) => qb.andWhere("fund.is_active=true")
+        )
         .loadRelationCountAndMap("user.total_campaigns", "user.campaign")
         .andWhere("tagged.id IS NULL")
         .select([
