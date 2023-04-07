@@ -545,11 +545,19 @@ export class CampaignController {
           "id IN (SELECT `campaign`.`staging_id` FROM `campaigns` `campaign` WHERE `campaign`.`is_deleted`=0 AND `campaign`.`is_active`=1 GROUP BY `campaign`.`staging_id`)"
         )
         .getMany();
+
+      const stageDropDown = stages.map((stage) => ({
+        id: stage.name,
+        name: stage.name,
+      }));
       return responseMessage.responseWithData(
         true,
         200,
         msg.stageSuccess,
-        stages
+        {
+          stages:stages,
+          stageDropDown:stageDropDown
+        }
       );
     } catch (error) {
       console.log(error);
