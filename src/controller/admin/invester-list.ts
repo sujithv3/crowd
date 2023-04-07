@@ -50,7 +50,7 @@ export class ListInvestor {
       const investorListRepository = await this.userRepository
         .createQueryBuilder("investors")
         .where("investors.is_active=true AND investors.role_id=2")
-        .leftJoinAndSelect("investors.fund", "fund")
+        .leftJoinAndSelect("investors.fund", "fund", "fund.is_active=true")
         .loadRelationCountAndMap(
           "investors.total_invest_count",
           "investors.fund"
@@ -121,8 +121,11 @@ export class ListInvestor {
           `campaign.end_date >= ${new Date().toISOString().slice(0, 10)}`
         )
         .leftJoinAndSelect("campaign.user", "user")
-        .leftJoinAndSelect("user.tagged", "tagged")
+        .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
+        .leftJoin("campaign.fund", "fund", "fund.is_active=true")
+        .addSelect("fund.fund_amount")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+
         .getMany();
 
       const investedDetails = await this.userRepository
@@ -140,8 +143,21 @@ export class ListInvestor {
 
       await InvestorData.forEach((e: any) => {
         total_funding_amount = Number(e.fund_amount) + total_funding_amount;
+        console.log(e.total_count);
+
         if (e.campaign) {
-          campaign.push(e.campaign);
+          const campaignData = { ...e.campaign };
+          let CampaignReceivedAmount = 0;
+
+          campaignData.fund.forEach((e: any) => {
+            CampaignReceivedAmount = CampaignReceivedAmount + e.fund_amount;
+          });
+
+          campaignData.fun_details = {
+            invest_fund: e.fund_amount,
+            received_amount: CampaignReceivedAmount,
+          };
+          campaign.push(campaignData);
           on_going_campaign = on_going_campaign + 1;
         }
       });
