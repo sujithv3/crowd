@@ -72,7 +72,7 @@ export const Routes = [
     route: "/update",
     controller: UserController,
     action: "update",
-    validationField: signupValidationEdit,
+    validationField: "",
     isLogin: true,
     fileUpload: true,
   },

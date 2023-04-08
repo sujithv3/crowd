@@ -70,7 +70,6 @@ export class ListStartUp {
       }
 
       const startUpList = await startUpListRepository
-
         .select([
           "startUp.id",
           "startUp.first_name",
@@ -81,7 +80,6 @@ export class ListStartUp {
           "tagged",
           "RelationManager",
         ])
-
         .skip(
           request.query.page
             ? Number(request.query.page) *
