@@ -203,10 +203,17 @@ export class TaggedController {
         const range = request.query.goal_amount.split('-');
         const min = Number(range[0]);
         const max = Number(range[1]);
-        campaignQuery.andWhere("campaign.goal_amount BETWEEN :min AND :max", {
-          min: min,
-          max: max,
-        });
+        if (!isNaN(min) && !isNaN(max)) {
+          campaignQuery.andWhere("campaign.goal_amount BETWEEN :min AND :max", {
+            min: min,
+            max: max,
+          });
+        }
+        else if (!isNaN(min) && isNaN(max)){
+          campaignQuery.andWhere("campaign.goal_amount > :min", {
+            min: min,
+          });
+        }
       }
       // .getRawMany();
       const total_count = await campaignQuery.getCount();

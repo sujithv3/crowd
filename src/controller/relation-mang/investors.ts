@@ -121,7 +121,7 @@ export class InvestorController {
         const range = request.query.fund_amount.split('-');
         const min = Number(range[0]);
         const max = Number(range[1]);
-        campaign.andWhere("funds.fund_amount BETWEEN :min AND :max", {
+        campaign.andWhere("(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max", {
           min: min,
           max: max,
         });
@@ -211,7 +211,7 @@ export class InvestorController {
         const range = request.query.fund_amount.split('-');
         const min = Number(range[0]);
         const max = Number(range[1]);
-        campaign.andWhere("fund.fund_amount BETWEEN :min AND :max", {
+        campaign.andWhere("(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max", {
           min: min,
           max: max,
         });
