@@ -57,6 +57,7 @@ export class ListStartUp {
           "fund",
           (qb) => qb.andWhere("fund.is_active=true")
         )
+        .orderBy("startUp.id", "DESC")
         .loadRelationCountAndMap("startUp.campaign_count", "startUp.campaign")
         .leftJoinAndSelect("startUp.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager");
@@ -169,7 +170,8 @@ export class ListStartUp {
     try {
       const startUpQueryBuilder = this.userRepository
         .createQueryBuilder("user")
-        .where("user.is_active=true AND user.role_id=1");
+        .where("user.is_active=true AND user.role_id=1")
+        .orderBy("user.id", "DESC");
 
       if (request.query.country) {
         startUpQueryBuilder.andWhere("user.country=:country", {
@@ -200,6 +202,7 @@ export class ListStartUp {
           "user.last_name",
           "user.sector",
           "user.country",
+          "user.profile",
           "RelationManager.id",
           "RelationManager.first_name",
           "RelationManager.last_name",
@@ -240,7 +243,8 @@ export class ListStartUp {
     try {
       const startUpQueryBuilder = this.userRepository
         .createQueryBuilder("user")
-        .where("user.is_active=true AND user.role_id=1");
+        .where("user.is_active=true AND user.role_id=1")
+        .orderBy("user.id", "DESC");
 
       if (request.query.country) {
         startUpQueryBuilder.andWhere("user.country=:country", {
@@ -254,7 +258,7 @@ export class ListStartUp {
         });
       }
 
-      const startUpListQuery = startUpQueryBuilder
+      startUpQueryBuilder
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
         .leftJoinAndSelect("user.campaign", "campaign")
@@ -271,15 +275,16 @@ export class ListStartUp {
           "user.first_name",
           "user.last_name",
           "user.sector",
+          "user.profile",
           "user.country",
           "RelationManager.id",
           "RelationManager.first_name",
           "RelationManager.last_name",
           "campaign.id",
-        ])
-        .orderBy("campaign.id", "DESC");
-      if (request.query.page) {
-        startUpListQuery
+        ]);
+
+      if (request.query.page != "full") {
+        startUpQueryBuilder
           .skip(
             request.query.page
               ? Number(request.query.page) *
@@ -288,8 +293,7 @@ export class ListStartUp {
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);
       }
-
-      const startUpList = await startUpListQuery.getManyAndCount();
+      const startUpList = await startUpQueryBuilder.getManyAndCount();
 
       return responseMessage.responseWithData(true, 200, msg.listStartUp, {
         total_count: startUpList[1],

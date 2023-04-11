@@ -22,6 +22,7 @@ export class RelationManager {
         .createQueryBuilder("user")
         .where("user.is_active=true AND user.role_id=3")
         .leftJoin("user.tagged", "tagged")
+        .orderBy("user.id", "DESC")
         .loadRelationCountAndMap(
           "user.tagged_count",
           "user.tagged",
