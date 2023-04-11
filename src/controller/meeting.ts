@@ -101,13 +101,17 @@ export class MeetingController {
       let date1 = new Date(request.body.start_time).getTime();
       let date2 = new Date(request.body.end_time).getTime();
       let meeting_date = new Date(request.body.meeting_date).getTime();
+      const currentDate = new Date();
+      currentDate.setHours(0);
+      currentDate.setMinutes(0);
+      currentDate.setSeconds(0);
 
-      let diff = new Date().getTime() - meeting_date;
+      let diff = currentDate.getTime() - meeting_date;
       if (diff > 0) {
         return responseMessage.responseWithData(
           false,
           400,
-          msg.createFundFail,
+          msg.meetingPastDate,
           "Meeting Date cannot be past"
         );
       }
@@ -116,7 +120,7 @@ export class MeetingController {
         return responseMessage.responseWithData(
           false,
           400,
-          msg.createFundFail,
+          msg.meetingEndTime,
           "End Time Should be greater than start time"
         );
       }
@@ -185,8 +189,14 @@ export class MeetingController {
           .orIgnore()
           .execute();
       }
-
-      return responseMessage.responseWithData(true, 200, msg.createMeeting);
+      if (meetingExists)
+        return responseMessage.responseWithData(
+          true,
+          200,
+          msg.reScheduleMeeting
+        );
+      else
+        return responseMessage.responseWithData(true, 200, msg.createMeeting);
     } catch (err) {
       return responseMessage.responseWithData(
         false,
