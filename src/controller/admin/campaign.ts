@@ -80,6 +80,7 @@ export class CampaignController {
         .leftJoinAndSelect("campaign.category", "Category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .leftJoin("campaign.fund", "fund")
+        .orderBy("campaign.id", "DESC")
         .addSelect("SUM(fund.fund_amount)", "received_funds")
         .groupBy("campaign.id")
         .offset(

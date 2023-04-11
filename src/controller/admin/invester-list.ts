@@ -50,6 +50,7 @@ export class ListInvestor {
       const investorListRepository = await this.userRepository
         .createQueryBuilder("investors")
         .where("investors.is_active=true AND investors.role_id=2")
+        .orderBy("investors.id", "DESC")
         .leftJoinAndSelect("investors.fund", "fund", "fund.is_active=true")
         .loadRelationCountAndMap(
           "investors.total_invest_count",

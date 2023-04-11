@@ -57,6 +57,7 @@ export class ListStartUp {
           "fund",
           (qb) => qb.andWhere("fund.is_active=true")
         )
+        .orderBy("startUp.id", "DESC")
         .loadRelationCountAndMap("startUp.campaign_count", "startUp.campaign")
         .leftJoinAndSelect("startUp.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager");
@@ -169,7 +170,8 @@ export class ListStartUp {
     try {
       const startUpQueryBuilder = this.userRepository
         .createQueryBuilder("user")
-        .where("user.is_active=true AND user.role_id=1");
+        .where("user.is_active=true AND user.role_id=1")
+        .orderBy("user.id", "DESC");
 
       if (request.query.country) {
         startUpQueryBuilder.andWhere("user.country=:country", {
@@ -241,7 +243,8 @@ export class ListStartUp {
     try {
       const startUpQueryBuilder = this.userRepository
         .createQueryBuilder("user")
-        .where("user.is_active=true AND user.role_id=1");
+        .where("user.is_active=true AND user.role_id=1")
+        .orderBy("user.id", "DESC");
 
       if (request.query.country) {
         startUpQueryBuilder.andWhere("user.country=:country", {
