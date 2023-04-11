@@ -35,11 +35,10 @@ export class TaggedController {
       const user = Jwt.decode(token);
       console.log("user", user);
 
-      let dbQuery = this.taggedRepository
-        .createQueryBuilder("tagged")
-        .innerJoinAndSelect("tagged.StartUp", "startup")
-        .innerJoin("tagged.RelationManager", "relationManager")
-        .where("relationManager.id = :id AND tagged.is_active=true", {
+      let dbQuery = this.userRepository
+        .createQueryBuilder("startup")
+        .innerJoinAndSelect("startup.tagged", "tagged")
+        .where("tagged.rm_id = :id AND tagged.is_active=true", {
           id: user[0].id,
         });
       if (request.query.stage) {
@@ -70,17 +69,19 @@ export class TaggedController {
           end_date: formatDate(request.query.to_date),
         });
       }
+
+      const total_count = await dbQuery.getCount();
       const campaign = await dbQuery
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
-        .getManyAndCount();
+        .getRawMany();
 
-      if (campaign[0].length === 0) {
+      if (campaign.length === 0) {
         return responseMessage.responseMessage(
           false,
           400,
@@ -92,8 +93,8 @@ export class TaggedController {
         200,
         msg.campaignListSuccess,
         {
-          total_count: campaign[1],
-          data: campaign[0],
+          total_count: total_count,
+          data: campaign,
         }
       );
     } catch (err) {
@@ -200,7 +201,7 @@ export class TaggedController {
       }
       if (typeof request.query.goal_amount === "string") {
         console.log(request.query.goal_amount);
-        const range = request.query.goal_amount.split('-');
+        const range = request.query.goal_amount.split("-");
         const min = Number(range[0]);
         const max = Number(range[1]);
         if (!isNaN(min) && !isNaN(max)) {
@@ -208,8 +209,7 @@ export class TaggedController {
             min: min,
             max: max,
           });
-        }
-        else if (!isNaN(min) && isNaN(max)){
+        } else if (!isNaN(min) && isNaN(max)) {
           campaignQuery.andWhere("campaign.goal_amount > :min", {
             min: min,
           });
@@ -221,7 +221,7 @@ export class TaggedController {
         .offset(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .limit(request.query.limit ? Number(request.query.limit) : 10)
