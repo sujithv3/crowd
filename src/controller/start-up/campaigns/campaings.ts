@@ -37,7 +37,7 @@ export class CampaignController {
 
       console.log(user[0].id);
 
-      const data = await this.campaignRepository
+      const dataQuery = this.campaignRepository
         .createQueryBuilder("campaign")
         .where(
           `campaign.user = :id AND
@@ -50,35 +50,33 @@ export class CampaignController {
             is_active: true,
           }
         )
+        .leftJoinAndSelect("campaign.tax_location", "tax_location")
+        .leftJoinAndSelect("campaign.bank_location", "bank_location")
+        .leftJoinAndSelect("campaign.location", "location")
+        .leftJoinAndSelect("campaign.category", "Category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory");
+
+      if (request.query.search) {
+        dataQuery.andWhere(
+          "(campaign.title LIKE :q OR Category.name LIKE :q)",
+          {
+            q: "%" + request.query.search + "%",
+          }
+        );
+      }
+
+      const total_count = await dataQuery.getCount();
+
+      dataQuery
         .offset(
           request.query.page
             ? Number(request.query.page) *
                 (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
-        .limit(request.query.limit ? Number(request.query.limit) : 10)
-        .leftJoinAndSelect("campaign.tax_location", "tax_location")
-        .leftJoinAndSelect("campaign.bank_location", "bank_location")
-        .leftJoinAndSelect("campaign.location", "location")
-        .leftJoinAndSelect("campaign.category", "Category")
-        .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .getRawMany();
+        .limit(request.query.limit ? Number(request.query.limit) : 10);
 
-      const total_count = await this.campaignRepository
-        .createQueryBuilder("campaign")
-        .where(
-          `campaign.user = :id AND
-       campaign.is_published=:published
-       AND campaign.is_deleted=:is_deleted
-       AND campaign.is_active=:is_active`,
-          {
-            id: user[0].id,
-            published: true,
-            is_deleted: false,
-            is_active: true,
-          }
-        )
-        .getCount();
+      const data = await dataQuery.getRawMany();
 
       return responseMessage.responseWithData(
         true,
