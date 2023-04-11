@@ -74,34 +74,36 @@ export class UserController {
         country,
         state,
         city,
+        is_verify: true,
         sector: sector ? JSON.parse(sector) : [],
         created_date: new Date(),
         updated_date: new Date(),
       });
       // console.log(users);
-      const token = await this.forgetTokenRepository.save({
-        user: users.id,
-        token: crypto.randomBytes(32).toString("hex"),
-        created_date: new Date(),
-        updated_date: new Date(),
-      });
+      // const token = await this.forgetTokenRepository.save({
+      //   user: users.id,
+      //   token: crypto.randomBytes(32).toString("hex"),
+      //   created_date: new Date(),
+      //   updated_date: new Date(),
+      // });
       // console.log(token);
 
       // send email
-      const link = `${process.env.BASE_URL_CREATE_PASSWORD}/?id=${users.id}&token=${token.token}`;
+      const link = `${process.env.BASE_URL_CREATE_PASSWORD}/rm-admin-login`;
 
       await sendEmail(
         email_id,
-        "Verify Email",
+        "Successfully account created",
         { link },
         "",
-        "click to verify"
+        "click to login your account"
       );
 
       return responseMessage.responseMessage(
         true,
         200,
-        msg.user_create_success
+        // msg.user_create_success
+        "Account created Successfully"
       );
     } catch (err) {
       console.log(err);
