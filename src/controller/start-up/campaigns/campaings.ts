@@ -50,13 +50,13 @@ export class CampaignController {
             is_active: true,
           }
         )
-        .skip(
+        .offset(
           request.query.page
             ? Number(request.query.page) *
                 (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
-        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .limit(request.query.limit ? Number(request.query.limit) : 10)
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.bank_location", "bank_location")
         .leftJoinAndSelect("campaign.location", "location")
