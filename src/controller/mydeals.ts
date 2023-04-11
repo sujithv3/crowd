@@ -95,15 +95,26 @@ export class MydealsController {
       }
       const user = Jwt.decode(token);
 
-      const campaign = await this.campaignRepository
+      const campaignQuery = this.campaignRepository
         .createQueryBuilder("campaign")
         .innerJoinAndSelect("campaign.myDeals", "myDeals")
+        .leftJoinAndSelect(
+          "campaign.meeting",
+          "meeting",
+          "meeting.campaign_id=campaign.id AND meeting.user_id=:id AND meeting.is_active=true",
+          { id: user[0].id }
+        )
         .where("myDeals.user_id = :id", { id: user[0].id })
         .leftJoinAndSelect("campaign.user", "startup")
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .loadRelationCountAndMap("campaign.fund", "campaign.fund")
-        .getMany();
+        .loadRelationCountAndMap("campaign.fund", "campaign.fund");
+
+      if (request.query.filter == "meeting") {
+        campaignQuery.andWhere("meeting.user_id=:id", { id: user[0].id });
+      }
+
+      const campaign = await campaignQuery.getMany();
 
       return responseMessage.responseWithData(
         true,

@@ -40,6 +40,22 @@ export const Routes = [
   },
   {
     method: "get",
+    route: "/related/:categoryId",
+    controller: CampaignController,
+    action: "related",
+    validationField: "",
+    isLogin: false,
+  },
+  {
+    method: "get",
+    route: "/support/:campaignId",
+    controller: CampaignController,
+    action: "support",
+    validationField: "",
+    isLogin: false,
+  },
+  {
+    method: "get",
     route: "/user/get",
     controller: CampaignController,
     action: "getUserBased",

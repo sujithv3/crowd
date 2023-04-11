@@ -342,6 +342,102 @@ export class CampaignController {
       );
     }
   }
+  // related campaign
+  async related(request: Request, response: Response, next: NextFunction) {
+    try {
+      const categoryId = request.params.categoryId;
+      const data = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        .where(
+          `campaign.is_published=true
+         AND campaign.is_deleted=false
+         AND campaign.is_active=true
+         AND campaign.category_id=:categoryId
+         `,
+          {
+            categoryId: categoryId,
+          }
+        )
+        .skip(0)
+        .take(20)
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
+        .getRawMany();
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.campaignListSuccess,
+        data
+      );
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.categoryListFailed,
+        err
+      );
+    }
+  }
+
+  async support(request: Request, response: Response, next: NextFunction) {
+    try {
+      const campaignId = request.params.campaignId;
+
+      const campaign: any = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .select(["campaign.category_id", "users.id"])
+        .where(
+          `campaign.id = :id 
+          AND campaign.is_published=true
+         AND campaign.is_deleted=false
+         AND campaign.is_active=true
+       `,
+          {
+            id: campaignId,
+          }
+        )
+        .leftJoin("campaign.user", "users")
+        .getRawOne();
+
+      const data = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        .where(
+          `campaign.is_published=true
+         AND campaign.is_deleted=false
+         AND campaign.is_active=true
+         AND (campaign.user_id=:userId AND campaign.category_id=:categoryId)
+         `,
+          {
+            userId: campaign?.users_id,
+            categoryId: campaign?.category_id,
+          }
+        )
+        .skip(0)
+        .take(2)
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.location", "location")
+        .getRawMany();
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.campaignListSuccess,
+        data
+      );
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.categoryListFailed,
+        err
+      );
+    }
+  }
   // campaign detail view
   async getOne(req: Request, res: Response, next: NextFunction) {
     const id = parseInt(req.params.id);
@@ -550,15 +646,10 @@ export class CampaignController {
         id: stage.name,
         name: stage.name,
       }));
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.stageSuccess,
-        {
-          stages:stages,
-          stageDropDown:stageDropDown
-        }
-      );
+      return responseMessage.responseWithData(true, 200, msg.stageSuccess, {
+        stages: stages,
+        stageDropDown: stageDropDown,
+      });
     } catch (error) {
       console.log(error);
       return responseMessage.responseWithData(false, 400, msg.stageFail, error);
