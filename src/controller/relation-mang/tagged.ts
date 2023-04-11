@@ -72,13 +72,13 @@ export class TaggedController {
 
       const total_count = await dbQuery.getCount();
       const campaign = await dbQuery
-        .skip(
+        .offset(
           request.query.page
             ? Number(request.query.page) *
                 (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
-        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .limit(request.query.limit ? Number(request.query.limit) : 10)
         .getRawMany();
 
       if (campaign.length === 0) {
