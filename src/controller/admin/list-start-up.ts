@@ -254,7 +254,7 @@ export class ListStartUp {
         });
       }
 
-      const startUpList = await startUpQueryBuilder
+      const startUpListQuery = startUpQueryBuilder
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
         .leftJoinAndSelect("user.campaign", "campaign")
@@ -277,14 +277,19 @@ export class ListStartUp {
           "RelationManager.last_name",
           "campaign.id",
         ])
-        .skip(
-          request.query.page
-            ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
-            : 0
-        )
-        .take(request.query.limit ? Number(request.query.limit) : 10)
-        .getManyAndCount();
+        .orderBy("campaign.id", "DESC");
+      if (request.query.page) {
+        startUpListQuery
+          .skip(
+            request.query.page
+              ? Number(request.query.page) *
+                  (request.query.limit ? Number(request.query.limit) : 10)
+              : 0
+          )
+          .take(request.query.limit ? Number(request.query.limit) : 10);
+      }
+
+      const startUpList = await startUpListQuery.getManyAndCount();
 
       return responseMessage.responseWithData(true, 200, msg.listStartUp, {
         total_count: startUpList[1],
