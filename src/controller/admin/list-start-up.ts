@@ -200,6 +200,7 @@ export class ListStartUp {
           "user.last_name",
           "user.sector",
           "user.country",
+          "user.profile",
           "RelationManager.id",
           "RelationManager.first_name",
           "RelationManager.last_name",
@@ -254,7 +255,7 @@ export class ListStartUp {
         });
       }
 
-      const startUpList = await startUpQueryBuilder
+      startUpQueryBuilder
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
         .leftJoinAndSelect("user.campaign", "campaign")
@@ -271,20 +272,25 @@ export class ListStartUp {
           "user.first_name",
           "user.last_name",
           "user.sector",
+          "user.profile",
           "user.country",
           "RelationManager.id",
           "RelationManager.first_name",
           "RelationManager.last_name",
           "campaign.id",
-        ])
-        .skip(
-          request.query.page
-            ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
-            : 0
-        )
-        .take(request.query.limit ? Number(request.query.limit) : 10)
-        .getManyAndCount();
+        ]);
+
+      if (request.query.page != "full") {
+        startUpQueryBuilder
+          .skip(
+            request.query.page
+              ? Number(request.query.page) *
+                  (request.query.limit ? Number(request.query.limit) : 10)
+              : 0
+          )
+          .take(request.query.limit ? Number(request.query.limit) : 10);
+      }
+      const startUpList = await startUpQueryBuilder.getManyAndCount();
 
       return responseMessage.responseWithData(true, 200, msg.listStartUp, {
         total_count: startUpList[1],
