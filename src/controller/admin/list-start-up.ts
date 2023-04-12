@@ -75,6 +75,7 @@ export class ListStartUp {
           "startUp.id",
           "startUp.first_name",
           "startUp.last_name",
+          "startUp.company_name",
           "startUp.country",
           "startUp.city",
           "campaign.id",
@@ -127,7 +128,6 @@ export class ListStartUp {
           "RelationManager.rm_tagged_count",
           "RelationManager.tagged",
           "tagged",
-
           (qb) => qb.andWhere("tagged.is_active=true")
         )
         .select([
@@ -139,6 +139,7 @@ export class ListStartUp {
           "investor.id",
           "investor.first_name",
           "investor.last_name",
+          "investor.company_name",
           "investor.country",
         ])
         .getOne();
@@ -186,6 +187,7 @@ export class ListStartUp {
 
       const startUpList = await startUpQueryBuilder
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
+
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
         .leftJoinAndSelect("user.campaign", "campaign")
         .loadRelationCountAndMap(
@@ -196,19 +198,23 @@ export class ListStartUp {
         )
         .loadRelationCountAndMap("user.total_campaigns", "user.campaign")
         .andWhere("tagged.id IS NOT NULL")
+
         .select([
           "user.id",
           "user.first_name",
           "user.last_name",
           "user.sector",
+          "user.company_name",
           "user.country",
           "user.profile",
           "RelationManager.id",
           "RelationManager.first_name",
           "RelationManager.last_name",
           "tagged.id",
+          "tagged.updatedDate",
           "campaign.id",
         ])
+        .orderBy("tagged.updatedDate", "DESC")
         .skip(
           request.query.page
             ? Number(request.query.page) *
@@ -274,6 +280,7 @@ export class ListStartUp {
           "user.id",
           "user.first_name",
           "user.last_name",
+          "user.company_name",
           "user.sector",
           "user.profile",
           "user.country",

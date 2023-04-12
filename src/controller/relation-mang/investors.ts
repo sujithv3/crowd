@@ -43,13 +43,36 @@ export class InvestorController {
       const user = Jwt.decode(token);
       console.log("user", user);
 
-      const investorList = await this.userRepository
+      const investorListQuery = await this.userRepository
         .createQueryBuilder("investor")
         .where("investor.is_deleted=false AND investor.role_id=2")
+      if (request.query.status) {
+        investorListQuery.andWhere("investor.is_active=:status", {
+          status: request.query.status,
+        });
+      }
+      if (request.query.from_date && request.query.to_date) {
+        const formatDate = (date) => {
+          let convertedDate = new Date(date);
+          // .toISOString();
+          // .replace(/T/, " ") // replace T with a space
+          // .replace(/\..+/, "");
+          return convertedDate;
+        };
+
+        investorListQuery.andWhere("investor.created_date > :start_dates  ", {
+          start_dates: formatDate(request.query.from_date),
+        });
+        investorListQuery.andWhere("investor.created_date < :end_date ", {
+          end_date: formatDate(request.query.to_date),
+        });
+      }
+
+      const investorList = await investorListQuery
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -139,7 +162,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -232,7 +255,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -298,7 +321,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -392,7 +415,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
