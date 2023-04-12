@@ -21,6 +21,7 @@ export class InvestorController {
   private fundsRepository = AppDataSource.getRepository(Funds);
   private MeetingRepository = AppDataSource.getRepository(Meeting);
   private MyDealsRepository = AppDataSource.getRepository(MyDeals);
+  private TaggedRepository = AppDataSource.getRepository(Tagged);
 
   //list all investors
   async getInvestorsList(
@@ -91,15 +92,18 @@ export class InvestorController {
       const user = Jwt.decode(token);
       console.log("user", user);
 
-      const campaign = await this.userRepository
-        .createQueryBuilder("user")
-        .innerJoin("user.tagged", "tagged")
+      const campaign = await this.TaggedRepository.createQueryBuilder("tagged")
+        .innerJoin("tagged.StartUp", "startup") // get tagged startup
+        .innerJoin("startup.campaign", "campaign") // get campaign details for tagged users
+        .innerJoin("campaign.myDeals", "mydeals") // get mydeals
+        .innerJoin("mydeals.user", "user")
         .where(
           "tagged.rm_id = :id AND tagged.is_active=true AND user.is_deleted=false",
           {
             id: user[0].id,
           }
         )
+        .distinct()
         .select([
           "user.id",
           "user.first_name",
@@ -118,13 +122,16 @@ export class InvestorController {
       }
       if (typeof request.query.fund_amount === "string") {
         console.log(request.query.fund_amount);
-        const range = request.query.fund_amount.split('-');
+        const range = request.query.fund_amount.split("-");
         const min = Number(range[0]);
         const max = Number(range[1]);
-        campaign.andWhere("(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max", {
-          min: min,
-          max: max,
-        });
+        campaign.andWhere(
+          "(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max",
+          {
+            min: min,
+            max: max,
+          }
+        );
       }
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
@@ -199,7 +206,7 @@ export class InvestorController {
           "location.name",
           "location.country",
           "fund.fund_amount",
-        ])
+        ]);
       if (request.query.stage) {
         console.log(request.query.stage);
         campaign.andWhere("startup.stage_of_business=:stage", {
@@ -208,13 +215,16 @@ export class InvestorController {
       }
       if (typeof request.query.fund_amount === "string") {
         console.log(request.query.fund_amount);
-        const range = request.query.fund_amount.split('-');
+        const range = request.query.fund_amount.split("-");
         const min = Number(range[0]);
         const max = Number(range[1]);
-        campaign.andWhere("(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max", {
-          min: min,
-          max: max,
-        });
+        campaign.andWhere(
+          "(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max",
+          {
+            min: min,
+            max: max,
+          }
+        );
       }
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
@@ -355,7 +365,7 @@ export class InvestorController {
         .innerJoin("startup.tagged", "tagged")
         .where("tagged.rm_id = :userId AND tagged.is_active=true", {
           userId: user[0].id,
-        })
+        });
       if (request.query.country) {
         campaignQuery.andWhere("investor.country=:country", {
           country: request.query.country,
@@ -443,15 +453,25 @@ export class InvestorController {
         })
         .getCount();
 
-      const interestedCount = await this.MyDealsRepository.createQueryBuilder(
-        "mydeals"
+      const interestedQuery = await this.TaggedRepository.createQueryBuilder(
+        "tagged"
       )
-        .innerJoin("mydeals.user", "investor")
-        .innerJoin("investor.tagged", "tagged")
-        .where("tagged.rm_id = :id AND tagged.is_active=true", {
-          id: user[0].id,
-        })
-        .getCount();
+        .innerJoin("tagged.StartUp", "startup") // get tagged startup
+        .innerJoin("startup.campaign", "campaign") // get campaign details for tagged users
+        .innerJoin("campaign.myDeals", "mydeals") // get mydeals
+        .innerJoin("mydeals.user", "user")
+        .where(
+          "tagged.rm_id = :id AND tagged.is_active=true AND user.is_deleted=false",
+          {
+            id: user[0].id,
+          }
+        )
+        .select(["COUNT(DISTINCT `mydeals`.`user_id`) as count"])
+        .getRawOne();
+
+      console.log("interestedQuery", interestedQuery);
+
+      const interestedCount = interestedQuery.count;
 
       const data = {
         meetingCount: meetingCount,
