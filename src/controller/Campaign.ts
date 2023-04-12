@@ -404,24 +404,45 @@ export class CampaignController {
 
       const data = await this.campaignRepository
         .createQueryBuilder("campaign")
-        .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        .select([
+          "campaign.id",
+          "campaign.title",
+          "campaign.description",
+          "campaign.project_image",
+          "user.id",
+          "user.first_name",
+          "user.last_name",
+          "user.profile",
+          "location.name",
+          "location.country",
+        ])
+        // .addSelect("DATEDIFF(campaign.end_date, NOW())", "daysLeft")
+        // categoryId: campaign?.category_id,
+        //  AND (campaign.user_id=:userId OR campaign.category_id=:categoryId)
         .where(
           `campaign.is_published=true
          AND campaign.is_deleted=false
          AND campaign.is_active=true
-         AND (campaign.user_id=:userId AND campaign.category_id=:categoryId)
+         AND (campaign.user_id=:userId)
          `,
           {
             userId: campaign?.users_id,
-            categoryId: campaign?.category_id,
           }
         )
         .skip(0)
         .take(2)
-        .leftJoinAndSelect("campaign.category", "category")
-        .leftJoinAndSelect("campaign.subcategory", "subcategory")
-        .leftJoinAndSelect("campaign.location", "location")
-        .getRawMany();
+        .leftJoin("campaign.user", "user")
+        .leftJoin("campaign.location", "location")
+        .loadRelationCountAndMap(
+          "user.campaign",
+          "user.campaign",
+          "user.campaign",
+          (qb) =>
+            qb.andWhere(`user.campaign.is_published=true
+        AND user.campaign.is_deleted=false
+        AND user.campaign.is_active=true`)
+        )
+        .getMany();
 
       return responseMessage.responseWithData(
         true,
@@ -430,6 +451,7 @@ export class CampaignController {
         data
       );
     } catch (err) {
+      console.log("err", err);
       return responseMessage.responseWithData(
         false,
         400,
