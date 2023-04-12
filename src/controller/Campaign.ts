@@ -423,9 +423,11 @@ export class CampaignController {
           `campaign.is_published=true
          AND campaign.is_deleted=false
          AND campaign.is_active=true
+         AND campaign.id!=:currentCampaign
          AND (campaign.user_id=:userId)
          `,
           {
+            currentCampaign: campaignId,
             userId: campaign?.users_id,
           }
         )
