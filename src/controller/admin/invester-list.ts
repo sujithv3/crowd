@@ -5,6 +5,8 @@ import { AppDataSource } from "../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Users } from "../../entity/Users";
 import { Funds } from "../../entity/funds";
+import { Campaigns } from "../../entity/campaigns";
+import { Between } from "typeorm";
 const responseMessage = require("../../configs/response");
 const msg = require("../../configs/message");
 const Jwt = require("../../utils/jsonwebtoken");
@@ -12,6 +14,7 @@ const Jwt = require("../../utils/jsonwebtoken");
 export class ListInvestor {
   private campaignRepository = AppDataSource.getRepository(Funds);
   private userRepository = AppDataSource.getRepository(Users);
+  private campaignsRepository = AppDataSource.getRepository(Campaigns);
 
   // list start up
   async getInvestorList(
@@ -112,6 +115,70 @@ export class ListInvestor {
     }
   }
 
+  // get invested campaign
+  async getInvestedCampaign(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      // const BeforeDate = (date: Date) => Between(subYears(date, 100), date);
+      const date: any = new Date();
+      const moment: any = require("moment");
+      console.log(moment().format("YYYY-MM-DD HH:mm:ss"));
+
+      const InvestorRepository = await this.campaignRepository
+        .createQueryBuilder("investors")
+        .where("investors.investor=:id AND investors.is_active=true", {
+          id: request.params.id,
+        })
+        .leftJoinAndSelect("investors.campaign", "campaign")
+        .andWhere(`campaign.end_date > ${moment().format("YYYY-MM-DD")} `);
+      // .andWhere("campaign.id IS NOT NULL");
+      const investedCampaign: any = await InvestorRepository.leftJoinAndSelect(
+        "campaign.user",
+        "user"
+      )
+        .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
+        .leftJoin("campaign.fund", "fund", "fund.is_active=true")
+        .addSelect("fund.fund_amount")
+        .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .orderBy("investors.id", "DESC")
+        .select([
+          "investors.id",
+          "campaign",
+          "user.id",
+          "tagged.id",
+          "fund",
+          "RelationManager.id",
+          "RelationManager.first_name",
+          "RelationManager.last_name",
+        ])
+        .getManyAndCount();
+
+      return responseMessage.responseWithData(true, 200, msg.list_success, {
+        total_count: investedCampaign[1],
+        data: investedCampaign[0],
+      });
+    } catch (error) {
+      console.log(error);
+
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.list_Failed,
+        error
+      );
+    }
+  }
+
   // get investor list
 
   async getInvestor(request: Request, response: Response, next: NextFunction) {
@@ -131,7 +198,13 @@ export class ListInvestor {
         .leftJoin("campaign.fund", "fund", "fund.is_active=true")
         .addSelect("fund.fund_amount")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
-
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
         .getMany();
 
       const investedDetails = await this.userRepository
