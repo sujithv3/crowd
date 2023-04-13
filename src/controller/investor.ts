@@ -596,6 +596,7 @@ export class investorController {
           investor: user[0].id,
           campaign: campaign_id,
           fund_amount: request.body.fund_amount,
+          currency: request.body.currency,
           expected_invest_date: request.body.expected_invest_date,
           remark: request.body.remark,
           req_meeting: request.body.req_meeting,

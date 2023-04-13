@@ -12,6 +12,11 @@ import { Users } from "./Users";
 import { Campaigns } from "./campaigns";
 import { Meeting } from "./meeting";
 
+export enum CURRENCY {
+  USD = "USD",
+  CAD = "CAD",
+}
+
 @Entity()
 export class Funds {
   @PrimaryGeneratedColumn()
@@ -49,6 +54,13 @@ export class Funds {
   @ManyToOne(() => Meeting, (meeting) => meeting.id)
   @JoinColumn({ name: "meeting_id", referencedColumnName: "id" })
   meeting: Meeting;
+
+  @Column({
+    type: "enum",
+    enum: CURRENCY,
+    default: CURRENCY.USD,
+  })
+  currency: CURRENCY;
 
   @CreateDateColumn()
   createdDate: Date;
