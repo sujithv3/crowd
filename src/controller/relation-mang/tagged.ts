@@ -163,7 +163,7 @@ export class TaggedController {
         ])
         .leftJoin("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
-        .leftJoin("campaign.fund", "fund")
+        // .leftJoin("campaign.fund", "fund")
         .innerJoin("startup.tagged", "tagged")
         .addSelect(
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.campaignId=campaign.id)",
