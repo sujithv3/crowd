@@ -23,6 +23,14 @@ export const Routes = [
   },
   {
     method: "get",
+    route: "/start-up/campaign-list/:id",
+    controller: ListStartUp,
+    action: "getStartUpCampaign",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
     route: "/start-up/assign/list",
     controller: ListStartUp,
     action: "assignedStartUp",
