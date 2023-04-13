@@ -32,6 +32,7 @@ const RmAdmin = require("./routes/admin/rm");
 const AdminTagged = require("./routes/admin/tagged");
 const Meeting = require("./routes/meeting");
 const AdminUser = require("./routes/admin/user");
+const Sales = require("./routes/sales/sales");
 import "./cron";
 
 // mysql database connection initialize
@@ -89,3 +90,4 @@ app.use("/api/admin/campaign", CampaignAdmin);
 app.use("/api/admin/rm", RmAdmin);
 app.use("/api/admin/tag", AdminTagged);
 app.use("/api/admin/user", AdminUser);
+app.use("/api/sales", Sales);
