@@ -635,8 +635,8 @@ export class CampaignController {
           name: "500000 USD - 2000000 USD",
         },
         {
-          id: "200000-null",
-          name: "200000 USD +",
+          id: "2000000-null",
+          name: "2000000 USD +",
         },
       ];
 
