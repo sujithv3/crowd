@@ -32,6 +32,7 @@ const RmAdmin = require("./routes/admin/rm");
 const AdminTagged = require("./routes/admin/tagged");
 const Meeting = require("./routes/meeting");
 const AdminUser = require("./routes/admin/user");
+import "./cron";
 
 // mysql database connection initialize
 
