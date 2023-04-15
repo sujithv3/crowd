@@ -16,6 +16,8 @@ import { rmForgetToken } from "./entity/rmforget-password-token";
 import { MyDeals } from "./entity/mydeals";
 import { Meeting } from "./entity/meeting";
 import { Tagged } from "./entity/tagged";
+import { Cms } from "./entity/cms";
+import { NewsletterEmail } from "./entity/newsletter-email";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -44,6 +46,8 @@ export const AppDataSource = new DataSource({
     MyDeals,
     Meeting,
     Tagged,
+    Cms,
+    NewsletterEmail
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],
