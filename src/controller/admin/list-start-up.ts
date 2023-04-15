@@ -4,6 +4,7 @@
 import { AppDataSource } from "../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Users } from "../../entity/Users";
+import { Tagged } from "../../entity/tagged";
 import { Campaigns } from "../../entity/campaigns";
 const responseMessage = require("../../configs/response");
 const msg = require("../../configs/message");
@@ -12,6 +13,7 @@ const Jwt = require("../../utils/jsonwebtoken");
 export class ListStartUp {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
   private userRepository = AppDataSource.getRepository(Users);
+  private taggedRepository = AppDataSource.getRepository(Tagged);
 
   // list start up
   async getStartUpList(
@@ -75,6 +77,7 @@ export class ListStartUp {
           "startUp.id",
           "startUp.first_name",
           "startUp.last_name",
+          "startUp.company_name",
           "startUp.country",
           "startUp.city",
           "campaign.id",
@@ -106,6 +109,53 @@ export class ListStartUp {
     }
   }
 
+  // get user start up campaign
+  async getStartUpCampaign(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      const campaign = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .where("campaign.is_active=true AND campaign.user=:id", {
+          id: request.params.id,
+        })
+        .leftJoinAndSelect("campaign.fund", "fund", "fund.is_active=true")
+        .leftJoinAndSelect("fund.investor", "investor")
+        .select([
+          "campaign",
+          "fund.id",
+          "investor.id",
+          "investor.first_name",
+          "investor.last_name",
+          "investor.company_name",
+          "investor.country",
+        ])
+        .orderBy("campaign.id", "DESC")
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getManyAndCount();
+
+      return responseMessage.responseWithData(true, 200, msg.listStartUp, {
+        total_count: campaign[1],
+        data: campaign[0],
+      });
+    } catch (error) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.listStartUpFailed,
+        error
+      );
+    }
+  }
+
   // get start up list
 
   async getStartUpUser(
@@ -114,35 +164,26 @@ export class ListStartUp {
     next: NextFunction
   ) {
     try {
-      const startUpList = await this.userRepository
+      const startUpList: any = await this.userRepository
         .createQueryBuilder("user")
         .where("user.is_active=true AND user.id=:id", { id: request.params.id })
-        .leftJoinAndSelect("user.campaign", "campaign")
-        .leftJoinAndSelect("user.tagged", "tagged")
+
+        .getOne();
+
+      const tagged = await this.taggedRepository
+        .createQueryBuilder("tagged")
         .orderBy("tagged.updatedDate", "DESC")
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
-        .leftJoinAndSelect("campaign.fund", "fund", "fund.is_active=true")
-        .leftJoinAndSelect("fund.investor", "investor")
         .loadRelationCountAndMap(
           "RelationManager.rm_tagged_count",
           "RelationManager.tagged",
           "tagged",
-
           (qb) => qb.andWhere("tagged.is_active=true")
         )
-        .select([
-          "user",
-          "campaign",
-          "tagged",
-          "RelationManager",
-          "fund.id",
-          "investor.id",
-          "investor.first_name",
-          "investor.last_name",
-          "investor.country",
-        ])
-        .getOne();
+        .limit(3)
+        .getMany();
 
+      startUpList.tagged = tagged;
       return responseMessage.responseWithData(
         true,
         200,
@@ -186,6 +227,7 @@ export class ListStartUp {
 
       const startUpList = await startUpQueryBuilder
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
+
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
         .leftJoinAndSelect("user.campaign", "campaign")
         .loadRelationCountAndMap(
@@ -196,19 +238,23 @@ export class ListStartUp {
         )
         .loadRelationCountAndMap("user.total_campaigns", "user.campaign")
         .andWhere("tagged.id IS NOT NULL")
+
         .select([
           "user.id",
           "user.first_name",
           "user.last_name",
           "user.sector",
+          "user.company_name",
           "user.country",
           "user.profile",
           "RelationManager.id",
           "RelationManager.first_name",
           "RelationManager.last_name",
           "tagged.id",
+          "tagged.updatedDate",
           "campaign.id",
         ])
+        .orderBy("tagged.updatedDate", "DESC")
         .skip(
           request.query.page
             ? Number(request.query.page) *
@@ -274,6 +320,7 @@ export class ListStartUp {
           "user.id",
           "user.first_name",
           "user.last_name",
+          "user.company_name",
           "user.sector",
           "user.profile",
           "user.country",

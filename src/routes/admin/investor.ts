@@ -21,6 +21,14 @@ export const Routes = [
     validationField: "",
     isLogin: true,
   },
+  {
+    method: "get",
+    route: "/list-campaign/:id",
+    controller: ListInvestor,
+    action: "getInvestedCampaign",
+    validationField: "",
+    isLogin: true,
+  },
 ];
 
 // function routes
