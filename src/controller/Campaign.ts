@@ -3,7 +3,7 @@
 
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { Campaigns } from "../entity/campaigns";
+import { Campaigns, CAMPAIGN_STATUS } from "../entity/campaigns";
 const responseMessage = require("../configs/response");
 const msg = require("../configs/message");
 const Jwt = require("./../utils/jsonwebtoken");
@@ -318,7 +318,10 @@ export class CampaignController {
           `campaign.is_published=true
          AND campaign.is_deleted=false
          AND campaign.is_active=true
-         `
+         AND campaign.status=:status
+         `, {
+          status: CAMPAIGN_STATUS.Approved
+        }
         )
         .skip(0)
         .take(20)
@@ -354,8 +357,10 @@ export class CampaignController {
          AND campaign.is_deleted=false
          AND campaign.is_active=true
          AND campaign.category_id=:categoryId
+         AND campaign.status=:status
          `,
           {
+            status: CAMPAIGN_STATUS.Approved,
             categoryId: categoryId,
           }
         )
@@ -424,8 +429,10 @@ export class CampaignController {
          AND campaign.is_active=true
          AND campaign.id!=:currentCampaign
          AND (campaign.user_id=:userId)
+         AND campaign.status=:status
          `,
           {
+            status: CAMPAIGN_STATUS.Approved,
             currentCampaign: campaignId,
             userId: campaign?.users_id,
           }
@@ -523,9 +530,11 @@ export class CampaignController {
         ])
         .where(
           `campaign.id = :id 
+          AND campaign.status = :status
        `,
           {
             id: id,
+            status: CAMPAIGN_STATUS.Approved,
           }
         )
         .leftJoin("campaign.category", "category")

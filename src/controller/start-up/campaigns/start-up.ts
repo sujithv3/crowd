@@ -3,7 +3,7 @@
 
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
-import { Campaigns } from "../../../entity/campaigns";
+import { Campaigns, CAMPAIGN_STATUS } from "../../../entity/campaigns";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 import { Category } from "../../../entity/category";
@@ -102,7 +102,7 @@ export class startUpController {
           start_date: null,
           end_date: null,
           is_featured: false,
-          status: "Not Approved",
+          status: CAMPAIGN_STATUS.NOT_APPROVE,
           createdDate: new Date(),
           updatedDate: new Date(),
           is_active: true,

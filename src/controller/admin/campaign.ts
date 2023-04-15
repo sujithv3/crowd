@@ -1,6 +1,6 @@
 import { AppDataSource } from "../../data-source";
 import { NextFunction, Request, Response } from "express";
-import { Campaigns } from "../../entity/campaigns";
+import { Campaigns, CAMPAIGN_STATUS } from "../../entity/campaigns";
 const responseMessage = require("../../configs/response");
 const msg = require("../../configs/message");
 const Jwt = require("../../utils/jsonwebtoken");
@@ -86,7 +86,7 @@ export class CampaignController {
         .offset(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .limit(request.query.limit ? Number(request.query.limit) : 10)
@@ -166,7 +166,7 @@ export class CampaignController {
       await this.campaignRepository
         .createQueryBuilder()
         .update(Campaigns)
-        .set({ status: "Approved" })
+        .set({ status: CAMPAIGN_STATUS.Approved })
         .where("id=:id", { id })
         .execute();
 

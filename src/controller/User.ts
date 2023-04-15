@@ -62,6 +62,7 @@ export class UserController {
       let paket = users.map((item) => {
         return { email: item.email_id, name: item.first_name + ' ' + item.last_name, companyname: item.company_name, id: item.id }
       })
+      let paket_count = paket.length;
 
       ++page;
       console.log('Page', page)

@@ -24,6 +24,11 @@ export enum businessType {
   INDIVIDUAL = "individual",
 }
 
+export enum CAMPAIGN_STATUS {
+  Approved = "Approved",
+  NOT_APPROVE = "Not Approved",
+}
+
 type FILE_LIST = { name: number; value: any }[];
 
 @Entity()
@@ -264,11 +269,11 @@ export class Campaigns {
   payment_contact_email_id: string;
 
   @Column({
-    length: 50,
-    type: "varchar",
-    default: "Not Approve",
+    type: "enum",
+    enum: CAMPAIGN_STATUS,
+    default: CAMPAIGN_STATUS.NOT_APPROVE,
   })
-  status: string;
+  status: CAMPAIGN_STATUS;
 
   @Column({
     length: 50,
