@@ -2,6 +2,8 @@ import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Users } from "../entity/Users";
 import { ForgetToken } from "../entity/forget-password-token";
+import { Cms } from "../entity/cms";
+import { NewsletterEmail } from "../entity/newsletter-email";
 import { deleteS3BucketValues } from "../utils/file-upload";
 const { genPass, verifyPass } = require("../utils/password");
 const { genToken } = require("../utils/jsonwebtoken");
@@ -10,10 +12,65 @@ const crypto = require("crypto");
 const msg = require("../configs/message");
 const Jwt = require("../utils/jsonwebtoken");
 const sendEmail = require("../utils/nodemailer/email");
+const sendTemplate = require("../utils/nodemailer/template");
+
+
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(Users);
   public forgetTokenRepository = AppDataSource.getRepository(ForgetToken);
+  public cmsRepository = AppDataSource.getRepository(Cms);
+  public NewsletterRepository = AppDataSource.getRepository(NewsletterEmail);
+
+  async test(request: Request) {
+
+    // await sendTemplate("muthukumar.ext@aagnia.com", 'startup-registration', {
+    //   startup_name: "Muthukumar",
+    //   your_name: "Testig"
+    // });
+
+    // await sendTemplate("muthukumar.ext@aagnia.com", 'investor-registration', {
+    //   investor_name: "Muthukumar",
+    //   your_name: "Investor"
+    // });
+
+    // await sendTemplate("muthukumar.ext@aagnia.com", 'verify-email', {
+    //   name: "Muthukumar",
+    //   verify_link: "https://example.com"
+    // });
+
+    //   const htmlTemplate = template(userData.params);
+
+    // get All investors
+    // to do match sectors of created campaign
+    let page = 0;
+    let value_exist = true;
+    const paketSize = 5;
+    const role_id = 2; //for investors
+    while (value_exist) {
+      let users = await this.userRepository.createQueryBuilder()
+        .where(
+          "role_id=:role_id AND is_deleted=false AND is_active=true AND subscribed=true",
+          {
+            role_id: role_id,
+          }
+        )
+        .skip(page * paketSize).take(paketSize).getMany();
+      if (users.length < paketSize || !users) { // very important to avoid infinite loop
+        value_exist = false;
+      }
+      let paket = users.map((item) => {
+        return { email: item.email_id, name: item.first_name + ' ' + item.last_name, companyname: item.company_name, id: item.id }
+      })
+
+      ++page;
+      console.log('Page', page)
+    }
+
+
+    // this.NewsletterRepository()
+    return responseMessage.responseMessage(true, 200, msg.verifySuccessfully);
+  }
 
   //   create user
   async create(request: Request, response: Response, next: NextFunction) {
@@ -82,13 +139,10 @@ export class UserController {
       // send email
       const link = `${process.env.BASE_URL_CREATE_PASSWORD}/?id=${users.id}&token=${token.token}`;
 
-      await sendEmail(
-        email_id,
-        "Verify Email",
-        { link },
-        "",
-        "click to verify"
-      );
+      await sendTemplate(email_id, 'verify-email', {
+        name: first_name + '' + last_name,
+        verify_link: link
+      });
 
       return responseMessage.responseMessage(
         true,
@@ -111,10 +165,15 @@ export class UserController {
     const id = parseInt(request.params.id);
     const verify_token = request.params.token;
     // find user
-    let user = await this.userRepository.findOneBy({
-      id,
-      is_active: true,
-    });
+    let user = await this.userRepository.createQueryBuilder()
+      .where("id=:id AND is_active=true", {
+        id
+      })
+      .getRawOne();;
+    // findOneBy({
+    //   id,
+    //   is_active: true,
+    // })
     if (!user) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);
     }
@@ -155,6 +214,23 @@ export class UserController {
     );
     // delete token
     await this.forgetTokenRepository.remove(token);
+    // send registeration complete mail
+    // console.log('user.id', user.Users_role_id);
+    if (user.Users_role_id === 1) {
+      await sendTemplate(user.Users_email_id, 'startup-registration', {
+        startup_name: user.Users_first_name + ' ' + user.Users_last_name,
+        your_name: "VK INSVESTMENT"
+      });
+    }
+
+    else if (user.Users_role_id === 2) {
+
+      await sendTemplate(user.Users_email_id, 'investor-registration', {
+        investor_name: user.Users_first_name + ' ' + user.Users_last_name,
+        your_name: "VK INSVESTMENT"
+      });
+    }
+
 
     return responseMessage.responseMessage(true, 200, msg.verifySuccessfully);
   }
