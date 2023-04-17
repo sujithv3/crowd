@@ -1,4 +1,4 @@
-const { UserController } = require("../../controller/sales/sales");
+const { UserController } = require("../../controller/sales/salesCreate");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
