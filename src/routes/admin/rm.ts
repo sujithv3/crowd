@@ -21,6 +21,14 @@ export const Routes = [
     validationField: "",
     isLogin: true,
   },
+  {
+    method: "get",
+    route: "/list-start-up/:id",
+    controller: RelationManager,
+    action: "getRmTaggedStartUp",
+    validationField: "",
+    isLogin: true,
+  },
 ];
 
 // function routes
