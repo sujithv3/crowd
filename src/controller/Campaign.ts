@@ -319,9 +319,10 @@ export class CampaignController {
          AND campaign.is_deleted=false
          AND campaign.is_active=true
          AND campaign.status=:status
-         `, {
-          status: CAMPAIGN_STATUS.Approved
-        }
+         `,
+          {
+            status: CAMPAIGN_STATUS.Approved,
+          }
         )
         .skip(0)
         .take(20)

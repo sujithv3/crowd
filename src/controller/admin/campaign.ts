@@ -86,7 +86,7 @@ export class CampaignController {
         .offset(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .limit(request.query.limit ? Number(request.query.limit) : 10)

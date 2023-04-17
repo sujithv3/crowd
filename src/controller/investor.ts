@@ -468,7 +468,7 @@ export class investorController {
         .skip(
           request.query.page
             ? (Number(request.query.page) - 1) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)

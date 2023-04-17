@@ -14,8 +14,6 @@ const Jwt = require("../utils/jsonwebtoken");
 const sendEmail = require("../utils/nodemailer/email");
 const sendTemplate = require("../utils/nodemailer/template");
 
-
-
 export class UserController {
   private userRepository = AppDataSource.getRepository(Users);
   public forgetTokenRepository = AppDataSource.getRepository(ForgetToken);
@@ -23,7 +21,6 @@ export class UserController {
   public NewsletterRepository = AppDataSource.getRepository(NewsletterEmail);
 
   async test(request: Request) {
-
     // await sendTemplate("muthukumar.ext@aagnia.com", 'startup-registration', {
     //   startup_name: "Muthukumar",
     //   your_name: "Testig"
@@ -48,26 +45,34 @@ export class UserController {
     const paketSize = 5;
     const role_id = 2; //for investors
     while (value_exist) {
-      let users = await this.userRepository.createQueryBuilder()
+      let users = await this.userRepository
+        .createQueryBuilder()
         .where(
           "role_id=:role_id AND is_deleted=false AND is_active=true AND subscribed=true",
           {
             role_id: role_id,
           }
         )
-        .skip(page * paketSize).take(paketSize).getMany();
-      if (users.length < paketSize || !users) { // very important to avoid infinite loop
+        .skip(page * paketSize)
+        .take(paketSize)
+        .getMany();
+      if (users.length < paketSize || !users) {
+        // very important to avoid infinite loop
         value_exist = false;
       }
       let paket = users.map((item) => {
-        return { email: item.email_id, name: item.first_name + ' ' + item.last_name, companyname: item.company_name, id: item.id }
-      })
+        return {
+          email: item.email_id,
+          name: item.first_name + " " + item.last_name,
+          companyname: item.company_name,
+          id: item.id,
+        };
+      });
       let paket_count = paket.length;
 
       ++page;
-      console.log('Page', page)
+      console.log("Page", page);
     }
-
 
     // this.NewsletterRepository()
     return responseMessage.responseMessage(true, 200, msg.verifySuccessfully);
@@ -140,9 +145,9 @@ export class UserController {
       // send email
       const link = `${process.env.BASE_URL_CREATE_PASSWORD}/?id=${users.id}&token=${token.token}`;
 
-      await sendTemplate(email_id, 'verify-email', {
-        name: first_name + '' + last_name,
-        verify_link: link
+      await sendTemplate(email_id, "verify-email", {
+        name: first_name + "" + last_name,
+        verify_link: link,
       });
 
       return responseMessage.responseMessage(
@@ -166,11 +171,12 @@ export class UserController {
     const id = parseInt(request.params.id);
     const verify_token = request.params.token;
     // find user
-    let user = await this.userRepository.createQueryBuilder()
+    let user = await this.userRepository
+      .createQueryBuilder()
       .where("id=:id AND is_active=true", {
-        id
+        id,
       })
-      .getRawOne();;
+      .getRawOne();
     // findOneBy({
     //   id,
     //   is_active: true,
@@ -218,20 +224,16 @@ export class UserController {
     // send registeration complete mail
     // console.log('user.id', user.Users_role_id);
     if (user.Users_role_id === 1) {
-      await sendTemplate(user.Users_email_id, 'startup-registration', {
-        startup_name: user.Users_first_name + ' ' + user.Users_last_name,
-        your_name: "VK INSVESTMENT"
+      await sendTemplate(user.Users_email_id, "startup-registration", {
+        startup_name: user.Users_first_name + " " + user.Users_last_name,
+        your_name: "VK INSVESTMENT",
+      });
+    } else if (user.Users_role_id === 2) {
+      await sendTemplate(user.Users_email_id, "investor-registration", {
+        investor_name: user.Users_first_name + " " + user.Users_last_name,
+        your_name: "VK INSVESTMENT",
       });
     }
-
-    else if (user.Users_role_id === 2) {
-
-      await sendTemplate(user.Users_email_id, 'investor-registration', {
-        investor_name: user.Users_first_name + ' ' + user.Users_last_name,
-        your_name: "VK INSVESTMENT"
-      });
-    }
-
 
     return responseMessage.responseMessage(true, 200, msg.verifySuccessfully);
   }

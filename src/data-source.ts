@@ -49,7 +49,7 @@ export const AppDataSource = new DataSource({
     Tagged,
     Cms,
     NewsletterEmail,
-    Taggedsales
+    Taggedsales,
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],
