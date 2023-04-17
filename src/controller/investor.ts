@@ -580,7 +580,7 @@ export class investorController {
           .values({
             user: user[0].id,
             campaign: campaign_id,
-            meeting_date: request.body.meeting,
+            meeting_date: request.body.meeting_date,
             start_time: request.body.start_time,
             end_time: request.body.end_time,
             is_active: true,
@@ -599,7 +599,7 @@ export class investorController {
           investor: user[0].id,
           campaign: campaign_id,
           fund_amount: request.body.fund_amount,
-          currency: request.body.currency,
+          // currency: request.body.currency,
           expected_invest_date: request.body.expected_invest_date,
           remark: request.body.remark,
           req_meeting: request.body.req_meeting,
