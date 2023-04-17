@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from "express";
 import { Category } from "../entity/category";
 import { Location } from "../entity/locations";
 import { Staging } from "../entity/staging";
-import { Campaigns } from "../entity/campaigns";
+import { Campaigns, CAMPAIGN_STATUS } from "../entity/campaigns";
 import { Funds } from "../entity/funds";
 import { Meeting } from "../entity/meeting";
 const Jwt = require("./../utils/jsonwebtoken");
@@ -402,8 +402,11 @@ export class investorController {
         .where(
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
-         AND campaign.is_active=:is_active`,
+         AND campaign.is_active=:is_active
+         AND campaign.status=:status
+         `,
           {
+            status: CAMPAIGN_STATUS.Approved,
             published: true,
             is_deleted: false,
             is_active: true,

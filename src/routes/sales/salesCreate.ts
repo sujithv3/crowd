@@ -1,25 +1,25 @@
-const { UserController } = require("../controller/User");
+const { UserController } = require("../../controller/sales/salesCreate");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
-const validationResult = require("../utils/validations/validation-error");
-const UserValidation = require("../utils/validations/user/user-validation");
-const signupValidationEdit = require("../utils/validations/user/user-validation-edit");
-const loginValidationEdit = require("../utils/validations/user/login");
+const validationResult = require("../../utils/validations/validation-error");
+const UserValidation = require("../../utils/validations/user/user-validation");
+const signupValidationEdit = require("../../utils/validations/user/user-validation-edit");
+const loginValidationEdit = require("../../utils/validations/user/login");
 const {
   changePasswordValidation,
   createPasswordValidation,
   forgetPasswordValidation,
-} = require("../utils/validations/user/change-password");
+} = require("../../utils/validations/user/change-password");
 const {
   mobileOTPSend,
   verifyMobileOTP,
   emailOTPSend,
   emailOTPverify,
-} = require("../utils/validations/user/verification");
-const { Verifications } = require("../controller/verification");
-const JWT = require("../utils/jsonwebtoken");
-const { upload } = require("../utils/file-upload");
+} = require("../../utils/validations/user/verification");
+const { Verifications } = require("../../controller/verification");
+const JWT = require("../../utils/jsonwebtoken");
+const { upload } = require("../../utils/file-upload");
 
 export const Routes = [
   {
@@ -50,15 +50,6 @@ export const Routes = [
     fileUpload: false,
   },
   {
-    method: "get",
-    route: "/test",
-    controller: UserController,
-    action: "test",
-    validationField: "",
-    isLogin: false,
-    fileUpload: false,
-  },
-  {
     method: "post",
     route: "/verify/:id/:token",
     controller: UserController,
@@ -73,15 +64,15 @@ export const Routes = [
     controller: UserController,
     action: "create",
     validationField: UserValidation,
-    isLogin: false,
-    fileUpload: false,
+    isLogin: true,
+    fileUpload: true,
   },
   {
     method: "put",
     route: "/update",
     controller: UserController,
     action: "update",
-    validationField: signupValidationEdit,
+    validationField: "",
     isLogin: true,
     fileUpload: true,
   },
@@ -196,7 +187,7 @@ Routes.forEach((route) => {
           return next();
         },
     route.fileUpload
-      ? upload.any()
+      ? upload.fields([{ name: "profile", maxCount: 1 }])
       : (req: Request, res: Response, next: Function) => {
           return next();
         },

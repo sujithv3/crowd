@@ -93,6 +93,13 @@ export class RelationManager {
           "fund",
           (qb) => qb.andWhere("fund.is_active=true")
         )
+        .skip(
+          request.query.page
+            ? Number(request.query.page) *
+                (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
         .select([
           "user.id",
           "user.company_name",
@@ -101,15 +108,12 @@ export class RelationManager {
           "user.country",
           "campaign.id",
         ])
-        .addSelect("SUM(campaign.investor_count)", "investor")
         .andWhere("tagged.id IS NOT NULL")
         .getManyAndCount();
-      return responseMessage.responseWithData(
-        true,
-        200,
-        msg.list_success,
-        StartUpData
-      );
+      return responseMessage.responseWithData(true, 200, msg.list_success, {
+        total_count: StartUpData[1],
+        data: StartUpData[0],
+      });
     } catch (error) {
       console.log(error);
 

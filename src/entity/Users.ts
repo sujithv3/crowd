@@ -209,6 +209,10 @@ export class Users {
   @UpdateDateColumn()
   updated_date: Date;
 
+  // Subscribed to newsletter (To avoid spam messages, we have to provide this column)
+  @Column({ default: true })
+  subscribed: boolean;
+
   @Column("boolean")
   is_active: boolean;
 

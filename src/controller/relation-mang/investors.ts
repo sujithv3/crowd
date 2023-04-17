@@ -45,7 +45,7 @@ export class InvestorController {
 
       const investorListQuery = await this.userRepository
         .createQueryBuilder("investor")
-        .where("investor.is_deleted=false AND investor.role_id=2")
+        .where("investor.is_deleted=false AND investor.role_id=2");
       if (request.query.status) {
         investorListQuery.andWhere("investor.is_active=:status", {
           status: request.query.status,
@@ -72,7 +72,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -126,7 +126,54 @@ export class InvestorController {
             id: user[0].id,
           }
         )
-        .distinct()
+        .distinct();
+      if (request.query.country && request.query.country !== "all") {
+        campaign.andWhere("user.country=:country", {
+          country: request.query.country,
+        });
+      }
+      if (
+        typeof request.query.fund_amount === "string" &&
+        request.query.fund_amount !== "all"
+      ) {
+        console.log(request.query.fund_amount);
+        const range = request.query.fund_amount.split("-");
+        const min = Number(range[0]);
+        const max = Number(range[1]);
+
+        if (min == 0) {
+          // allow null values also
+          campaign.andWhere(
+            "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.investorId=user.id HAVING ((total_fund >= :min AND total_fund <= :max) OR total_fund IS NULL))",
+            {
+              min: min,
+              max: max,
+            }
+          );
+        } else {
+          campaign.andWhere(
+            "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.investorId=user.id HAVING (total_fund >= :min AND total_fund <= :max))",
+            {
+              min: min,
+              max: max,
+            }
+          );
+        }
+      }
+
+      const total_query = campaign.clone();
+
+      const total_count_result: any = await total_query
+        .select("COUNT(DISTINCT `user`.`id`) AS `count`")
+        .getRawOne();
+
+      console.log("total_count_result", total_count_result);
+
+      const total_count = total_count_result
+        ? total_count_result?.count || 0
+        : 0;
+
+      campaign
         .select([
           "user.id",
           "user.first_name",
@@ -138,31 +185,13 @@ export class InvestorController {
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.investorId=user.id)",
           "fund_amount"
         );
-      if (request.query.country) {
-        campaign.andWhere("user.country=:country", {
-          country: request.query.country,
-        });
-      }
-      if (typeof request.query.fund_amount === "string") {
-        console.log(request.query.fund_amount);
-        const range = request.query.fund_amount.split("-");
-        const min = Number(range[0]);
-        const max = Number(range[1]);
-        campaign.andWhere(
-          "(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max",
-          {
-            min: min,
-            max: max,
-          }
-        );
-      }
-      const total_count = await campaign.getCount();
+
       if (request.query.page && request.query.limit) {
         campaign
           .offset(
             request.query.page
               ? Number(request.query.page) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -255,7 +284,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -321,7 +350,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -415,7 +444,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
