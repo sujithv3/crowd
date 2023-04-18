@@ -46,11 +46,13 @@ export class InvestorController {
       const investorListQuery = await this.userRepository
         .createQueryBuilder("investor")
         .where("investor.is_deleted=false AND investor.role_id=2");
-      if (request.query.status) {
+
+      if (typeof request.query.status !== 'undefined') {
         investorListQuery.andWhere("investor.is_active=:status", {
           status: request.query.status,
         });
       }
+
       if (request.query.from_date && request.query.to_date) {
         const formatDate = (date) => {
           let convertedDate = new Date(date);
@@ -60,10 +62,10 @@ export class InvestorController {
           return convertedDate;
         };
 
-        investorListQuery.andWhere("investor.created_date > :start_dates  ", {
+        investorListQuery.andWhere("investor.created_date >= :start_dates  ", {
           start_dates: formatDate(request.query.from_date),
         });
-        investorListQuery.andWhere("investor.created_date < :end_date ", {
+        investorListQuery.andWhere("investor.created_date <= :end_date ", {
           end_date: formatDate(request.query.to_date),
         });
       }
@@ -290,7 +292,7 @@ export class InvestorController {
           );
         } else {
           campaign.andWhere(
-            "(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max",
+            "(fund.fund_amount >= :min AND fund.fund_amount <= :max)",
             {
               min: min,
               max: max,
