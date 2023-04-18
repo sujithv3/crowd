@@ -18,10 +18,10 @@ export class RelationManager {
       // featured
       // AND campaign.is_featured=1
 
-      const startUpCountsRepository = await this.userRepository
+      const startUpCountsRepository = this.userRepository
         .createQueryBuilder("user")
         .where("user.is_active=true AND user.role_id=3")
-        .leftJoin("user.tagged", "tagged")
+        .leftJoin("user.tagged", "tagged", "tagged.is_active=true")
         .orderBy("user.id", "DESC")
         .loadRelationCountAndMap(
           "user.tagged_count",
