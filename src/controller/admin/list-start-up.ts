@@ -118,9 +118,12 @@ export class ListStartUp {
     try {
       const campaign = await this.campaignRepository
         .createQueryBuilder("campaign")
-        .where("campaign.is_active=true AND campaign.user=:id", {
-          id: request.params.id,
-        })
+        .where(
+          "campaign.is_active=true AND campaign.is_published=true AND campaign.user=:id",
+          {
+            id: request.params.id,
+          }
+        )
         .leftJoinAndSelect("campaign.fund", "fund", "fund.is_active=true")
         .leftJoinAndSelect("fund.investor", "investor")
         .select([
@@ -172,7 +175,7 @@ export class ListStartUp {
 
       const tagged = await this.taggedRepository
         .createQueryBuilder("tagged")
-        .orderBy("tagged.updatedDate", "DESC")
+
         .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
         .loadRelationCountAndMap(
           "RelationManager.rm_tagged_count",
@@ -180,6 +183,7 @@ export class ListStartUp {
           "tagged",
           (qb) => qb.andWhere("tagged.is_active=true")
         )
+        .orderBy("tagged.updatedDate", "DESC")
         .limit(3)
         .getMany();
 
