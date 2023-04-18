@@ -75,19 +75,11 @@ export class TaggedController {
         .offset(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .limit(request.query.limit ? Number(request.query.limit) : 10)
         .getRawMany();
-
-      if (campaign.length === 0) {
-        return responseMessage.responseMessage(
-          false,
-          400,
-          msg.campaignListFailed
-        );
-      }
       return responseMessage.responseWithData(
         true,
         200,
@@ -192,10 +184,10 @@ export class TaggedController {
 
         console.log(request.query.from_date, request.query.to_date);
 
-        campaignQuery.andWhere("campaign.start_date > :start_dates  ", {
+        campaignQuery.andWhere("campaign.start_date >= :start_dates  ", {
           start_dates: formatDate(request.query.from_date),
         });
-        campaignQuery.andWhere("campaign.start_date < :end_date ", {
+        campaignQuery.andWhere("campaign.start_date <= :end_date ", {
           end_date: formatDate(request.query.to_date),
         });
       }
@@ -204,6 +196,34 @@ export class TaggedController {
         const range = request.query.goal_amount.split("-");
         const min = Number(range[0]);
         const max = Number(range[1]);
+
+        // if (min == 0) {
+        //   // allow null values also
+        //   campaignQuery.andWhere(
+        //     "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.campaignId=campaign.id HAVING ((total_fund >= :min AND total_fund <= :max) OR total_fund IS NULL))",
+        //     {
+        //       min: min,
+        //       max: max,
+        //     }
+        //   );
+        // } else if (!isNaN(min) && isNaN(max)) {
+        //   campaignQuery.andWhere(
+        //     "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.campaignId=campaign.id HAVING (total_fund > :max))",
+        //     {
+        //       max: max,
+        //     }
+        //   );
+
+        // } else {
+        //   campaignQuery.andWhere(
+        //     "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.campaignId=campaign.id HAVING (total_fund >= :min AND total_fund <= :max))",
+        //     {
+        //       min: min,
+        //       max: max,
+        //     }
+        //   );
+        // }
+
         if (!isNaN(min) && !isNaN(max)) {
           campaignQuery.andWhere("campaign.goal_amount BETWEEN :min AND :max", {
             min: min,
@@ -216,16 +236,18 @@ export class TaggedController {
         }
       }
       // .getRawMany();
-      const total_count = await campaignQuery.getCount();
+      const totalQuery = campaignQuery.clone();
       const data = await campaignQuery
         .offset(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .limit(request.query.limit ? Number(request.query.limit) : 10)
         .getRawMany();
+
+      const total_count = await totalQuery.getCount();
 
       return responseMessage.responseWithData(
         true,

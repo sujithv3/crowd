@@ -46,11 +46,13 @@ export class InvestorController {
       const investorListQuery = await this.userRepository
         .createQueryBuilder("investor")
         .where("investor.is_deleted=false AND investor.role_id=2");
-      if (request.query.status) {
+
+      if (typeof request.query.status !== 'undefined') {
         investorListQuery.andWhere("investor.is_active=:status", {
           status: request.query.status,
         });
       }
+
       if (request.query.from_date && request.query.to_date) {
         const formatDate = (date) => {
           let convertedDate = new Date(date);
@@ -60,10 +62,10 @@ export class InvestorController {
           return convertedDate;
         };
 
-        investorListQuery.andWhere("investor.created_date > :start_dates  ", {
+        investorListQuery.andWhere("investor.created_date >= :start_dates  ", {
           start_dates: formatDate(request.query.from_date),
         });
-        investorListQuery.andWhere("investor.created_date < :end_date ", {
+        investorListQuery.andWhere("investor.created_date <= :end_date ", {
           end_date: formatDate(request.query.to_date),
         });
       }
@@ -72,7 +74,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -141,6 +143,8 @@ export class InvestorController {
         const min = Number(range[0]);
         const max = Number(range[1]);
 
+        console.log('dfasfas', min, max);
+
         if (min == 0) {
           // allow null values also
           campaign.andWhere(
@@ -150,7 +154,16 @@ export class InvestorController {
               max: max,
             }
           );
-        } else {
+        }
+        else if (isNaN(max)) {
+          campaign.andWhere(
+            "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.investorId=user.id HAVING (total_fund > :min))",
+            {
+              min: min,
+            }
+          );
+        }
+        else {
           campaign.andWhere(
             "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.investorId=user.id HAVING (total_fund >= :min AND total_fund <= :max))",
             {
@@ -191,7 +204,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -259,24 +272,34 @@ export class InvestorController {
           "location.country",
           "fund.fund_amount",
         ]);
-      if (request.query.stage) {
+      if (request.query.stage && request.query.stage !== 'all') {
         console.log(request.query.stage);
         campaign.andWhere("startup.stage_of_business=:stage", {
           stage: request.query.stage,
         });
       }
-      if (typeof request.query.fund_amount === "string") {
+      if (typeof request.query.fund_amount === "string" && request.query.fund_amount !== 'all') {
         console.log(request.query.fund_amount);
         const range = request.query.fund_amount.split("-");
         const min = Number(range[0]);
         const max = Number(range[1]);
-        campaign.andWhere(
-          "(fund.fund_amount >= :min AND fund.fund_amount <= :max) OR fund.fund_amount = :min OR fund.fund_amount = :max",
-          {
-            min: min,
-            max: max,
-          }
-        );
+        if (isNaN(max)) {
+          campaign.andWhere(
+            "(fund.fund_amount > :min)",
+            {
+              min: min,
+            }
+          );
+        } else {
+          campaign.andWhere(
+            "(fund.fund_amount >= :min AND fund.fund_amount <= :max)",
+            {
+              min: min,
+              max: max,
+            }
+          );
+        }
+
       }
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
@@ -284,7 +307,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -350,7 +373,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -444,7 +467,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
