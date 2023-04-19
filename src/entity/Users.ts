@@ -14,6 +14,7 @@ import { Location } from "./locations";
 import { Campaigns } from "./campaigns";
 import { Tagged } from "./tagged";
 import { Funds } from "./funds";
+import { TaggedSalesStartup } from "./taggedSalesStartup";
 
 type FILE_LIST = { name: number; value: any }[];
 
@@ -202,6 +203,9 @@ export class Users {
 
   @OneToMany(() => Funds, (Funds) => Funds.investor)
   fund: Funds[];
+
+  @OneToMany(() => TaggedSalesStartup, (TaggedSalesStartup) => TaggedSalesStartup.StartUp)
+  taggedSalesStartup: TaggedSalesStartup[];
 
   @CreateDateColumn()
   created_date: Date;

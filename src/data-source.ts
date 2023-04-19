@@ -19,6 +19,7 @@ import { Tagged } from "./entity/tagged";
 import { Cms } from "./entity/cms";
 import { NewsletterEmail } from "./entity/newsletter-email";
 import { Taggedsales } from "./entity/taggedSales";
+import { TaggedSalesStartup } from "./entity/taggedSalesStartup";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -50,6 +51,7 @@ export const AppDataSource = new DataSource({
     Cms,
     NewsletterEmail,
     Taggedsales,
+    TaggedSalesStartup,
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],
