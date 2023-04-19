@@ -32,6 +32,22 @@ export class Cms {
   })
   tag: string;
 
+
+  @Column({
+    length: 70,
+    type: "varchar",
+    default: null,
+    unique: true,
+  })
+  page: string;
+
+  @Column({
+    type: "json",
+    default: null,
+    nullable: true,
+  })
+  params: Array<{ name: string; content: string }>;
+
   @Column({
     type: "text",
     default: null,
