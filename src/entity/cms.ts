@@ -10,6 +10,8 @@ export enum TYPE {
   MAIL = "MAIL",
   CONTENT = "CONTENT",
   MAIL_TEMPLATE = "MAIL TEMPLATE",
+  HOME_PAGE = "HOME Page",
+  FOOTER = "FOOTER",
 }
 
 @Entity()
@@ -31,15 +33,6 @@ export class Cms {
     unique: true,
   })
   tag: string;
-
-
-  @Column({
-    length: 70,
-    type: "varchar",
-    default: null,
-    unique: true,
-  })
-  page: string;
 
   @Column({
     type: "json",
