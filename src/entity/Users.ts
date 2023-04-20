@@ -15,6 +15,8 @@ import { Campaigns } from "./campaigns";
 import { Tagged } from "./tagged";
 import { Funds } from "./funds";
 import { TaggedSalesStartup } from "./taggedSalesStartup";
+import { LegalStatusStartup } from "./legalStatusStartup";
+import { LegalStatusInvestor } from "./legalStatusInvestor";
 
 type FILE_LIST = { name: number; value: any }[];
 
@@ -206,6 +208,12 @@ export class Users {
 
   @OneToMany(() => TaggedSalesStartup, (TaggedSalesStartup) => TaggedSalesStartup.StartUp)
   taggedSalesStartup: TaggedSalesStartup[];
+
+  @OneToOne(() => LegalStatusStartup, (legalStatusStartup) => legalStatusStartup.User)
+  legalStatusStartup: LegalStatusStartup[];
+
+  @OneToOne(() => LegalStatusInvestor, (legalStatusInvestor) => legalStatusInvestor.User)
+  legalStatusInvestor: LegalStatusInvestor[];
 
   @CreateDateColumn()
   created_date: Date;

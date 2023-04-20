@@ -544,7 +544,7 @@ export class UserController {
             token = token.token ?? token[0].token;
 
             // generate links
-            const link = `${process.env.BASE_URL_RMADMIN_CREATE_PASSWORD}/?resetId=${user.id}&token=${token}`;
+            const link = `${process.env.BASE_URL_RMADMIN_CREATE_PASSWORD}/sales-login/?resetId=${user.id}&token=${token}`;
 
             // send email
 
