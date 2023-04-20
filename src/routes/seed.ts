@@ -26,6 +26,14 @@ export const Routes = [
     validationField: "",
     isLogin: false,
   },
+  {
+    method: "post",
+    route: "/categories",
+    controller: SeedController,
+    action: "categories",
+    validationField: "",
+    isLogin: false,
+  },
 ];
 
 // function routes
@@ -35,13 +43,13 @@ Routes.forEach((route) => {
     route.isLogin
       ? JWT.verify
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     route.validationField
       ? validationResult(route.validationField)
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     (req: Request, res: Response, next: Function) => {
       const result = new (route.controller as any)()[route.action](
         req,

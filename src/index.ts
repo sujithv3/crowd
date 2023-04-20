@@ -100,4 +100,4 @@ app.use("/api/sales", Sales);
 app.use("/api/sales-list", SalesList);
 app.use("/api/sales/tag", SalesTagged);
 app.use("/api/sales/startup", SalesStartup);
-app.use("/api/sales/startup-tag",SalesStartupTag);
+app.use("/api/sales/startup-tag", SalesStartupTag);
