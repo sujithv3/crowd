@@ -13,6 +13,7 @@ import { Roles } from "./roles";
 import { Location } from "./locations";
 import { Tagged } from "./tagged";
 import { Taggedsales } from "./taggedSales";
+import { TaggedSalesStartup } from "./taggedSalesStartup";
 
 type FILE_LIST = any[];
 
@@ -103,6 +104,9 @@ export class rmAdmin {
 
   @OneToMany(() => Taggedsales, (Taggedsales) => Taggedsales.SalesUser)
   taggedsales: Taggedsales[];
+
+  @OneToMany(() => TaggedSalesStartup, (Taggedsales) => Taggedsales.Sales)
+  taggedsalesStartup: TaggedSalesStartup[];
 
   @CreateDateColumn()
   created_date: Date;

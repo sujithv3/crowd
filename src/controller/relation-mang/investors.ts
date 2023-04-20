@@ -119,7 +119,7 @@ export class InvestorController {
 
       const campaign = await this.TaggedRepository.createQueryBuilder("tagged")
         .innerJoin("tagged.StartUp", "startup") // get tagged startup
-        .innerJoin("startup.campaign", "campaign") // get campaign details for tagged users
+        .innerJoin("startup.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true") // get campaign details for tagged users
         .innerJoin("campaign.myDeals", "mydeals") // get mydeals
         .innerJoin("mydeals.user", "user")
         .where(
@@ -252,7 +252,7 @@ export class InvestorController {
       const campaign = await this.fundsRepository
         .createQueryBuilder("fund")
         .innerJoinAndSelect("fund.investor", "investor")
-        .innerJoinAndSelect("fund.campaign", "campaign")
+        .innerJoinAndSelect("fund.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true")
         .innerJoinAndSelect("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
         .innerJoin("startup.tagged", "tagged")

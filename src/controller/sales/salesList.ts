@@ -104,31 +104,31 @@ export class ListSales {
     try {
       const salesQueryBuilder = this.rmRepository
         .createQueryBuilder("user")
-        .where("user.is_active=true AND user.role_id=5")
+        .where("user.is_active=true")
         .orderBy("user.id", "DESC");
 
       if (request.query.country) {
-          salesQueryBuilder.andWhere("user.country=:country", {
+        salesQueryBuilder.andWhere("user.country=:country", {
           country: request.query.country,
         });
       }
       if (request.query.sector) {
-          salesQueryBuilder.andWhere("user.sector  LIKE :sector", {
+        salesQueryBuilder.andWhere("user.sector  LIKE :sector", {
           sector: `%${request.query.sector}%`,
         });
       }
 
       const salesList = await salesQueryBuilder
-          .leftJoinAndSelect("user.taggedsales", "taggedsales", "taggedsales.is_active = true")
-          .leftJoinAndSelect("taggedsales.RelationManager", "RelationManager")    
-          .andWhere("taggedsales.id IS NOT NULL")
-        
+        .leftJoinAndSelect("user.taggedsales", "taggedsales", "taggedsales.is_active = true")
+        .leftJoinAndSelect("taggedsales.RelationManager", "RelationManager")
+        .andWhere("taggedsales.id IS NOT NULL")
+
         .select([
           "user.id",
           "user.first_name",
           "user.last_name",
           "user.sector",
-          "user.country", 
+          "user.country",
           "RelationManager.id",
           "RelationManager.first_name",
           "RelationManager.last_name",

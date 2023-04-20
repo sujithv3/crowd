@@ -19,7 +19,6 @@ export class TaggedSales {
     try {
       //   tagged
       const { rm_id, sales } = request.body;
-      console.log(request.body);
 
       for (let i = 0; i < sales.length; i++) {
         this.taggedRepository.save({
@@ -46,7 +45,6 @@ export class TaggedSales {
     try {
       //   tagged
       const { sales } = request.body;
-      console.log(sales)
 
       for (let i = 0; i < sales.length; i++) {
         this.taggedRepository

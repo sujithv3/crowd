@@ -165,7 +165,7 @@ export class TaggedController {
           "(SELECT COUNT(*) FROM funds WHERE funds.campaignId=campaign.id)",
           "fund_count"
         )
-        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+        .where("tagged.rm_id = :id AND tagged.is_active=true AND campaign.is_deleted=false AND campaign.is_published=true", {
           id: user[0].id,
         });
       if (request.query.country) {
