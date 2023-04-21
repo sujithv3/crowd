@@ -19,30 +19,46 @@ export class ListSales {
   // list start up
   async getSalesList(request: Request, response: Response, next: NextFunction) {
     try {
-      const userData = await this.rmRepository
+      const userDataQuery = await this.rmRepository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.role", "role")
-        .where("user.is_active=true")
-        .andWhere("role.id = :roleId", { roleId: 5 })
+        .where("user.is_active=true AND user.role_id = 5")
+      if (request.query.country) {
+        console.log(request.query.country);
+        userDataQuery.andWhere("user.country=:country", {
+          country: request.query.country,
+        });
+      }
+
+      const userData = await userDataQuery
+        .leftJoinAndSelect("user.taggedsales", "taggedsales", "taggedsales.is_active = true")
+        .leftJoinAndSelect("taggedsales.RelationManager", "RelationManager")
+        .andWhere("taggedsales.id IS NOT NULL")
         .select([
           "user.id",
           "user.first_name",
           "user.last_name",
           "user.country",
           "user.city",
-          "user.sector"
+          "user.sector",
+          "taggedsales.id",
+          "RelationManager.id",
+          "RelationManager.first_name",
+          "RelationManager.last_name"
         ])
-        .getMany();
+        .getManyAndCount();
       //   check user exist
 
-      if (userData.length === 0) {
+      if (userData[0].length === 0) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
       }
       return responseMessage.responseWithData(
         true,
         200,
         msg.userListSuccess,
-        userData
+        {
+          total_count: userData[1],
+          data: userData[0],
+        }
       );
     } catch (err) {
       console.log(err);
@@ -61,9 +77,10 @@ export class ListSales {
     try {
       const userData = await this.rmRepository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.role", "role")
-        .where("user.is_active=true AND user.id=:id", { id: request.params.id })
-        .andWhere("role.id = :roleId", { roleId: 5 })
+        .where("user.is_active=true AND user.id=:id AND user.role_id = 5", { id: request.params.id })
+        .leftJoinAndSelect("user.taggedsales", "taggedsales", "taggedsales.is_active = true")
+        .leftJoinAndSelect("taggedsales.RelationManager", "RelationManager")
+        .andWhere("taggedsales.id IS NOT NULL")
         .getOne();
       //   check user exist
 
