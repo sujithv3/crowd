@@ -41,31 +41,26 @@ export class TaggedSalesController {
             const user = Jwt.decode(token);
             console.log("user", user);
 
-            let dbQuery = this.taggedSalesStartup
-                .createQueryBuilder('user')
-                .leftJoinAndSelect('user.StartUp', "StartUp", "StartUp.is_active=true")
-                .leftJoinAndSelect('StartUp.campaign', 'campaign', 'campaign.is_active=true')
-                .leftJoinAndSelect('StartUp.fund', 'fund')
-                .leftJoinAndSelect('fund.investor', 'investor')
-                .leftJoinAndSelect('user.Sales', "Sales", "Sales.is_active=true")
+            let dbQuery = this.campaignRepository
+                .createQueryBuilder('campaign')
+                .leftJoinAndSelect('campaign.location', "location")
+                .leftJoinAndSelect('campaign.user', "StartUp", "StartUp.is_active=true")
+                .leftJoinAndSelect('StartUp.taggedSalesStartup', 'tagged', 'tagged.is_active=true')
+                .leftJoinAndSelect('tagged.Sales', "Sales", "Sales.is_active=true")
                 // .leftJoinAndSelect('user.campaign', 'campaign')
                 // .leftJoinAndSelect('user.tagged', 'tagged')
                 // .leftJoinAndSelect('user.fund', 'fund')
                 .select([
+                    "campaign.title",
                     "StartUp.id",
                     "StartUp.company_name",
                     "StartUp.sector",
-                    "StartUp.city",
-                    "StartUp.country",
-                    "StartUp.created_date",
+                    "location.name",
+                    "location.country",
+                    "campaign.createdDate",
+                    "campaign.deal_size",
                     "campaign.goal_amount",
-                    "campaign.id",
-                    "fund.fund_amount",
-                    "investor.id",
-                    "investor.first_name",
-                    "investor.last_name",
-                    "investor.city",
-                    "investor.country",
+                    "campaign.id"
                 ])
                 .addSelect(
                     "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.campaignId=campaign.id AND funds.is_active = true)",
@@ -75,8 +70,7 @@ export class TaggedSalesController {
                     "(SELECT COUNT(*) FROM funds WHERE funds.campaignId=campaign.id AND funds.is_active = true)",
                     "fund_count"
                 )
-                // .where('tagged.rm_id = :id', { id: user[0].id })
-                .where('user.sales_id = :id AND user.is_active=true', { id: 21 })
+                .where('tagged.sales_id = :id AND tagged.is_active=true', { id: user[0].id })
                 .distinct();
 
             if (request.query.stage) {
@@ -119,13 +113,6 @@ export class TaggedSalesController {
                 .limit(request.query.limit ? Number(request.query.limit) : 10)
                 .getRawMany();
 
-            if (campaign.length === 0) {
-                return responseMessage.responseMessage(
-                    false,
-                    400,
-                    msg.campaignListFailed
-                );
-            }
             return responseMessage.responseWithData(
                 true,
                 200,
@@ -133,6 +120,73 @@ export class TaggedSalesController {
                 {
                     total_count: total_count,
                     data: { campaign },
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.userListFailed,
+                err
+            );
+        }
+    }
+
+    async getOne(request: Request, response: Response, next: NextFunction) {
+        try {
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const campaignId = request.params.id;
+
+            const user = Jwt.decode(token);
+            console.log("user", user);
+
+            const campaign = await this.campaignRepository
+                .createQueryBuilder('campaign')
+                .leftJoinAndSelect('campaign.location', "location")
+                .leftJoinAndSelect('campaign.user', "StartUp", "StartUp.is_active=true")
+                .select([
+                    "campaign.title",
+                    "StartUp.id",
+                    "StartUp.company_name",
+                    "StartUp.sector",
+                    "location.name",
+                    "location.country",
+                    "campaign.createdDate",
+                    "campaign.deal_size",
+                    "campaign.goal_amount",
+                    "campaign.id"
+                ])
+                .addSelect(
+                    "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.campaignId=campaign.id AND funds.is_active = true)",
+                    "fund_amount"
+                )
+                .addSelect(
+                    "(SELECT COUNT(*) FROM funds WHERE funds.campaignId=campaign.id AND funds.is_active = true)",
+                    "fund_count"
+                )
+                .where('campaign.id = :id', { id: campaignId }).getRawOne();
+
+            const investors = await this.fundsRepository
+                .createQueryBuilder('funds').where('funds.campaignId = :id', { id: campaignId }).getMany()
+
+
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.campaignListSuccess,
+                {
+                    data: { campaign, investors },
                 }
             );
         } catch (err) {
@@ -529,7 +583,7 @@ export class TaggedSalesController {
                 .leftJoinAndSelect('user.StartUp', "StartUp", "StartUp.is_active=true")
                 .leftJoinAndSelect('StartUp.fund', 'fund')
                 .leftJoinAndSelect('fund.investor', 'investor')
-                .leftJoinAndSelect('StartUp.legalStatusInvestor',"legalStatusInvestor")
+                .leftJoinAndSelect('StartUp.legalStatusInvestor', "legalStatusInvestor")
 
                 .select([
                     "StartUp.id",
