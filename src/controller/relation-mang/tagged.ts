@@ -395,6 +395,8 @@ export class TaggedController {
           "startup.first_name",
           "startup.last_name",
           "startup.city",
+          "startup.sector",
+          "startup.stage_of_business",
           "startup.country",
           "startup.created_date",
           "campaign.id",
