@@ -64,18 +64,10 @@ export class ListSales {
         .leftJoinAndSelect("user.role", "role")
         .where("user.is_active=true AND user.id=:id", { id: request.params.id })
         .andWhere("role.id = :roleId", { roleId: 5 })
-        .select([
-          "user.id",
-          "user.first_name",
-          "user.last_name",
-          "user.country",
-          "user.city",
-          "user.sector"
-        ])
-        .getMany();
+        .getOne();
       //   check user exist
 
-      if (userData.length === 0) {
+      if (!userData) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
       }
       return responseMessage.responseWithData(

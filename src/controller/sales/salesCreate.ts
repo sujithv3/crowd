@@ -374,7 +374,7 @@ export class UserController {
     //   login user
     async login(request: Request, response: Response, next: NextFunction) {
         const { email, password, role } = request.body;
-        console.log("this is from relationship");
+        console.log("this is from sales");
         console.log(email, password, role);
         // find user
 
