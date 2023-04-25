@@ -177,7 +177,7 @@ export class TaggedSalesController {
                 .where('campaign.id = :id', { id: campaignId }).getRawOne();
 
             const investors = await this.fundsRepository
-                .createQueryBuilder('funds').where('funds.campaignId = :id', { id: campaignId }).getMany()
+                .createQueryBuilder('funds').where('funds.campaignId = :id AND funds.is_active = true', { id: campaignId }).getMany()
 
 
 

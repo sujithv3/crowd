@@ -7,6 +7,8 @@ import { Funds } from "../../entity/funds";
 const responseMessage = require("../../configs/response");
 const msg = require("../../configs/message");
 const Jwt = require("../../utils/jsonwebtoken");
+const json2xls = require("json2xls");
+const fs = require("fs");
 
 export class ListSales {
   private userRepository = AppDataSource.getRepository(Users);
@@ -51,6 +53,17 @@ export class ListSales {
       if (userData[0].length === 0) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
       }
+
+      var xls = json2xls(userData[0]);
+      fs.writeFileSync('data.xlsx', xls, 'binary');
+
+      // const xlsBuffer = Buffer.from(xls, 'binary');
+
+      // response.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      // response.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      // response.setHeader('Content-Disposition', 'attachment; filename=data.xlsx');
+      // response.send(xlsBuffer);
+
       return responseMessage.responseWithData(
         true,
         200,
@@ -58,7 +71,13 @@ export class ListSales {
         {
           total_count: userData[1],
           data: userData[0],
+          // file: xlsBuffer
+        },
+        {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'Content-Disposition': 'attachment; filename=data.xlsx'
         }
+
       );
     } catch (err) {
       console.log(err);

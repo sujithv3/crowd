@@ -24,6 +24,7 @@
     "express": "^4.17.2",
     "express-validator": "^6.15.0",
     "handlebars": "^4.7.7",
+    "json2xls": "^0.1.2",
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^3.1.2",
     "moment": "^2.29.4",
