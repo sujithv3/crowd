@@ -7,11 +7,12 @@ import { Category } from "../entity/category";
 import { Staging } from "../entity/staging";
 const responseMessage = require("../configs/response");
 const msg = require("../configs/message");
+import { Users } from "../entity/Users";
 
 export class SeedController {
   private categoryRepository = AppDataSource.getRepository(Category);
   private Staging = AppDataSource.getRepository(Staging);
-
+  private userRepository = AppDataSource.getRepository(Users);
   // list all
   async seedStages(request: Request, response: Response, next: NextFunction) {
     try {

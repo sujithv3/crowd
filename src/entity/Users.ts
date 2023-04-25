@@ -8,6 +8,7 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index
 } from "typeorm";
 import { Roles } from "./roles";
 import { Location } from "./locations";
@@ -24,6 +25,15 @@ type FILE_LIST = { name: number; value: any }[];
 export class Users {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Index("user_code_index")
+  @Column({
+    length: 100,
+    default: null,
+    nullable: true,
+    type: "varchar",
+  })
+  user_code: string;
 
   @ManyToOne((type) => Roles)
   @JoinColumn({ name: "role_id", referencedColumnName: "id" })

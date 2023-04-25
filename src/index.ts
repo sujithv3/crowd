@@ -38,6 +38,8 @@ const SalesList = require("./routes/sales/salesList");
 const SalesTagged = require("./routes/sales/tagged");
 const SalesStartup = require("./routes/sales/startUp");
 const SalesStartupTag = require("./routes/relation-mang/salesAssignTag");
+const chat = require("./routes/chat/chatApi");
+const chatHook = require("./routes/chat/chatHooks");
 import "./cron";
 
 // mysql database connection initialize
@@ -101,3 +103,5 @@ app.use("/api/sales-list", SalesList);
 app.use("/api/sales/tag", SalesTagged);
 app.use("/api/sales/startup", SalesStartup);
 app.use("/api/sales/startup-tag", SalesStartupTag);
+app.use("/api/chat", chat);
+app.use("/api/chat-hooks", chatHook);
