@@ -133,6 +133,10 @@ export class UserController {
         updated_date: new Date(),
         extra_links: [],
       });
+      // generate Unique code
+
+      await AppDataSource.query("UPDATE users SET user_code = case role_id when 1 then CONCAT('VKCF', LPAD(id,5,'0')) when 2 then CONCAT('VKCI', LPAD(id,5,'0')) end WHERE user_code is NULL");
+
       // console.log(users);
       const token = await this.forgetTokenRepository.save({
         user: users.id,
@@ -475,6 +479,7 @@ export class UserController {
         })
         .where("id =:id", { id: user[0].id })
         .execute();
+
       return responseMessage.responseMessage(true, 200, msg.userUpdateSuccess);
     } catch (err) {
       console.log(err);

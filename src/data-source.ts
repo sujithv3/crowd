@@ -25,6 +25,10 @@ import { LegalStatusInvestor } from "./entity/legalStatusInvestor";
 import { Countries } from "./entity/countries";
 import { States } from "./entity/states";
 import { Cities } from "./entity/cities";
+import { ChatGroup } from "./entity/chatGroup";
+import { ChatGroupMember } from "./entity/chatGroupMembers";
+import { ChatMessage } from "./entity/chatMessages";
+import { ChatOnline } from "./entity/chatOnline";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -61,7 +65,11 @@ export const AppDataSource = new DataSource({
     LegalStatusInvestor,
     Countries,
     States,
-    Cities
+    Cities,
+    ChatGroup,
+    ChatGroupMember,
+    ChatMessage,
+    ChatOnline
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],

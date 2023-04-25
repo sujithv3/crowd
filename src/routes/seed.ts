@@ -34,6 +34,14 @@ export const Routes = [
     validationField: "",
     isLogin: false,
   },
+  {
+    method: "post",
+    route: "/triggers",
+    controller: SeedController,
+    action: "triggers",
+    validationField: "",
+    isLogin: false,
+  },
 ];
 
 // function routes
