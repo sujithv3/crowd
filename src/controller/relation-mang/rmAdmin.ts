@@ -10,6 +10,7 @@ const crypto = require("crypto");
 const msg = require("../../configs/message");
 const Jwt = require("../../utils/jsonwebtoken");
 const sendEmail = require("../../utils/nodemailer/email");
+const axios = require("axios");
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(rmAdmin);
@@ -35,6 +36,29 @@ export class UserController {
 
       // encrypt password
       const encrypt_password: string = genPass(password);
+
+      // INVITE RM FOR CALENDLY
+      if (Number(role_id) === 3) {
+        await axios
+          .post(
+            process.env.CALENDLY_BASE_URL +
+              "/organizations/" +
+              process.env.ORGANIZATION_ID +
+              "/invitations",
+            {
+              email: email_id,
+            },
+            {
+              headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
+            }
+          )
+          .then((e) => {
+            // console.log("calendly", e);
+          })
+          .catch((err) => {
+            console.log("calendly error", err);
+          });
+      }
 
       // if user check
       const user = await this.userRepository

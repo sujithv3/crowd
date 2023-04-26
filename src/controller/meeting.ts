@@ -6,6 +6,7 @@ import { NextFunction, Request, Response } from "express";
 import { Meeting } from "../entity/meeting";
 import { Campaigns } from "../entity/campaigns";
 import { MyDeals } from "../entity/mydeals";
+import axios from "axios";
 const responseMessage = require("../configs/response");
 const Jwt = require("../utils/jsonwebtoken");
 const msg = require("../configs/message");
@@ -51,6 +52,7 @@ export class MeetingController {
           "campaign.title",
           "rm.first_name",
           "rm.last_name",
+          "rm.email_id",
         ])
         .innerJoin("campaign.user", "startup")
         .innerJoin("startup.tagged", "tagged")
@@ -59,6 +61,33 @@ export class MeetingController {
           campaignId: id,
         })
         .getRawOne();
+
+      // get rm calendly url
+      const getRmDetails = await axios.get(
+        process.env.CALENDLY_BASE_URL +
+          "/organizations/" +
+          process.env.ORGANIZATION_ID +
+          "/invitations?email=" +
+          "santhosh@aagnia.com",
+        {
+          headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
+        }
+      );
+      // console.log("getRmDetails", getRmDetails.data);
+      if (getRmDetails.data.collection.length != 0) {
+        const user = getRmDetails.data.collection[0];
+        if (user?.status === "accepted") {
+          const getRmCalendlyUrl: any = await axios.get(user.user, {
+            headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
+          });
+          campaignData.scheduling_url =
+            getRmCalendlyUrl.data.resource.scheduling_url +
+            "/" +
+            process.env.EVENT_NAME;
+          // console.log(getRmCalendlyUrl.data.resource.scheduling_url);
+        }
+      }
+      console.log(campaignData);
 
       const data = {
         meetingData,
