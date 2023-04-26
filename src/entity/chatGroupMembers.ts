@@ -12,7 +12,7 @@ import { Users } from "./Users";
 import { rmAdmin } from "./rmAdmin";
 import { ChatGroup } from './chatGroup'
 
-export enum USER_TYPE {
+export enum MEMBER_TYPE {
     STARTUP = "STARTUP",
     INVESTOR = "INVESTOR",
     SALES_EXECUTIVE = "SALES_EXECUTIVE",
@@ -27,8 +27,8 @@ export class ChatGroupMember {
 
     @Column({
         type: "enum",
-        enum: USER_TYPE,
-        default: USER_TYPE.RM,
+        enum: MEMBER_TYPE,
+        default: MEMBER_TYPE.RM,
     })
     user_type: string;
 

@@ -12,9 +12,9 @@ import { Staging } from "../../entity/staging";
 import { ChatOnline, USER_TYPE } from "../../entity/chatOnline";
 import { Users } from "../../entity/Users";
 import { rmAdmin } from "../../entity/rmAdmin";
-import { ChatGroup } from "../../entity/chatGroup";
+import { ChatGroup, GROUP_TYPE } from "../../entity/chatGroup";
 import { ChatMessage } from "../../entity/chatMessages";
-import { ChatGroupMember } from "../../entity/chatGroupMembers";
+import { ChatGroupMember, MEMBER_TYPE } from "../../entity/chatGroupMembers";
 
 const mqtt = require('mqtt');
 
@@ -152,7 +152,7 @@ export class ChatApiController {
         }
     }
 
-    async postTextMessage(req: Request, res: Response, next: NextFunction) {
+    async postTextMessage(request: Request, res: Response, next: NextFunction) {
         try {
             // const client = this.initConnection();
             // client.publish(topic, payload, { qos }, (error: any) => {
@@ -160,10 +160,116 @@ export class ChatApiController {
             //         console.log('Publish error: ', error);
             //     }
             // });
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const user = Jwt.decode(token);
+
+            if (request.body.startup_id) { // for RM To startup
+                // const group_member = this.ChatGroupMemberRepository.createQueryBuilder('members')
+                //     .innerJoin('members.group', 'group', 'members.user_id=:user_id', req.body.startup_id) // find startup with members
+                //     .innerJoin('members.group', 'group', 'members.user_id=:user_id', req.body.startup_id) // find investor with members
+                //     .where('group.type=:type AND members.user_id=:user_id', { type: GROUP_TYPE }).execute();
+
+                let group = await this.ChatGroupRepository.createQueryBuilder('group')
+                    .innerJoin('group.members', 'startup', 'startup.user_id=:startup_id', { startup_id: request.body.startup_id }) // find startup with members
+                    .innerJoin('group.members', 'user', 'user.execuive_id=:user_id', { user_id: user[0].id }) // find investor with members
+                    .where('group.type=:type', { type: GROUP_TYPE.STARTUP }).getOne();
+                console.log('group_member', group);
+
+                if (!group) { // create group
+                    // create group
+                    group = await this.ChatGroupRepository.save({
+                        type: GROUP_TYPE.STARTUP,
+                        count: 2,
+                        title: 'individual user'
+                    });
+
+                    // create 2 members for this group
+                    console.log('result', group);
+                    const member1 = await this.ChatGroupMemberRepository.save({
+                        user_type: MEMBER_TYPE.STARTUP,
+                        user: { id: request.body.startup_id },
+                        group: { id: group.id }
+                    });
+
+                    const member2 = await this.ChatGroupMemberRepository.save({
+                        user_type: MEMBER_TYPE.RM,
+                        executive: { id: user[0].id },
+                        group: { id: group.id }
+                    });
+                }
+                if (group.id > 0) { // post message
+                    // find group Member id
+                    if (group.type === 'STARTUP') {
+
+                        let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                            .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group.id }) // find logged in user with members
+                            .getOne();
+                        console.log('current_member', current_member);
+
+                        const message = await this.ChatMessageRepository.save({
+                            message: request.body.message,
+                            from: { id: current_member.id }
+                        })
+                    }
+                }
+            }
             return responseMessage.responseWithData(
                 true,
                 200,
                 msg.chat_post_success
+            );
+        } catch (error) {
+            console.log(error);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.chat_post_success,
+                error
+            );
+        }
+    }
+
+    async getMessages(request: Request, res: Response, next: NextFunction) {
+        try {
+            // const client = this.initConnection();
+            // client.publish(topic, payload, { qos }, (error: any) => {
+            //     if (error) {
+            //         console.log('Publish error: ', error);
+            //     }
+            // });
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const user = Jwt.decode(token);
+
+            const group_id = request.body.group_id;
+            // get all messages belongs to this group
+            const message = await this.ChatMessageRepository.createQueryBuilder('message')
+                .innerJoin('message.group', 'group', 'group.id=:group_id', { group_id })
+                .leftJoin('message.user', 'user')
+                .leftJoin('message.executive', 'executive').getMany();
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.chat_post_success,
+                message
             );
         } catch (error) {
             console.log(error);

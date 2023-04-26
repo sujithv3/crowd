@@ -5,26 +5,33 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    OneToMany
 } from "typeorm";
 
 export enum GROUP_TYPE {
     INDIVIDUAL = "INDIVIDUAL",
     GROUP = "GROUP",
+    STARTUP = "STARTUP",
+    INVESTOR = "INVESTOR",
     SUPPORT = "SUPPORT",
 };
+import { ChatGroupMember } from "./chatGroupMembers";
 
 @Entity()
 export class ChatGroup {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @OneToMany(() => ChatGroupMember, (members) => members.group)
+    members: ChatGroupMember[];
+
     @Column({
         type: "enum",
         enum: GROUP_TYPE,
-        default: GROUP_TYPE.INDIVIDUAL,
+        default: GROUP_TYPE.STARTUP,
     })
-    group: string;
+    type: string;
 
     @Column({
         type: "int",
