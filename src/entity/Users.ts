@@ -15,6 +15,7 @@ import { Location } from "./locations";
 import { Campaigns } from "./campaigns";
 import { Tagged } from "./tagged";
 import { Funds } from "./funds";
+import { ChatOnline } from "./chatOnline";
 import { TaggedSalesStartup } from "./taggedSalesStartup";
 import { LegalStatusStartup } from "./legalStatusStartup";
 import { LegalStatusInvestor } from "./legalStatusInvestor";
@@ -215,6 +216,9 @@ export class Users {
 
   @OneToMany(() => Funds, (Funds) => Funds.investor)
   fund: Funds[];
+
+  @OneToMany(() => ChatOnline, (Funds) => Funds.user)
+  online: ChatOnline[];
 
   @OneToMany(() => TaggedSalesStartup, (TaggedSalesStartup) => TaggedSalesStartup.StartUp)
   taggedSalesStartup: TaggedSalesStartup[];

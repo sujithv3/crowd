@@ -15,6 +15,38 @@ export const Routes = [
     validationField: "",
     isLogin: false,
   },
+  {
+    method: "post",
+    route: "/getMessages",
+    controller: ChatApiController,
+    action: "getMessages",
+    validationField: "",
+    isLogin: false,
+  },
+  {
+    method: "get",
+    route: "/getRMusers",
+    controller: ChatApiController,
+    action: "getRMusers",
+    validationField: "",
+    isLogin: false,
+  },
+  {
+    method: "get",
+    route: "/getInvestorUsers",
+    controller: ChatApiController,
+    action: "getInvestorUsers",
+    validationField: "",
+    isLogin: false,
+  },
+  {
+    method: "get",
+    route: "/getStartupUsers",
+    controller: ChatApiController,
+    action: "getStartupUsers",
+    validationField: "",
+    isLogin: false,
+  },
 ];
 
 // function routes
