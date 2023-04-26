@@ -38,6 +38,8 @@ const SalesList = require("./routes/sales/salesList");
 const SalesTagged = require("./routes/sales/tagged");
 const SalesStartup = require("./routes/sales/startUp");
 const SalesStartupTag = require("./routes/relation-mang/salesAssignTag");
+const payment = require("./routes/payment");
+const data = require("./routes/payment");
 const chat = require("./routes/chat/chatApi");
 const chatHook = require("./routes/chat/chatHooks");
 import "./cron";
@@ -69,6 +71,7 @@ app.listen(process.env.SERVER_URL, () => {
 });
 
 // routes
+app.use("/api", payment);
 app.use("/api/user", user);
 app.use("/api/role", role);
 app.use("/api/category", category);
@@ -105,3 +108,67 @@ app.use("/api/sales/startup", SalesStartup);
 app.use("/api/sales/startup-tag", SalesStartupTag);
 app.use("/api/chat", chat);
 app.use("/api/chat-hooks", chatHook);
+
+// payment webhooks
+const Stripe = require("stripe");
+
+const stripe = new Stripe(
+  "sk_test_51MyTbnSHygDnzMTz8wqlnzreImLjrwCfRyWPxjmCEkjS0Kq3TKUXg6P8zOsGNyPIHh4GeGsIwmN2hTw56KdtvUOo00V1GymlYX"
+);
+
+app.post(
+  "/webhook",
+  bodyParser.raw({ type: "application/json" }),
+  async (req, res) => {
+    console.log("req", req);
+    // Retrieve the event by verifying the signature using the raw body and secret.
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        req.headers["stripe-signature"],
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.log(err);
+      console.log(`⚠️  Webhook signature verification failed.`);
+      console.log(
+        `⚠️  Check the env file and enter the correct webhook secret.`
+      );
+      return res.sendStatus(400);
+    }
+    // Extract the object from the event.
+    const dataObject = event.data.object;
+
+    // Handle the event
+    // Review important events for Billing webhooks
+    // https://stripe.com/docs/billing/webhooks
+    // Remove comment to see the various objects sent for this sample
+    switch (event.type) {
+      case "invoice.paid":
+        // Used to provision services after the trial has ended.
+        // The status of the invoice will show up as paid. Store the status in your
+        // database to reference when a user accesses your service to avoid hitting rate limits.
+        break;
+      case "invoice.payment_failed":
+        // If the payment fails or the customer does not have a valid payment method,
+        //  an invoice.payment_failed event is sent, the subscription becomes past_due.
+        // Use this webhook to notify your user that their payment has
+        // failed and to retrieve new card details.
+        break;
+      case "customer.subscription.deleted":
+        if (event.request != null) {
+          // handle a subscription canceled by your request
+          // from above.
+        } else {
+          // handle subscription canceled automatically based
+          // upon your subscription settings.
+        }
+        break;
+      default:
+      // Unexpected event type
+    }
+    res.sendStatus(200);
+  }
+);

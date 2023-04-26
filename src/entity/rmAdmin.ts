@@ -22,11 +22,11 @@ export class rmAdmin {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    length: 100,
-    type: "varchar",
-  })
-  user_code: string;
+  // @Column({
+  //   length: 100,
+  //   type: "varchar",
+  // })
+  // user_code: string;
 
   @ManyToOne((type) => Roles)
   @JoinColumn({ name: "role_id", referencedColumnName: "id" })
