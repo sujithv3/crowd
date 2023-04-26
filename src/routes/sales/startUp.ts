@@ -1,4 +1,4 @@
-const {TaggedSalesController} = require("../../controller/sales/startUp")
+const { TaggedSalesController } = require("../../controller/sales/startUp")
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
@@ -12,6 +12,15 @@ export const Routes = [
     route: "/list",
     controller: TaggedSalesController,
     action: "all",
+    validationField: "",
+    isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "get",
+    route: "/list/:id",
+    controller: TaggedSalesController,
+    action: "getOne",
     validationField: "",
     isLogin: true,
     fileUpload: false,
@@ -79,13 +88,13 @@ Routes.forEach((route) => {
     route.isLogin
       ? JWT.verify
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     route.validationField
       ? validationResult(route.validationField)
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     (req: Request, res: Response, next: Function) => {
       const result = new (route.controller as any)()[route.action](
         req,

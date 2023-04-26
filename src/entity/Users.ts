@@ -8,12 +8,14 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index
 } from "typeorm";
 import { Roles } from "./roles";
 import { Location } from "./locations";
 import { Campaigns } from "./campaigns";
 import { Tagged } from "./tagged";
 import { Funds } from "./funds";
+import { ChatOnline } from "./chatOnline";
 import { TaggedSalesStartup } from "./taggedSalesStartup";
 import { LegalStatusStartup } from "./legalStatusStartup";
 import { LegalStatusInvestor } from "./legalStatusInvestor";
@@ -24,6 +26,15 @@ type FILE_LIST = { name: number; value: any }[];
 export class Users {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Index("user_code_index")
+  @Column({
+    length: 100,
+    default: null,
+    nullable: true,
+    type: "varchar",
+  })
+  user_code: string;
 
   @ManyToOne((type) => Roles)
   @JoinColumn({ name: "role_id", referencedColumnName: "id" })
@@ -205,6 +216,9 @@ export class Users {
 
   @OneToMany(() => Funds, (Funds) => Funds.investor)
   fund: Funds[];
+
+  @OneToMany(() => ChatOnline, (Funds) => Funds.user)
+  online: ChatOnline[];
 
   @OneToMany(() => TaggedSalesStartup, (TaggedSalesStartup) => TaggedSalesStartup.StartUp)
   taggedSalesStartup: TaggedSalesStartup[];

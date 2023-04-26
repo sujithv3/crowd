@@ -108,6 +108,7 @@ export class rmSalesList {
                 .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
                 .leftJoinAndSelect("user.taggedSalesStartup", "taggedSalesStartup", "taggedSalesStartup.is_active=true")
                 .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+                .leftJoinAndSelect("taggedSalesStartup.Sales", "Sales")
                 .andWhere("tagged.rm_id = :id", { id: user[0].id })
                 .andWhere("taggedSalesStartup.id IS NOT NULL")
 
@@ -124,7 +125,9 @@ export class rmSalesList {
                     "RelationManager.last_name",
                     "tagged.id",
                     "tagged.updatedDate",
-                    "taggedSalesStartup.id"
+                    "taggedSalesStartup.id",
+                    "Sales.first_name",
+                    "Sales.last_name"
                 ])
                 .orderBy("tagged.updatedDate", "DESC")
                 .skip(
