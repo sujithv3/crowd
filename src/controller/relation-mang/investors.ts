@@ -478,14 +478,16 @@ export class InvestorController {
         let res = {
           ...temp,
           campaignId : temp.campaign.id,
-          campaignTitle : temp.campaign.title,
+          campaign_title : temp.campaign.title,
           userId : temp.user.id,
           first_name: temp.user.first_name,
           last_name: temp.user.last_name,
           city: temp.user.city,
           country: temp.user.country,
-          company_name: temp.user.company_name
+          company_name: temp.user.company_name,
+          created_date: temp.createdDate
         }
+        delete res.createdDate;
         delete res.campaign;
         delete res.user;
         return res;
