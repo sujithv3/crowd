@@ -69,7 +69,7 @@ export const AppDataSource = new DataSource({
     ChatGroup,
     ChatGroupMember,
     ChatMessage,
-    ChatOnline
+    ChatOnline,
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],

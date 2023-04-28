@@ -68,7 +68,7 @@ export class MeetingController {
           "/organizations/" +
           process.env.ORGANIZATION_ID +
           "/invitations?email=" +
-          "santhosh@aagnia.com",
+          campaignData.email_id,
         {
           headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
         }
