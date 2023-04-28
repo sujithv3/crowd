@@ -5,12 +5,14 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    OneToMany,
 } from "typeorm";
 
 import { Users } from "./Users";
 import { rmAdmin } from "./rmAdmin";
 import { ChatGroup } from './chatGroup'
+import { ChatMessage } from './chatMessages'
 
 export enum MEMBER_TYPE {
     STARTUP = "STARTUP",
@@ -31,6 +33,9 @@ export class ChatGroupMember {
         default: MEMBER_TYPE.RM,
     })
     user_type: string;
+
+    @OneToMany(() => ChatMessage, (message) => message.from)
+    messages: ChatMessage[];
 
     @ManyToOne((type) => ChatGroup)
     @JoinColumn({ name: "group_id", referencedColumnName: "id" })
