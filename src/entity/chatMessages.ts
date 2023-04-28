@@ -25,6 +25,7 @@ export enum USER_TYPE {
 };
 
 import { ChatGroupMember } from './chatGroupMembers';
+import { ChatGroup } from './chatGroup';
 
 export enum MESSAGE_TYPE {
     CONTENT = "CONTENT",
@@ -45,6 +46,18 @@ export class ChatMessage {
     message: string;
 
     @Column({
+        type: "boolean",
+        default: true,
+    })
+    latest: boolean;
+
+    @Column({
+        type: "boolean",
+        default: false,
+    })
+    read: boolean;
+
+    @Column({
         type: "enum",
         enum: MESSAGE_TYPE,
         default: MESSAGE_TYPE.CONTENT,
@@ -54,6 +67,10 @@ export class ChatMessage {
     @ManyToOne((type) => ChatGroupMember)
     @JoinColumn({ name: "from_id", referencedColumnName: "id" })
     from: ChatGroupMember;
+
+    @ManyToOne((type) => ChatGroup)
+    @JoinColumn({ name: "group_id", referencedColumnName: "id" })
+    group: ChatGroup;
 
     @CreateDateColumn({
         type: "timestamp",

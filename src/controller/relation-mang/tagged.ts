@@ -37,8 +37,8 @@ export class TaggedController {
 
       let dbQuery = this.userRepository
         .createQueryBuilder("startup")
-        .innerJoinAndSelect("startup.tagged", "tagged")
-        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+        .innerJoinAndSelect("startup.tagged", "tagged", "tagged.is_active=true")
+        .where("tagged.rm_id = :id", {
           id: user[0].id,
         });
       if (request.query.stage) {
