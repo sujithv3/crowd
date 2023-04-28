@@ -441,6 +441,7 @@ export class InvestorController {
         .where("tagged.rm_id = :userId AND tagged.is_active=true", {
           userId: user[0].id,
         });
+
       if (request.query.country) {
         campaignQuery.andWhere("investor.country=:country", {
           country: request.query.country,
@@ -473,14 +474,33 @@ export class InvestorController {
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .getManyAndCount();
 
+      let data = campaign[0].map((temp)=>{
+        let res = {
+          ...temp,
+          campaignId : temp.campaign.id,
+          campaignTitle : temp.campaign.title,
+          userId : temp.user.id,
+          first_name: temp.user.first_name,
+          last_name: temp.user.last_name,
+          city: temp.user.city,
+          country: temp.user.country,
+          company_name: temp.user.company_name
+        }
+        delete res.campaign;
+        delete res.user;
+        return res;
+      })
+
+      let result = {
+        total_count: campaign[1],
+        data: data,
+      }
+
       return responseMessage.responseWithData(
         true,
         200,
         msg.ListMeetingSuccess,
-        {
-          total_count: campaign[1],
-          data: campaign[0],
-        }
+        result
       );
     } catch (err) {
       console.log(err);
