@@ -141,6 +141,7 @@ export class startUpController {
       }
 
       const user = Jwt.decode(token);
+      console.log('user', user);
       //   find startUp
       const startCampaigns = await this.startUpRepository
         .createQueryBuilder("campaign")
@@ -166,6 +167,8 @@ export class startUpController {
           "staging",
         ])
         .getOne();
+
+      console.log('startCampaigns', startCampaigns);
 
       return responseMessage.responseWithData(
         true,
