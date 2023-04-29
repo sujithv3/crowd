@@ -14,6 +14,7 @@ import { Location } from "./locations";
 import { Tagged } from "./tagged";
 import { Taggedsales } from "./taggedSales";
 import { TaggedSalesStartup } from "./taggedSalesStartup";
+import { Cities } from "./cities";
 
 type FILE_LIST = any[];
 
@@ -70,13 +71,9 @@ export class rmAdmin {
   })
   profile: string;
 
-  @Column({
-    length: 250,
-    type: "varchar",
-    default: null,
-    nullable: true,
-  })
-  city: string;
+  @ManyToOne((type) => Cities)
+  @JoinColumn({ name: "city_id", referencedColumnName: "id" })
+  city: Cities;
 
   @Column({
     length: 100,

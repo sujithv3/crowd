@@ -37,6 +37,7 @@ export class TaggedController {
 
       let dbQuery = this.userRepository
         .createQueryBuilder("startup")
+        .leftJoinAndSelect("startup.city", "city")
         .innerJoinAndSelect("startup.tagged", "tagged", "tagged.is_active=true")
         .where("tagged.rm_id = :id", {
           id: user[0].id,
@@ -152,10 +153,13 @@ export class TaggedController {
           "campaign.goal_amount",
           "campaign.start_date",
           "campaign.deal_size",
+          'city.name',
+          'city.state_code',
         ])
         .leftJoin("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
         // .leftJoin("campaign.fund", "fund")
+        .leftJoin("startup.city", "city")
         .innerJoin("startup.tagged", "tagged")
         .addSelect(
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.campaignId=campaign.id)",

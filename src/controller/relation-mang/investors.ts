@@ -45,6 +45,7 @@ export class InvestorController {
 
       const investorListQuery = await this.userRepository
         .createQueryBuilder("investor")
+        .leftJoinAndSelect('investor.city', 'city')
         .where("investor.is_deleted=false AND investor.role_id=2");
 
       if (typeof request.query.status !== 'undefined') {
@@ -118,10 +119,11 @@ export class InvestorController {
       console.log("user", user);
 
       const campaign = await this.TaggedRepository.createQueryBuilder("tagged")
-        .innerJoin("tagged.StartUp", "startup") // get tagged startup
+        .innerJoin("tagged.StartUp", "startup")
         .innerJoin("startup.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true") // get campaign details for tagged users
         .innerJoin("campaign.myDeals", "mydeals") // get mydeals
         .innerJoin("mydeals.user", "user")
+        .leftJoin("user.city", "city") // get tagged startup
         .where(
           "tagged.rm_id = :id AND tagged.is_active=true AND user.is_deleted=false",
           {
@@ -193,6 +195,8 @@ export class InvestorController {
           "user.last_name",
           "user.city",
           "user.country",
+          "city.name",
+          "city.state_code",
         ])
         .addSelect(
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.investorId=user.id)",
@@ -252,10 +256,12 @@ export class InvestorController {
       const campaign = await this.fundsRepository
         .createQueryBuilder("fund")
         .innerJoinAndSelect("fund.investor", "investor")
+        .leftJoinAndSelect("investor.city", "city")
         .innerJoinAndSelect("fund.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true")
         .innerJoinAndSelect("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
         .innerJoin("startup.tagged", "tagged")
+        .leftJoin("startup.city", "startupCity")
         .where("tagged.rm_id = :userId AND tagged.is_active=true", {
           userId: user[0].id,
         })
@@ -263,7 +269,11 @@ export class InvestorController {
           "investor.id",
           "investor.first_name",
           "investor.last_name",
-          "investor.city",
+          // "investor.city",
+          "city.name",
+          "city.state_code",
+          'startupCity.name',
+          'startupCity.state_code',
           "investor.country",
           "startup.company_name",
           "startup.stage_of_business",

@@ -22,6 +22,7 @@ export class RelationManager {
         .createQueryBuilder("user")
         .where("user.is_active=true AND user.role_id=3")
         .leftJoin("user.tagged", "tagged", "tagged.is_active=true")
+        .leftJoinAndSelect("user.city", "city")
         .orderBy("user.id", "DESC")
         .loadRelationCountAndMap(
           "user.tagged_count",
@@ -32,8 +33,7 @@ export class RelationManager {
 
       if (request.query.tagged_status) {
         startUpCountsRepository.andWhere(
-          `tagged.id IS ${
-            request.query.tagged_status === "tagged" ? "NOT NULL" : "NULL"
+          `tagged.id IS ${request.query.tagged_status === "tagged" ? "NOT NULL" : "NULL"
           }`
         );
       }
@@ -47,7 +47,7 @@ export class RelationManager {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -96,7 +96,7 @@ export class RelationManager {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)

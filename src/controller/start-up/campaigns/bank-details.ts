@@ -190,8 +190,9 @@ export class bankController {
       // find campaign
 
       const campaign = await this.campaignRepository
-        .createQueryBuilder("")
-        .where("user_id=:id AND is_active=true AND is_published=false", {
+        .createQueryBuilder("campaign")
+        .leftJoinAndSelect('campaign.bank_location', 'bank_location')
+        .where("campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false", {
           id: user[0].id,
         })
         .getOne();
@@ -199,12 +200,20 @@ export class bankController {
       if (!campaign) {
         return responseMessage.responseMessage(false, 404, "No Data Found");
       }
+
       //   find bank
-      const basicCampaigns = await this.bankRepository
+      let basicCampaigns: any = await this.bankRepository
         .createQueryBuilder("bank")
         .leftJoinAndSelect("bank.bank_location", "Location")
         .where("bank.campaign = :id", { id: campaign.id })
         .getOne();
+      console.log('campaign?.bank_location', campaign?.bank_location);
+      if (!basicCampaigns && campaign?.bank_location && campaign?.bank_location?.country) {
+
+        basicCampaigns = {
+          bank_location: campaign?.bank_location
+        }
+      }
 
       return responseMessage.responseWithData(
         true,

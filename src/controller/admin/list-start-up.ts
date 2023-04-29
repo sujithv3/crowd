@@ -52,6 +52,7 @@ export class ListStartUp {
       const startUpListRepository = await this.userRepository
         .createQueryBuilder("startUp")
         .where("startUp.is_active=true AND startUp.role_id=1")
+        .leftJoinAndSelect("startUp.city", 'city')
         .leftJoinAndSelect("startUp.campaign", "campaign")
         .loadRelationCountAndMap(
           "campaign.fund_count",
@@ -66,8 +67,7 @@ export class ListStartUp {
 
       if (request.query.status) {
         startUpListRepository.andWhere(
-          `tagged.id IS ${
-            request.query.status === "tagged" ? "NOT NULL" : "NULL"
+          `tagged.id IS ${request.query.status === "tagged" ? "NOT NULL" : "NULL"
           }`
         );
       }
@@ -79,7 +79,8 @@ export class ListStartUp {
           "startUp.last_name",
           "startUp.company_name",
           "startUp.country",
-          "startUp.city",
+          "city.name",
+          "city.state_code",
           "campaign.id",
           "tagged",
           "RelationManager",
@@ -87,7 +88,7 @@ export class ListStartUp {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -139,7 +140,7 @@ export class ListStartUp {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -262,7 +263,7 @@ export class ListStartUp {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -339,7 +340,7 @@ export class ListStartUp {
           .skip(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);

@@ -42,9 +42,9 @@ export class UserController {
         await axios
           .post(
             process.env.CALENDLY_BASE_URL +
-              "/organizations/" +
-              process.env.ORGANIZATION_ID +
-              "/invitations",
+            "/organizations/" +
+            process.env.ORGANIZATION_ID +
+            "/invitations",
             {
               email: email_id,
             },
@@ -267,8 +267,10 @@ export class UserController {
       const userData = Jwt.decode(token);
 
       const user = await this.userRepository
-        .createQueryBuilder()
-        .where("id=:id", { id: userData[0].id })
+        .createQueryBuilder('user')
+        .innerJoinAndSelect('user.city', 'city')
+        .innerJoinAndSelect('city.state_id', 'state')
+        .where("user.id=:id", { id: userData[0].id })
         .getOne();
 
       if (!user) {
