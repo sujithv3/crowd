@@ -15,6 +15,7 @@ import { Tagged } from "./tagged";
 import { Taggedsales } from "./taggedSales";
 import { TaggedSalesStartup } from "./taggedSalesStartup";
 import { Cities } from "./cities";
+import { ChatOnline } from "./chatOnline";
 
 type FILE_LIST = any[];
 
@@ -137,4 +138,7 @@ export class rmAdmin {
     default: false,
   })
   contact_number_verified: boolean;
+
+  @OneToMany(() => ChatOnline, (Funds) => Funds.executive)
+  online: ChatOnline[];
 }

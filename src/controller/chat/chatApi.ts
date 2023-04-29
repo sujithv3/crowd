@@ -143,7 +143,7 @@ export class ChatApiController {
         }
     }
 
-    async getStartupUsers(req: Request, res: Response, next: NextFunction) {
+    async getStartupUsers(request: Request, res: Response, next: NextFunction) {
         try {
             // const client = this.initConnection();
             // client.publish(topic, payload, { qos }, (error: any) => {
@@ -151,10 +151,37 @@ export class ChatApiController {
             //         console.log('Publish error: ', error);
             //     }
             // });
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const user = Jwt.decode(token);
+            // get all groups
+            const members = await this.ChatGroupRepository
+                .createQueryBuilder("group")
+                .innerJoinAndSelect('group.members', 'members')
+                .innerJoinAndSelect('group.members', 'user')
+                .leftJoinAndSelect('group.messages', 'message', 'message.latest=1')
+                .leftJoinAndSelect('members.executive', 'executive')
+                .innerJoinAndSelect("executive.tagged", "tagged")
+                .leftJoinAndSelect("executive.online", "online")
+                .where("tagged.start_up_id = :id AND user.user_id = :id AND tagged.is_active=true", {
+                    id: user[0].id,
+                })
+                .getRawMany();
+
+            console.log('members', members);
             return responseMessage.responseWithData(
                 true,
                 200,
-                msg.chat_post_success
+                msg.chat_post_success,
+                members
             );
         } catch (error) {
             console.log(error);
