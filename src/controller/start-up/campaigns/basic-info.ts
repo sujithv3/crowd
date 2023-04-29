@@ -172,6 +172,7 @@ export class basicInfoController {
           "campaign.tag_line",
           "campaign.location",
           "campaign.tag",
+          "tax_location",
           "campaign.project_image",
           "campaign.project_video",
           "campaign.demo_url",

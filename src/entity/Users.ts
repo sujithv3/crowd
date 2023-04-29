@@ -11,6 +11,7 @@ import {
   Index
 } from "typeorm";
 import { Roles } from "./roles";
+import { Cities } from "./cities";
 import { Location } from "./locations";
 import { Campaigns } from "./campaigns";
 import { Tagged } from "./tagged";
@@ -89,13 +90,17 @@ export class Users {
   })
   street_name: string;
 
-  @Column({
-    length: 250,
-    type: "varchar",
-    default: null,
-    nullable: true,
-  })
-  city: string;
+  @ManyToOne((type) => Cities)
+  @JoinColumn({ name: "city_id", referencedColumnName: "id" })
+  city: Cities;
+
+  // @Column({
+  //   length: 250,
+  //   type: "varchar",
+  //   default: null,
+  //   nullable: true,
+  // })
+  // city: string;
 
   @Column({
     length: 100,

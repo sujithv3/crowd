@@ -68,7 +68,7 @@ export class MeetingController {
           "/organizations/" +
           process.env.ORGANIZATION_ID +
           "/invitations?email=" +
-          campaignData.email_id,
+          campaignData.rm_email_id,
         {
           headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
         }
@@ -101,6 +101,7 @@ export class MeetingController {
         data
       );
     } catch (err) {
+      console.log(err);
       return responseMessage.responseWithData(
         false,
         400,

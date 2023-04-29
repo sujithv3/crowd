@@ -54,7 +54,9 @@ export class locationController {
       const locationData = await this.locationRepository.createQueryBuilder('state').
         innerJoin('state.country_id', 'country').where(
           'country.iso2=:country_code AND is_active=:active', { country_code: request.query.country_code, active: true }
-        ).getMany();
+        )
+        .orderBy('state.name', 'ASC')
+        .getMany();
 
       //   check location exist
       if (locationData.length === 0) {
@@ -84,8 +86,9 @@ export class locationController {
   // get all countries
   async countries(request: Request, response: Response, next: NextFunction) {
     try {
-      const locationData = await this.countryRepositor.find();
-
+      const locationData = await this.countryRepositor.createQueryBuilder('country')
+        .orderBy('country.name', 'ASC')
+        .getMany();
       //   check location exist
       if (locationData.length === 0) {
         return responseMessage.responseMessage(
@@ -113,12 +116,12 @@ export class locationController {
   async cities(request: Request, response: Response, next: NextFunction) {
     try {
 
-      const locationData = await this.cityRepository.createQueryBuilder('city').
-        where(
+      const locationData = await this.cityRepository.createQueryBuilder('city')
+        .where(
           'state_id=:id', {
           id: request.params.id
         }
-        ).getMany();
+        ).getRawMany();
 
       //   check location exist
       if (locationData.length === 0) {

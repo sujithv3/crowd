@@ -33,6 +33,7 @@ export class ListSales {
 
       const userData = await userDataQuery
         .leftJoinAndSelect("user.taggedsales", "taggedsales", "taggedsales.is_active = true")
+        .leftJoinAndSelect("user.city", "city")
         .leftJoinAndSelect("taggedsales.RelationManager", "RelationManager")
         .andWhere("taggedsales.id IS NOT NULL")
         .select([
@@ -42,6 +43,8 @@ export class ListSales {
           "user.country",
           "user.city",
           "user.sector",
+          "city.name",
+          "city.state_code",
           "taggedsales.id",
           "RelationManager.id",
           "RelationManager.first_name",
