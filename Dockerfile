@@ -1,23 +1,29 @@
-# Base image node
-FROM node:latest
+FROM mysql:latest
 
-# Set working directory
-WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+COPY init.sql /docker-entrypoint-initdb.d/init.sql
 
-# Install dependencies
-RUN npm install
+# Set the root password for MySQL
+ENV MYSQL_ROOT_PASSWORD=Root@123
 
-# Copy app files
-COPY . .
+# Create a custom database, user, and password
+#ENV MYSQL_DATABASE=db1
+#ENV MYSQL_USER=admin
+#ENV MYSQL_PASSWORD=admin123
 
-# Set environment variable
-#ENV NODE_ENV production
+ENV MYSQL_DATABASE=db1
+ENV MYSQL_USER=adec
+ENV MYSQL_PASSWORD=adec123
 
-# Expose port 3000
-EXPOSE 3000
+# Copy custom configuration files into the container
+COPY my.cnf /etc/mysql/conf.d/my.cnf
 
-# Start the app
-CMD ["npm", "start"]
+# Copy the SQL script to initialize the database
+COPY init.sql /docker-entrypoint-initdb.d/init.sql
+#COPY ./scripts/ /docker-entrypoint-initdb.d/
+RUN chmod +x /docker-entrypoint-initdb.d/init.sql
+# Expose the MySQL port
+EXPOSE 3306
+
+# Start the MySQL server
+CMD ["mysqld"]
