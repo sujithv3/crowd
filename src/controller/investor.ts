@@ -468,13 +468,14 @@ export class investorController {
         .skip(
           request.query.page
             ? (Number(request.query.page) - 1) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
+        .addSelect(['user.first_name', 'user.last_name', 'user.id', 'user.company_name'])
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.category", "Category")
-        .leftJoinAndSelect("campaign.user", "user")
+        .leftJoin("campaign.user", "user")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .leftJoinAndSelect(
           "campaign.myDeals",
