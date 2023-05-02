@@ -165,13 +165,14 @@ export class basicInfoController {
           }
         )
         .leftJoinAndSelect("campaign.location", "project_location")
-
+        .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .select([
           "campaign.id",
           "campaign.title",
           "campaign.tag_line",
           "campaign.location",
           "campaign.tag",
+          "tax_location",
           "campaign.project_image",
           "campaign.project_video",
           "campaign.demo_url",

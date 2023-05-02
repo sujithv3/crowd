@@ -7,6 +7,7 @@ import { Funds } from "../../entity/funds";
 import { Users } from "../../entity/Users";
 import { Meeting } from "../../entity/meeting";
 import { MyDeals } from "../../entity/mydeals";
+import axios from "axios";
 const { genToken } = require("../../utils/jsonwebtoken");
 const responseMessage = require("../../configs/response");
 const crypto = require("crypto");
@@ -45,9 +46,10 @@ export class InvestorController {
 
       const investorListQuery = await this.userRepository
         .createQueryBuilder("investor")
+        .leftJoinAndSelect("investor.city", "city")
         .where("investor.is_deleted=false AND investor.role_id=2");
 
-      if (typeof request.query.status !== 'undefined') {
+      if (typeof request.query.status !== "undefined") {
         investorListQuery.andWhere("investor.is_active=:status", {
           status: request.query.status,
         });
@@ -74,7 +76,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -118,10 +120,15 @@ export class InvestorController {
       console.log("user", user);
 
       const campaign = await this.TaggedRepository.createQueryBuilder("tagged")
-        .innerJoin("tagged.StartUp", "startup") // get tagged startup
-        .innerJoin("startup.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true") // get campaign details for tagged users
+        .innerJoin("tagged.StartUp", "startup")
+        .innerJoin(
+          "startup.campaign",
+          "campaign",
+          "campaign.is_deleted=false AND campaign.is_published=true"
+        ) // get campaign details for tagged users
         .innerJoin("campaign.myDeals", "mydeals") // get mydeals
         .innerJoin("mydeals.user", "user")
+        .leftJoin("user.city", "city") // get tagged startup
         .where(
           "tagged.rm_id = :id AND tagged.is_active=true AND user.is_deleted=false",
           {
@@ -143,7 +150,7 @@ export class InvestorController {
         const min = Number(range[0]);
         const max = Number(range[1]);
 
-        console.log('dfasfas', min, max);
+        console.log("dfasfas", min, max);
 
         if (min == 0) {
           // allow null values also
@@ -154,16 +161,14 @@ export class InvestorController {
               max: max,
             }
           );
-        }
-        else if (isNaN(max)) {
+        } else if (isNaN(max)) {
           campaign.andWhere(
             "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.investorId=user.id HAVING (total_fund > :min))",
             {
               min: min,
             }
           );
-        }
-        else {
+        } else {
           campaign.andWhere(
             "EXISTS (SELECT SUM(funds.fund_amount) as total_fund FROM funds WHERE funds.investorId=user.id HAVING (total_fund >= :min AND total_fund <= :max))",
             {
@@ -193,6 +198,8 @@ export class InvestorController {
           "user.last_name",
           "user.city",
           "user.country",
+          "city.name",
+          "city.state_code",
         ])
         .addSelect(
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.investorId=user.id)",
@@ -204,7 +211,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -252,10 +259,16 @@ export class InvestorController {
       const campaign = await this.fundsRepository
         .createQueryBuilder("fund")
         .innerJoinAndSelect("fund.investor", "investor")
-        .innerJoinAndSelect("fund.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true")
+        .leftJoinAndSelect("investor.city", "city")
+        .innerJoinAndSelect(
+          "fund.campaign",
+          "campaign",
+          "campaign.is_deleted=false AND campaign.is_published=true"
+        )
         .innerJoinAndSelect("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
         .innerJoin("startup.tagged", "tagged")
+        .leftJoin("startup.city", "startupCity")
         .where("tagged.rm_id = :userId AND tagged.is_active=true", {
           userId: user[0].id,
         })
@@ -263,7 +276,11 @@ export class InvestorController {
           "investor.id",
           "investor.first_name",
           "investor.last_name",
-          "investor.city",
+          // "investor.city",
+          "city.name",
+          "city.state_code",
+          "startupCity.name",
+          "startupCity.state_code",
           "investor.country",
           "startup.company_name",
           "startup.stage_of_business",
@@ -272,24 +289,24 @@ export class InvestorController {
           "location.country",
           "fund.fund_amount",
         ]);
-      if (request.query.stage && request.query.stage !== 'all') {
+      if (request.query.stage && request.query.stage !== "all") {
         console.log(request.query.stage);
         campaign.andWhere("startup.stage_of_business=:stage", {
           stage: request.query.stage,
         });
       }
-      if (typeof request.query.fund_amount === "string" && request.query.fund_amount !== 'all') {
+      if (
+        typeof request.query.fund_amount === "string" &&
+        request.query.fund_amount !== "all"
+      ) {
         console.log(request.query.fund_amount);
         const range = request.query.fund_amount.split("-");
         const min = Number(range[0]);
         const max = Number(range[1]);
         if (isNaN(max)) {
-          campaign.andWhere(
-            "(fund.fund_amount > :min)",
-            {
-              min: min,
-            }
-          );
+          campaign.andWhere("(fund.fund_amount > :min)", {
+            min: min,
+          });
         } else {
           campaign.andWhere(
             "(fund.fund_amount >= :min AND fund.fund_amount <= :max)",
@@ -299,7 +316,6 @@ export class InvestorController {
             }
           );
         }
-
       }
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
@@ -307,7 +323,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -373,7 +389,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -417,69 +433,146 @@ export class InvestorController {
       }
       const user = Jwt.decode(token);
 
-      const campaignQuery = await this.MeetingRepository.createQueryBuilder(
-        "meeting"
-      )
-        .select([
-          "meeting.id",
-          "meeting.query",
-          "meeting.feedback",
-          "meeting.createdDate",
-          "campaign.id",
-          "campaign.title",
-          "investor.company_name",
-          "investor.first_name",
-          "investor.last_name",
-          "investor.id",
-          "investor.city",
-          "investor.country",
-        ])
-        .innerJoin("meeting.campaign", "campaign")
-        .innerJoin("meeting.user", "investor")
-        .innerJoin("campaign.user", "startup")
-        .innerJoin("startup.tagged", "tagged")
-        .where("tagged.rm_id = :userId AND tagged.is_active=true", {
-          userId: user[0].id,
-        });
-      if (request.query.country) {
-        campaignQuery.andWhere("investor.country=:country", {
-          country: request.query.country,
-        });
-      }
-      if (request.query.from_date && request.query.to_date) {
-        const formatDate = (date) => {
-          let convertedDate = new Date(date);
-          // .toISOString();
-          // .replace(/T/, " ") // replace T with a space
-          // .replace(/\..+/, "");
-          return convertedDate;
-        };
+      // const campaignQuery = await this.MeetingRepository.createQueryBuilder(
+      //   "meeting"
+      // )
+      //   .select([
+      //     "meeting.id",
+      //     "meeting.query",
+      //     "meeting.feedback",
+      //     "meeting.createdDate",
+      //     "campaign.id",
+      //     "campaign.title",
+      //     "investor.company_name",
+      //     "investor.first_name",
+      //     "investor.last_name",
+      //     "investor.id",
+      //     "investor.city",
+      //     "investor.country",
+      //   ])
+      //   .innerJoin("meeting.campaign", "campaign")
+      //   .innerJoin("meeting.user", "investor")
+      //   .innerJoin("campaign.user", "startup")
+      //   .innerJoin("startup.tagged", "tagged")
+      //   .where("tagged.rm_id = :userId AND tagged.is_active=true", {
+      //     userId: user[0].id,
+      //   });
+      // if (request.query.country) {
+      //   campaignQuery.andWhere("investor.country=:country", {
+      //     country: request.query.country,
+      //   });
+      // }
+      // if (request.query.from_date && request.query.to_date) {
+      //   const formatDate = (date) => {
+      //     let convertedDate = new Date(date);
+      //     // .toISOString();
+      //     // .replace(/T/, " ") // replace T with a space
+      //     // .replace(/\..+/, "");
+      //     return convertedDate;
+      //   };
 
-        campaignQuery.andWhere("meeting.createdDate > :start_dates  ", {
-          start_dates: formatDate(request.query.from_date),
-        });
-        campaignQuery.andWhere("meeting.createdDate < :end_date ", {
-          end_date: formatDate(request.query.to_date),
-        });
-      }
+      //   campaignQuery.andWhere("meeting.createdDate > :start_dates  ", {
+      //     start_dates: formatDate(request.query.from_date),
+      //   });
+      //   campaignQuery.andWhere("meeting.createdDate < :end_date ", {
+      //     end_date: formatDate(request.query.to_date),
+      //   });
+      // }
 
-      const campaign = await campaignQuery
-        .skip(
-          request.query.page
-            ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
-            : 0
-        )
-        .take(request.query.limit ? Number(request.query.limit) : 10)
-        .getManyAndCount();
+      // const campaign = await campaignQuery
+      //   .skip(
+      //     request.query.page
+      //       ? Number(request.query.page) *
+      //           (request.query.limit ? Number(request.query.limit) : 10)
+      //       : 0
+      //   )
+      //   .take(request.query.limit ? Number(request.query.limit) : 10)
+      //   .getManyAndCount();
+
+      // list schedule events in calendly
+      const getRmDetails = await axios.get(
+        process.env.CALENDLY_BASE_URL +
+          "/organizations/" +
+          process.env.ORGANIZATION_ID +
+          "/invitations?email=" +
+          user[0].email_id,
+        {
+          headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
+        }
+      );
+      let eventData = [];
+      if (getRmDetails.data.collection.length != 0) {
+        const user = getRmDetails.data.collection[0];
+        var getNext7Days = new Date();
+        getNext7Days.setDate(getNext7Days.getDate() + 7);
+        if (user?.status === "accepted") {
+          const getScheduleEvents: any = await axios.get(
+            process.env.CALENDLY_BASE_URL + "/user_busy_times",
+
+            {
+              headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
+              params: {
+                end_time: getNext7Days,
+                start_time: new Date(),
+                user: user.user,
+              },
+            }
+          );
+          const data = await getScheduleEvents.data?.collection
+            ?.filter((e) => e.type === "calendly")
+            .map(async (e) => {
+              if (e.event) {
+                const getData = await axios.get(e.event.uri, {
+                  headers: {
+                    Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+                  },
+                });
+                // console.log(getData.data);
+                e.detailData = getData.data?.resource;
+              } else {
+                e.detailData = {};
+              }
+              return e;
+            });
+          eventData = data;
+        }
+      } else {
+        return responseMessage.responseWithData(false, 400, "No events Found");
+      }
+      const data = await Promise.all(eventData).then((e) => e);
+
+      // let data = campaign[0].map((temp)=>{
+      //   let res = {
+      //     ...temp,
+      //     campaignId : temp.campaign.id,
+      //     campaign_title : temp.campaign.title,
+      //     userId : temp.user.id,
+      //     first_name: temp.user.first_name,
+      //     last_name: temp.user.last_name,
+      //     city: temp.user.city,
+      //     country: temp.user.country,
+      //     company_name: temp.user.company_name,
+      //     created_date: temp.createdDate
+      //   }
+      //   delete res.createdDate;
+      //   delete res.campaign;
+      //   delete res.user;
+      //   return res;
+      // })
+
+      // let result = {
+      //   total_count: campaign[1],
+      //   data: data,
+      // }
 
       return responseMessage.responseWithData(
         true,
         200,
         msg.ListMeetingSuccess,
         {
-          total_count: campaign[1],
-          data: campaign[0],
+          // total_count: campaign[1],
+          // data: campaign[0],
+          events: data,
         }
       );
     } catch (err) {

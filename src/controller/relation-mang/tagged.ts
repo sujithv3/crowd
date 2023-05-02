@@ -37,8 +37,9 @@ export class TaggedController {
 
       let dbQuery = this.userRepository
         .createQueryBuilder("startup")
-        .innerJoinAndSelect("startup.tagged", "tagged")
-        .where("tagged.rm_id = :id AND tagged.is_active=true", {
+        .leftJoinAndSelect("startup.city", "city")
+        .innerJoinAndSelect("startup.tagged", "tagged", "tagged.is_active=true")
+        .where("tagged.rm_id = :id", {
           id: user[0].id,
         });
       if (request.query.stage) {
@@ -152,10 +153,13 @@ export class TaggedController {
           "campaign.goal_amount",
           "campaign.start_date",
           "campaign.deal_size",
+          'city.name',
+          'city.state_code',
         ])
         .leftJoin("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
         // .leftJoin("campaign.fund", "fund")
+        .leftJoin("startup.city", "city")
         .innerJoin("startup.tagged", "tagged")
         .addSelect(
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.campaignId=campaign.id)",
@@ -399,6 +403,7 @@ export class TaggedController {
           "startup.stage_of_business",
           "startup.country",
           "startup.created_date",
+          "startup.company_name",
           "campaign.id",
           "campaign.files",
         ])

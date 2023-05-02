@@ -11,6 +11,7 @@ import { Users } from "./Users";
 import { rmAdmin } from "./rmAdmin";
 
 @Entity()
+// @Unique('uniq_tagged_rm', ['StartUp', 'RelationManager'])
 export class Tagged {
   @PrimaryGeneratedColumn()
   id: number;

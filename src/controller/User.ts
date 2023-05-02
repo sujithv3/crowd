@@ -133,6 +133,10 @@ export class UserController {
         updated_date: new Date(),
         extra_links: [],
       });
+      // generate Unique code
+
+      await AppDataSource.query("UPDATE users SET user_code = case role_id when 1 then CONCAT('VKCF', LPAD(id,5,'0')) when 2 then CONCAT('VKCI', LPAD(id,5,'0')) end WHERE user_code is NULL");
+
       // console.log(users);
       const token = await this.forgetTokenRepository.save({
         user: users.id,
@@ -315,8 +319,10 @@ export class UserController {
       const userData = Jwt.decode(token);
 
       const user = await this.userRepository
-        .createQueryBuilder()
-        .where("id=:id", { id: userData[0].id })
+        .createQueryBuilder('user')
+        .innerJoinAndSelect('user.city', 'city')
+        .innerJoinAndSelect('city.state_id', 'state')
+        .where("user.id=:id", { id: userData[0].id })
         .getOne();
 
       if (!user) {
@@ -475,6 +481,7 @@ export class UserController {
         })
         .where("id =:id", { id: user[0].id })
         .execute();
+
       return responseMessage.responseMessage(true, 200, msg.userUpdateSuccess);
     } catch (err) {
       console.log(err);

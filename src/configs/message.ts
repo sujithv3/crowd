@@ -166,4 +166,7 @@ module.exports = {
   // profile
   profile_updated_successfully: "Update Successfully",
   profile_updated_failed: "Update Failed",
+
+  // chat
+  chat_post_success: "chat saved successfully",
 };

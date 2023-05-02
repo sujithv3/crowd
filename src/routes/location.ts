@@ -24,6 +24,30 @@ export const Routes = [
   },
   {
     method: "get",
+    route: "/states",
+    controller: locationController,
+    action: "states",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
+    route: "/countries",
+    controller: locationController,
+    action: "countries",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
+    route: "/cities/:id",
+    controller: locationController,
+    action: "cities",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
     route: "/list/:id",
     controller: locationController,
     action: "one",
@@ -55,13 +79,13 @@ Routes.forEach((route) => {
     route.isLogin
       ? JWT.verify
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     route.validationField
       ? validationResult(route.validationField)
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     (req: Request, res: Response, next: Function) => {
       const result = new (route.controller as any)()[route.action](
         req,

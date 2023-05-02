@@ -81,6 +81,7 @@ export class MydealsController {
     }
   }
 
+
   async list(request: Request, response: Response, next: NextFunction) {
     try {
       // get user id
@@ -114,13 +115,24 @@ export class MydealsController {
         campaignQuery.andWhere("meeting.user_id=:id", { id: user[0].id });
       }
 
-      const campaign = await campaignQuery.getMany();
+      const totalQuery = campaignQuery.clone();
+      const total_count = await totalQuery.getCount();
+
+      const campaign = await campaignQuery
+      .skip(
+        request.query.page
+          ? (Number(request.query.page) - 1) *
+              (request.query.limit ? Number(request.query.limit) : 10)
+          : 0
+      )
+      .take(request.query.limit ? Number(request.query.limit) : 10)
+      .getMany()
 
       return responseMessage.responseWithData(
         true,
         200,
         msg.listDashboard,
-        campaign
+        { total_count, campaign }
       );
     } catch (err) {
       console.log(err);
