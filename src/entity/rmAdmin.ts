@@ -14,6 +14,8 @@ import { Location } from "./locations";
 import { Tagged } from "./tagged";
 import { Taggedsales } from "./taggedSales";
 import { TaggedSalesStartup } from "./taggedSalesStartup";
+import { Cities } from "./cities";
+import { ChatOnline } from "./chatOnline";
 
 type FILE_LIST = any[];
 
@@ -21,6 +23,12 @@ type FILE_LIST = any[];
 export class rmAdmin {
   @PrimaryGeneratedColumn()
   id: number;
+
+  // @Column({
+  //   length: 100,
+  //   type: "varchar",
+  // })
+  // user_code: string;
 
   @ManyToOne((type) => Roles)
   @JoinColumn({ name: "role_id", referencedColumnName: "id" })
@@ -64,13 +72,9 @@ export class rmAdmin {
   })
   profile: string;
 
-  @Column({
-    length: 250,
-    type: "varchar",
-    default: null,
-    nullable: true,
-  })
-  city: string;
+  @ManyToOne((type) => Cities)
+  @JoinColumn({ name: "city_id", referencedColumnName: "id" })
+  city: Cities;
 
   @Column({
     length: 100,
@@ -134,4 +138,7 @@ export class rmAdmin {
     default: false,
   })
   contact_number_verified: boolean;
+
+  @OneToMany(() => ChatOnline, (Funds) => Funds.executive)
+  online: ChatOnline[];
 }

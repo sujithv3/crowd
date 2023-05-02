@@ -22,6 +22,7 @@ export class RelationManager {
         .createQueryBuilder("user")
         .where("user.is_active=true AND user.role_id=3")
         .leftJoin("user.tagged", "tagged", "tagged.is_active=true")
+        .leftJoinAndSelect("user.city", "city")
         .orderBy("user.id", "DESC")
         .loadRelationCountAndMap(
           "user.tagged_count",
@@ -32,8 +33,7 @@ export class RelationManager {
 
       if (request.query.tagged_status) {
         startUpCountsRepository.andWhere(
-          `tagged.id IS ${
-            request.query.tagged_status === "tagged" ? "NOT NULL" : "NULL"
+          `tagged.id IS ${request.query.tagged_status === "tagged" ? "NOT NULL" : "NULL"
           }`
         );
       }
@@ -47,15 +47,24 @@ export class RelationManager {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .getManyAndCount();
 
+
+        let data = await startUpCounts[0].map((temp:any) => {
+          let res = {
+            ...temp,
+            city_name: temp.city ? `${temp.city.name},${temp.city.state_code}` : null
+          }
+          return res;
+        })
+
       return responseMessage.responseWithData(true, 200, msg.list_success, {
         total_count: startUpCounts[1],
-        data: startUpCounts[0],
+        data: data,
       });
     } catch (err) {
       return responseMessage.responseWithData(false, 400, msg.list_Failed, err);
@@ -96,7 +105,7 @@ export class RelationManager {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)

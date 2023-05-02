@@ -2,7 +2,9 @@
  * Created By Muthu
  * routers will be blocked after moved the seed
  */
-const { SeedController } = require("../controller/seed");
+const {
+  SubscriptionController,
+} = require("../controller/payments/subscription");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
@@ -12,35 +14,11 @@ const JWT = require("../utils/jsonwebtoken");
 export const Routes = [
   {
     method: "post",
-    route: "/seed-category",
-    controller: SeedController,
-    action: "seedCategory",
+    route: "/create-subscription",
+    controller: SubscriptionController,
+    action: "createSubscription",
     validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "post",
-    route: "/seed-stages",
-    controller: SeedController,
-    action: "seedStages",
-    validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "post",
-    route: "/categories",
-    controller: SeedController,
-    action: "categories",
-    validationField: "",
-    isLogin: false,
-  },
-  {
-    method: "post",
-    route: "/triggers",
-    controller: SeedController,
-    action: "triggers",
-    validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
 ];
 
@@ -51,13 +29,13 @@ Routes.forEach((route) => {
     route.isLogin
       ? JWT.verify
       : (req: Request, res: Response, next: Function) => {
-        return next();
-      },
+          return next();
+        },
     route.validationField
       ? validationResult(route.validationField)
       : (req: Request, res: Response, next: Function) => {
-        return next();
-      },
+          return next();
+        },
     (req: Request, res: Response, next: Function) => {
       const result = new (route.controller as any)()[route.action](
         req,

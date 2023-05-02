@@ -54,6 +54,7 @@ export class ListInvestor {
         .createQueryBuilder("investors")
         .where("investors.is_active=true AND investors.role_id=2")
         .orderBy("investors.id", "DESC")
+        .leftJoinAndSelect("investors.city", 'city')
         .leftJoinAndSelect("investors.fund", "fund", "fund.is_active=true")
         .loadRelationCountAndMap(
           "investors.total_invest_count",
@@ -77,7 +78,8 @@ export class ListInvestor {
           "investors.first_name",
           "investors.last_name",
           "investors.country",
-          "investors.city",
+          "city.name",
+          "city.state_code",
           "fund",
           "campaign",
         ])
@@ -85,7 +87,7 @@ export class ListInvestor {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -100,6 +102,7 @@ export class ListInvestor {
           }
         });
         e.current_invest_count = current_invest_count;
+        e.city_name = e.city ? `${e.city.name},${e.city.state_code}` : null
         delete e.fund;
         return e;
       });
@@ -146,7 +149,7 @@ export class ListInvestor {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -201,7 +204,7 @@ export class ListInvestor {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)

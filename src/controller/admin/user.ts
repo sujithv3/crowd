@@ -43,8 +43,10 @@ export class User {
       const user = Jwt.decode(token);
 
       const adminUser = await this.userRepository
-        .createQueryBuilder()
-        .where("is_active=true AND is_deleted=false AND id=:id", {
+        .createQueryBuilder("user")
+        .innerJoinAndSelect('user.city', 'city')
+        .innerJoinAndSelect('city.state_id', 'state')
+        .where("user.is_active=true AND user.is_deleted=false AND user.id=:id", {
           id: user[0].id,
         })
         .getOne();

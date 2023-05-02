@@ -374,7 +374,7 @@ export class UserController {
     //   login user
     async login(request: Request, response: Response, next: NextFunction) {
         const { email, password, role } = request.body;
-        console.log("this is from relationship");
+        console.log("this is from sales");
         console.log(email, password, role);
         // find user
 
@@ -544,7 +544,7 @@ export class UserController {
             token = token.token ?? token[0].token;
 
             // generate links
-            const link = `${process.env.BASE_URL_RMADMIN_CREATE_PASSWORD}/?resetId=${user.id}&token=${token}`;
+            const link = `${process.env.BASE_URL_RMADMIN_CREATE_PASSWORD}/sales-login/?resetId=${user.id}&token=${token}`;
 
             // send email
 

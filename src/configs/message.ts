@@ -169,5 +169,7 @@ module.exports = {
 
   //HomePage Edit Templates
   homepage_templates_list_success : 'HomePage List Success',
-  homepage_templates_list_failed : 'HomePage List failed'
+  homepage_templates_list_failed : 'HomePage List failed',
+  // chat
+  chat_post_success: "chat saved successfully",
 };

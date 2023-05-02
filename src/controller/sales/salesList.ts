@@ -7,6 +7,8 @@ import { Funds } from "../../entity/funds";
 const responseMessage = require("../../configs/response");
 const msg = require("../../configs/message");
 const Jwt = require("../../utils/jsonwebtoken");
+const json2xls = require("json2xls");
+const fs = require("fs");
 
 export class ListSales {
   private userRepository = AppDataSource.getRepository(Users);
@@ -19,30 +21,66 @@ export class ListSales {
   // list start up
   async getSalesList(request: Request, response: Response, next: NextFunction) {
     try {
-      const userData = await this.rmRepository
+      const userDataQuery = await this.rmRepository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.role", "role")
-        .where("user.is_active=true")
-        .andWhere("role.id = :roleId", { roleId: 5 })
+        .where("user.is_active=true AND user.role_id = 5")
+      if (request.query.country) {
+        console.log(request.query.country);
+        userDataQuery.andWhere("user.country=:country", {
+          country: request.query.country,
+        });
+      }
+
+      const userData = await userDataQuery
+        .leftJoinAndSelect("user.taggedsales", "taggedsales", "taggedsales.is_active = true")
+        .leftJoinAndSelect("user.city", "city")
+        .leftJoinAndSelect("taggedsales.RelationManager", "RelationManager")
+        .andWhere("taggedsales.id IS NOT NULL")
         .select([
           "user.id",
           "user.first_name",
           "user.last_name",
           "user.country",
           "user.city",
-          "user.sector"
+          "user.sector",
+          "city.name",
+          "city.state_code",
+          "taggedsales.id",
+          "RelationManager.id",
+          "RelationManager.first_name",
+          "RelationManager.last_name"
         ])
-        .getMany();
+        .getManyAndCount();
       //   check user exist
 
-      if (userData.length === 0) {
+      if (userData[0].length === 0) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
       }
+
+      var xls = json2xls(userData[0]);
+      fs.writeFileSync('data.xlsx', xls, 'binary');
+
+      // const xlsBuffer = Buffer.from(xls, 'binary');
+
+      // response.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      // response.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      // response.setHeader('Content-Disposition', 'attachment; filename=data.xlsx');
+      // response.send(xlsBuffer);
+
       return responseMessage.responseWithData(
         true,
         200,
         msg.userListSuccess,
-        userData
+        {
+          total_count: userData[1],
+          data: userData[0],
+          // file: xlsBuffer
+        },
+        {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'Content-Disposition': 'attachment; filename=data.xlsx'
+        }
+
       );
     } catch (err) {
       console.log(err);
@@ -61,21 +99,14 @@ export class ListSales {
     try {
       const userData = await this.rmRepository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.role", "role")
-        .where("user.is_active=true AND user.id=:id", { id: request.params.id })
-        .andWhere("role.id = :roleId", { roleId: 5 })
-        .select([
-          "user.id",
-          "user.first_name",
-          "user.last_name",
-          "user.country",
-          "user.city",
-          "user.sector"
-        ])
-        .getMany();
+        .where("user.is_active=true AND user.id=:id AND user.role_id = 5", { id: request.params.id })
+        .leftJoinAndSelect("user.taggedsales", "taggedsales", "taggedsales.is_active = true")
+        .leftJoinAndSelect("taggedsales.RelationManager", "RelationManager")
+        .andWhere("taggedsales.id IS NOT NULL")
+        .getOne();
       //   check user exist
 
-      if (userData.length === 0) {
+      if (!userData) {
         return responseMessage.responseMessage(false, 400, msg.user_not_found);
       }
       return responseMessage.responseWithData(
