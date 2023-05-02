@@ -5,13 +5,18 @@ const response = require("../configs/response");
 import { Request, Response, NextFunction } from "express";
 module.exports = {
   genToken(data: any) {
-    return jwt.sign(
-      {
-        data: data,
-      },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "5 days" }
-    );
+    try {
+      return jwt.sign(
+        {
+          data: data,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: "5 days" }
+      );
+    } catch (err) {
+      console.log('err', err);
+      console.log('data', data);
+    }
   },
   verify: async (req: any, res: Response, next: NextFunction) => {
     try {
