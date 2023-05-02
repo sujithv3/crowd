@@ -166,4 +166,8 @@ module.exports = {
   // profile
   profile_updated_successfully: "Update Successfully",
   profile_updated_failed: "Update Failed",
+
+  //HomePage Edit Templates
+  homepage_templates_list_success : 'HomePage List Success',
+  homepage_templates_list_failed : 'HomePage List failed'
 };

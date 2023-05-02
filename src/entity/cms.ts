@@ -39,7 +39,7 @@ export class Cms {
     default: null,
     nullable: true,
   })
-  params: Array<{ name: string; content: string }>;
+  params: Array<any>;
 
   @Column({
     type: "text",
