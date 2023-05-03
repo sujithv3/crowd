@@ -56,7 +56,9 @@ module.exports = {
       }
       return next();
     } catch (error) {
-      console.log(error);
+      console.log('token value', req?.headers?.authorization);
+      console.log('token error', error);
+
       return (
         res
           .status(401)
