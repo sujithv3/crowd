@@ -222,12 +222,21 @@ export class ChatApiController {
                 .getOne();
             console.log('current_member', current_member);
 
+
+
             if (current_member) {
 
-                // update other message to 0
+                // update other message to 0 for latest message func
                 await this.ChatMessageRepository.createQueryBuilder('message').update().set({
                     latest: false
                 }).where('group_id=:id', { id: group_id }).execute();
+
+                // update unread Status
+                const qb = this.ChatGroupMemberRepository.createQueryBuilder()
+                await qb.update().set({
+                    unread: () => qb.escape(`unread`) + " + 1"
+                }).where('group_id=:id AND id!=:member_id', { id: group_id, member_id: current_member.id }).execute();
+
 
                 const message = await this.ChatMessageRepository.save({
                     message: request.body.message,
@@ -259,6 +268,7 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
+                one_message.group_id = group_id;
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
@@ -347,6 +357,12 @@ export class ChatApiController {
                     latest: false
                 }).where('group_id=:id', { id: group_id }).execute();
 
+                // update unread Status
+                const qb = this.ChatGroupMemberRepository.createQueryBuilder()
+                await qb.update().set({
+                    unread: () => qb.escape(`unread`) + " + 1"
+                }).where('group_id=:id AND id!=:member_id', { id: group_id, member_id: current_member.id }).execute();
+
                 const message = await this.ChatMessageRepository.save({
                     message: request.body.message,
                     from: { id: current_member.id },
@@ -377,6 +393,7 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
+                one_message.group_id = group_id;
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
@@ -418,6 +435,21 @@ export class ChatApiController {
                 msg.chat_post_success
             );
         } catch (error) {
+            console.log(error);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.chat_post_success,
+                error
+            );
+        }
+    }
+
+    async updateReadMessage(request) {
+        try {
+
+        }
+        catch (error) {
             console.log(error);
             return responseMessage.responseWithData(
                 false,
