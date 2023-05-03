@@ -320,8 +320,8 @@ export class UserController {
 
       const user = await this.userRepository
         .createQueryBuilder('user')
-        .innerJoinAndSelect('user.city', 'city')
-        .innerJoinAndSelect('city.state_id', 'state')
+        .leftJoinAndSelect('user.city', 'city')
+        .leftJoinAndSelect('city.state_id', 'state')
         .where("user.id=:id", { id: userData[0].id })
         .getOne();
 

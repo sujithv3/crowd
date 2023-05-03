@@ -49,6 +49,13 @@ export class ChatGroupMember {
     @JoinColumn({ name: "execuive_id", referencedColumnName: "id" })
     executive: rmAdmin;
 
+    @Column({
+        type: "int",
+        nullable: false,
+        default: 0,
+    })
+    unread: number;
+
     @CreateDateColumn({
         type: "timestamp",
         default: () => "CURRENT_TIMESTAMP(6)",
