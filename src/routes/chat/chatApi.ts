@@ -16,6 +16,14 @@ export const Routes = [
     isLogin: false,
   },
   {
+    method: "post",
+    route: "/postStartupMessage",
+    controller: ChatApiController,
+    action: "postStartupMessage",
+    validationField: "",
+    isLogin: false,
+  },
+  {
     method: "get",
     route: "/getMessages/:id",
     controller: ChatApiController,
