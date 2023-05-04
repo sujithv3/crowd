@@ -31,8 +31,8 @@ export class Verifications {
 
       return responseMessage.responseMessage(true, 200, msg.otpSendYourMobile);
     } catch (error) {
-      console.log(error);
-      responseMessage.responseWithData(
+      console.log("verify err", error);
+      return responseMessage.responseWithData(
         false,
         400,
         msg.otpSendYourMobileFailed,

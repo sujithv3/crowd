@@ -11,6 +11,7 @@ import { Staging } from "../../entity/staging";
 
 import { ChatOnline, USER_TYPE } from "../../entity/chatOnline";
 import { Users } from "../../entity/Users";
+import { Funds } from "../../entity/funds";
 import { ChatGroup, GROUP_TYPE } from "../../entity/chatGroup";
 import { ChatMessage } from "../../entity/chatMessages";
 import { ChatGroupMember, MEMBER_TYPE } from "../../entity/chatGroupMembers";
@@ -23,6 +24,8 @@ export class ChatApiController {
     private ChatMessageRepository = AppDataSource.getRepository(ChatMessage);
     private ChatGroupMemberRepository = AppDataSource.getRepository(ChatGroupMember);
     private ChatGroupRepository = AppDataSource.getRepository(ChatGroup);
+    private CampaignsRepository = AppDataSource.getRepository(Campaigns);
+    private fundsRepository = AppDataSource.getRepository(Funds);
 
     async initConnection() {
         const qos = 0;
@@ -73,16 +76,48 @@ export class ChatApiController {
             // get all groups
             const members = await this.ChatGroupRepository
                 .createQueryBuilder("group")
-                .innerJoinAndSelect('group.members', 'members')
+                .select([
+                    'group.id',
+                    'group.type',
+                    'group.status',
+                    'group.count',
+                    'group.title',
+                    'group.is_active',
+                    'group.is_deleted',
+                    'members.unread',
+                    'members.user_type',
+                    'user.id',
+                    'user.first_name',
+                    'user.last_name',
+                    'user.company_name',
+                    'user.profile',
+                    'executive.id',
+                    'executive.first_name',
+                    'executive.last_name',
+                    'executive.profile',
+                    'message.createdDate',
+                    'message.message',
+                    'message.message_type',
+                    'userOnline.user_type',
+                    'executiveOnline.user_type',
+                    'campaign.id',
+                    'campaign.project_image',
+                ])
+                .leftJoin('group.members', 'members')
+                .leftJoin('group.campaign', 'campaign')
                 // .addSelect('SELECT message from chat_message WHERE ')
-                .leftJoinAndSelect('group.messages', 'message', 'message.latest=1')
-                .leftJoinAndSelect('members.user', 'startup')
-                .innerJoinAndSelect("startup.tagged", "tagged")
-                .leftJoinAndSelect("startup.online", "online")
+                .leftJoin('group.messages', 'message', 'message.latest=1')
+                .leftJoin('members.user', 'user')
+                .leftJoin("user.online", "userOnline")
+                .leftJoin("members.executive", "executive")
+                .leftJoin("executive.online", "executiveOnline")
+                .leftJoin('group.members', 'members2', 'members2.user_type="STARTUP"')
+                .leftJoin('members2.user', 'startup', 'startup.role_id=1')
+                .innerJoin("startup.tagged", "tagged")
                 .where("tagged.rm_id = :id AND tagged.is_active=true", {
                     id: user[0].id,
                 })
-                .getRawMany();
+                .getMany();
 
             console.log('members', members);
 
@@ -222,12 +257,21 @@ export class ChatApiController {
                 .getOne();
             console.log('current_member', current_member);
 
+
+
             if (current_member) {
 
-                // update other message to 0
+                // update other message to 0 for latest message func
                 await this.ChatMessageRepository.createQueryBuilder('message').update().set({
                     latest: false
                 }).where('group_id=:id', { id: group_id }).execute();
+
+                // update unread Status
+                const qb = this.ChatGroupMemberRepository.createQueryBuilder()
+                await qb.update().set({
+                    unread: () => qb.escape(`unread`) + " + 1"
+                }).where('group_id=:id AND id!=:member_id', { id: group_id, member_id: current_member.id }).execute();
+
 
                 const message = await this.ChatMessageRepository.save({
                     message: request.body.message,
@@ -259,6 +303,132 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
+                one_message.group_id = group_id;
+                one_message.type = 'chat';
+
+                for (let i = 0; i < members.length; i++) {
+                    const activeMember = members[i];
+                    console.log('activeMember', activeMember);
+                    let topic = '';
+                    let profile = '';
+                    if (activeMember.member_user_type == 'RM') {
+                        topic = 'AdminChat/' + activeMember.executive_id;
+                        profile = activeMember?.executive_profile
+                    } else {
+                        topic = 'chat/' + activeMember.user_id;
+                        profile = activeMember?.user_profile
+                    }
+                    // let payload = {
+                    //     type: 'chat',
+                    //     message: request.body.message,
+                    //     userType: activeMember.member_user_type,
+                    //     profile: profile
+                    // };
+                    console.log('client?.publish', client?.publish);
+                    if (client?.publish) {
+                        // console.log('AdminChat/1' === topic)
+                        console.log('message publish', topic, one_message);
+
+                        client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
+                            if (error) {
+                                console.log('Publish error: ', error);
+                            }
+                        });
+                    }
+                }
+            }
+
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.chat_post_success
+            );
+        } catch (error) {
+            console.log(error);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.chat_post_success,
+                error
+            );
+        }
+    }
+
+    async postStartupMessage(request: Request, res: Response, next: NextFunction) {
+        try {
+
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const user = Jwt.decode(token);
+
+            console.log('user', user);
+
+            // const group_member = this.ChatGroupMemberRepository.createQueryBuilder('members')
+            //     .innerJoin('members.group', 'group', 'members.user_id=:user_id', req.body.startup_id) // find startup with members
+            //     .innerJoin('members.group', 'group', 'members.user_id=:user_id', req.body.startup_id) // find investor with members
+            //     .where('group.type=:type AND members.user_id=:user_id', { type: GROUP_TYPE }).execute();
+            const group_id = request.body.group_id;
+
+            // find group Member id
+
+            let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                .where('member.user_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
+                .getOne();
+            console.log('current_member', current_member);
+
+            if (current_member) {
+
+                // update other message to 0
+                await this.ChatMessageRepository.createQueryBuilder('message').update().set({
+                    latest: false
+                }).where('group_id=:id', { id: group_id }).execute();
+
+                // update unread Status
+                const qb = this.ChatGroupMemberRepository.createQueryBuilder()
+                await qb.update().set({
+                    unread: () => qb.escape(`unread`) + " + 1"
+                }).where('group_id=:id AND id!=:member_id', { id: group_id, member_id: current_member.id }).execute();
+
+                const message = await this.ChatMessageRepository.save({
+                    message: request.body.message,
+                    from: { id: current_member.id },
+                    group: { id: group_id }
+                });
+                const client: any = await this.initConnection();
+                // if(current_member.user_type=='RM') {
+                // get all members belongs to this group
+                let members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .where('member.group_id=:id', { id: group_id }) // find logged in user with members
+                    .getRawMany();
+
+                const one_message: any = await this.ChatMessageRepository.createQueryBuilder('message')
+                    // .innerJoin('message.group', 'group', 'group.id=:group_id', { group_id })
+                    // .select([
+                    //     'message.createdDate',
+                    //     'message.latest',
+                    //     'message.message',
+                    //     'message.message_type',
+                    //     'message.from_id',
+                    //     'user.name',
+                    //     'message.from_id',
+                    // ])
+                    .where('message.id=:id', { id: message.id })
+                    .innerJoinAndSelect('message.from', 'member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .getOne();
+                one_message.group_id = group_id;
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
@@ -362,6 +532,327 @@ export class ChatApiController {
                 400,
                 msg.chat_post_success,
                 error
+            );
+        }
+    }
+
+    async getNotification(request) {
+        try {
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const user = Jwt.decode(token);
+            console.log('user', user[0]);
+
+            let message = {
+                unreadCount: 0,
+                data: {}
+            };
+            if (user[0] && user[0].role) {
+                if (user[0].role.name === 'start-up') {
+
+                    // if(request.query.group_id && request.query.group_id>0) {
+                    //     await this.ChatGroupMemberRepository.createQueryBuilder().update().set({
+                    //         unread: 0
+                    //     }).where('group_id=:id AND id=:member_id', { id: request.query.group_id, member_id: current_member.id }).execute();
+                    // }
+
+                    const unreadData = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                        .select(['member.group_id', 'member.unread'])
+                        .innerJoin('member.user', 'user')
+                        .where('user.id=:id AND member.unread>0', { id: user[0].id }).getRawMany();
+                    if (unreadData && Array.isArray(unreadData)) {
+                        unreadData.forEach((item: any) => {
+                            message.unreadCount += item.member_unread;
+                            message.data['grp' + item.group_id] = item.member_unread;
+                        })
+                    }
+                } else {
+                    const unreadData = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                        .select(['member.group_id', 'member.unread'])
+                        .innerJoin('member.executive', 'user')
+                        .where('user.id=:id AND member.unread>0', { id: user[0].id }).getRawMany();
+                    if (unreadData && Array.isArray(unreadData)) {
+                        unreadData.forEach((item: any) => {
+                            message.unreadCount += item.member_unread;
+                            message.data['grp' + item.group_id] = item.member_unread;
+                        })
+                    }
+
+                }
+
+            }
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.chat_post_success,
+                message
+            );
+        }
+        catch (error) {
+            console.log(error);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.chat_post_success,
+                error
+            );
+        }
+    }
+
+    async getInvestorList(request: Request, response: Response, next: NextFunction) {
+        try {
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const user = Jwt.decode(token);
+
+            const group_id = request.params.id;
+
+            //get startup id for group
+            const startup = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                .select(['member.user_id'])
+                .where('member.group_id=:id AND member.user_type=:type', { id: group_id, type: USER_TYPE.STARTUP }).getRawOne();
+
+            // get invested Investors
+            // const queryBuilder = this.fundsRepository.createQueryBuilder('campaign')
+            //     .innerJoin("campaign.myDeals", "mydeals")
+            //     .innerJoin("mydeals.user", "user")
+            //     .innerJoin("user.city", "city")
+            //     .where('campaign.is_deleted=false AND campaign.is_published=true AND campaign.user_id=:id', { id: startup.user_id });
+
+            const campaign = await this.fundsRepository
+                .createQueryBuilder("fund")
+                .innerJoinAndSelect("fund.investor", "investor")
+                .leftJoinAndSelect("investor.city", "city")
+                .innerJoinAndSelect(
+                    "fund.campaign",
+                    "campaign",
+                    "campaign.is_deleted=false AND campaign.is_published=true"
+                )
+                .innerJoinAndSelect("campaign.location", "location")
+                // .innerJoin("campaign.user", "startup")
+                // .leftJoin("startup.city", "startupCity")
+                .where("campaign.user_id=:id", {
+                    id: startup.user_id
+                });
+
+            if (request.query.country && request.query.country !== "all") {
+                campaign.andWhere("investor.country=:country", {
+                    country: request.query.country,
+                });
+            }
+
+            // const totalQuery = queryBuilder.clone();
+
+            // const total_count = await totalQuery.select('count(*) as cnt').getRawOne();
+
+            // queryBuilder.select([
+            //     'campaign.id as campId',
+            //     'campaign.title',
+            //     'user.id',
+            //     'user.first_name',
+            //     'user.last_name',
+            //     'user.country',
+            //     'city.name',
+            //     'city.state_code',
+            // ]).
+            // addSelect('(SELECT SUM(funds) FROM WHERE funds campaign_id)');
+            // const data = await queryBuilder.offset(
+            //     request.query.page
+            //         ? Number(request.query.page) *
+            //         (request.query.limit ? Number(request.query.limit) : 10)
+            //         : 0
+            // )
+            //     .limit(request.query.limit ? Number(request.query.limit) : 10).getRawMany();
+            // const totalQuery = campaign.clone();
+            // const total_count = await totalQuery.select('COUNT(DISTINCT investor.id, campaign.id) as cnt').getRawOne();
+
+            campaign.select([
+                "investor.id",
+                "investor.first_name",
+                "investor.last_name",
+                // "investor.city",
+                "city.name",
+                "city.state_code",
+                //   "startupCity.name",
+                //   "startupCity.state_code",
+                "investor.country",
+                // "startup.company_name",
+                //   "startup.stage_of_business",
+                "campaign.title",
+                "campaign.currency",
+                "campaign.id",
+                "location.name",
+                "location.country",
+                "fund.fund_amount",
+            ]);
+            // .groupBy('investor.id')
+            // .addGroupBy('campaign.id');
+
+            const totalQuery = campaign.clone();
+            const total_count = await totalQuery.getCount();
+            if (request.query.page && request.query.limit) {
+                campaign
+                    .offset(
+                        request.query.page
+                            ? Number(request.query.page) *
+                            (request.query.limit ? Number(request.query.limit) : 10)
+                            : 0
+                    )
+                    .limit(request.query.limit ? Number(request.query.limit) : 10);
+            }
+
+            const data = await campaign.getRawMany();
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.userListSuccess,
+                {
+                    total_count: total_count,
+                    data: data
+                }
+            );
+        } catch (err) {
+            console.log(err);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.userListFailed,
+                err
+            );
+        }
+    }
+
+    async createGroup(request: Request, response: Response, next: NextFunction) {
+        try {
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const user = Jwt.decode(token);
+
+            const group_id = request.body.group_id;
+            const investor_id = request.body.investor_id;
+            const campaign_id = request.body.campaign_id;
+
+            // check provided group is valid
+            const group_exist = await this.ChatGroupRepository
+                .createQueryBuilder('chat')
+                .where('id=:id AND type=:type', {
+                    id: group_id,
+                    type: GROUP_TYPE.STARTUP
+                }).getOne();
+            console.log('group_exist', group_exist);
+
+            const investor_exist = await this.userRepository
+                .createQueryBuilder('user')
+                .select([
+                    'id',
+                ])
+                .where({
+                    id: investor_id,
+                }).getRawOne();
+
+            const campaign_exists = await this.CampaignsRepository
+                .createQueryBuilder('campaign')
+                .select([
+                    'campaign.id',
+                ])
+                .where({
+                    id: campaign_id,
+                }).getOne();
+            console.log('campaign_exists', campaign_exists);
+
+            if (group_exist && investor_exist && campaign_exists) {
+                // get all members
+                const all_members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                    .where('group_id=:id', { id: group_exist.id })
+                    .getRawMany();
+                if (all_members && all_members.length > 0) {
+                    console.log('all_members', all_members);
+                    // get investor
+
+
+                    // create Group Id
+
+                    const group = await this.ChatGroupRepository.save({
+                        type: GROUP_TYPE.GROUP,
+                        count: 2,
+                        campaign: { id: campaign_exists.id },
+                        title: 'Group user'
+                    });
+                    // copy existing group members (2 members)
+                    for (let i = 0; i < all_members.length; ++i) {
+                        const current_member = all_members[i];
+                        await this.ChatGroupMemberRepository.save({
+                            user_type: current_member.member_user_type,
+                            group: {
+                                id: group.id,
+                            },
+                            user: {
+                                id: current_member.member_user_id,
+                            },
+                            executive: {
+                                id: current_member.member_execuive_id,
+                            }
+                        })
+                    }
+
+                    await this.ChatGroupMemberRepository.save({
+                        user_type: MEMBER_TYPE.INVESTOR,
+                        group: {
+                            id: group.id,
+                        },
+                        user: {
+                            id: investor_exist.id,
+                        }
+                    })
+
+
+                    // add new memeber investor as 3 man group
+
+                }
+
+            }
+
+
+
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.userListSuccess
+            );
+        } catch (err) {
+            console.log(err);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.userListFailed,
+                err
             );
         }
     }

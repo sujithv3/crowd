@@ -13,7 +13,15 @@ export const Routes = [
     controller: ChatApiController,
     action: "postTextMessage",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
+  },
+  {
+    method: "post",
+    route: "/postStartupMessage",
+    controller: ChatApiController,
+    action: "postStartupMessage",
+    validationField: "",
+    isLogin: true,
   },
   {
     method: "get",
@@ -29,7 +37,7 @@ export const Routes = [
     controller: ChatApiController,
     action: "getRMusers",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
   {
     method: "get",
@@ -37,7 +45,7 @@ export const Routes = [
     controller: ChatApiController,
     action: "getInvestorUsers",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
   },
   {
     method: "get",
@@ -45,7 +53,31 @@ export const Routes = [
     controller: ChatApiController,
     action: "getStartupUsers",
     validationField: "",
-    isLogin: false,
+    isLogin: true,
+  },
+  {
+    method: "get",
+    route: "/getNotification",
+    controller: ChatApiController,
+    action: "getNotification",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
+    route: "/getInvestorList/:id",
+    controller: ChatApiController,
+    action: "getInvestorList",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "post",
+    route: "/createGroup",
+    controller: ChatApiController,
+    action: "createGroup",
+    validationField: "",
+    isLogin: true,
   },
 ];
 
