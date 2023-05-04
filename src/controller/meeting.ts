@@ -16,7 +16,7 @@ export class MeetingController {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
   private MyDealsRepository = AppDataSource.getRepository(MyDeals);
 
-  // list all
+  // list one
   async getone(request: Request, response: Response, next: NextFunction) {
     try {
       const { id } = request.params;
@@ -53,6 +53,7 @@ export class MeetingController {
           "rm.first_name",
           "rm.last_name",
           "rm.email_id",
+          "rm.id",
         ])
         .innerJoin("campaign.user", "startup")
         .innerJoin("startup.tagged", "tagged")
@@ -114,7 +115,7 @@ export class MeetingController {
   async add(request: Request, response: Response, next: NextFunction) {
     try {
       const { campaign_id } = request.body;
-
+      console.log(request.body);
       // get user id
       let token: any;
       if (
@@ -183,14 +184,20 @@ export class MeetingController {
           .execute();
       }
 
+      console.log(user[0].id);
+
       await this.MeetingRepository.createQueryBuilder()
         .insert()
         .values({
           user: user[0].id,
           campaign: campaign_id,
           meeting_date: request.body.meeting_date,
+          name: request.body.name,
+          Relationship_manager: request.body.rm_id,
           start_time: request.body.start_time,
           end_time: request.body.end_time,
+          location: request.body.location,
+          url: request.body.url,
           is_active: true,
           is_deleted: false,
         })
@@ -219,14 +226,15 @@ export class MeetingController {
           .orIgnore()
           .execute();
       }
-      if (meetingExists)
+      if (meetingExists) {
         return responseMessage.responseWithData(
           true,
           200,
           msg.reScheduleMeeting
         );
-      else
+      } else {
         return responseMessage.responseWithData(true, 200, msg.createMeeting);
+      }
     } catch (err) {
       return responseMessage.responseWithData(
         false,
@@ -263,6 +271,53 @@ export class MeetingController {
         false,
         400,
         msg.RemoveMyDealFail,
+        err
+      );
+    }
+  }
+
+  // list investor meeting details
+  async investorMeeting(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    try {
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        token = request.headers.authorization.slice(7);
+      } else {
+        token = request.cookies.token;
+      }
+      const user = Jwt.decode(token);
+
+      const month = new Date().getMonth() + 1;
+      // console.log(month);
+
+      const MeetingDetails = await this.MeetingRepository.createQueryBuilder(
+        "meeting"
+      )
+        .where(
+          "meeting.user_id=:user_id AND EXTRACT(month FROM meeting.meeting_date) = :month OR EXTRACT(month FROM meeting.meeting_date) = :next_month",
+          { user_id: user[0].id, month: month, next_month: month + 1 }
+        )
+        .getMany();
+      // console.log();
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.createMeeting,
+        MeetingDetails
+      );
+    } catch (err) {
+      console.log(err);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.createMeetingFail,
         err
       );
     }
