@@ -36,6 +36,14 @@ export const Routes = [
   },
   {
     method: "get",
+    route: "/list-investor-meeting",
+    controller: MeetingController,
+    action: "investorMeeting",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
     route: "/get/:id",
     controller: MeetingController,
     action: "getone",
