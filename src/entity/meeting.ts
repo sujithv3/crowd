@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Users } from "./Users";
 import { Campaigns } from "./campaigns";
+import { rmAdmin } from "./rmAdmin";
 
 export enum status {
   APPROVED = "approved",
@@ -27,6 +28,30 @@ export class Meeting {
   @ManyToOne((type) => Campaigns, (campaign) => campaign.myDeals)
   @JoinColumn({ name: "campaign_id", referencedColumnName: "id" })
   campaign: Campaigns;
+
+  @ManyToOne(
+    (type) => rmAdmin,
+    (Relationship_manager) => Relationship_manager.meeting
+  )
+  @JoinColumn({ name: "rm_id", referencedColumnName: "id" })
+  Relationship_manager: Campaigns;
+
+  @Column({ type: "json", nullable: true, default: null })
+  location: any[];
+
+  @Column({
+    length: 200,
+    type: "varchar",
+    default: null,
+  })
+  name: string;
+
+  @Column({
+    length: 700,
+    type: "varchar",
+    default: null,
+  })
+  url: string;
 
   @Column({
     length: 200,

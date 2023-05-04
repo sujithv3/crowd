@@ -16,6 +16,7 @@ import { Taggedsales } from "./taggedSales";
 import { TaggedSalesStartup } from "./taggedSalesStartup";
 import { Cities } from "./cities";
 import { ChatOnline } from "./chatOnline";
+import { Meeting } from "./meeting";
 
 type FILE_LIST = any[];
 
@@ -111,6 +112,9 @@ export class rmAdmin {
 
   @OneToMany(() => TaggedSalesStartup, (Taggedsales) => Taggedsales.Sales)
   taggedsalesStartup: TaggedSalesStartup[];
+
+  @OneToMany(() => Meeting, (meeting) => meeting.Relationship_manager)
+  meeting: Meeting[];
 
   @CreateDateColumn()
   created_date: Date;
