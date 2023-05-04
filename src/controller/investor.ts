@@ -97,25 +97,33 @@ export class investorController {
       const existing_location = await this.campaignRepository
         .createQueryBuilder("campaign")
         .where(
-          `campaign.is_deleted=:is_deleted
+          `campaign.is_published=:published
+         AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
+         AND campaign.status=:status
          `,
           {
+            status: CAMPAIGN_STATUS.Approved,
+            published: true,
             is_deleted: false,
             is_active: true,
           }
         )
-        .select("campaign.tax_location_id")
-        .groupBy("campaign.tax_location_id")
+        .select("campaign.location")
+        .groupBy("campaign.location")
         .getRawMany();
 
+      console.log('existing_location', existing_location);
+
       const locationArray = existing_location.map(
-        (item) => item.tax_location_id
+        (item) => item.project_location_id
       );
+      console.log('locationArray', locationArray);
 
       const location = await this.locationRepository
         .createQueryBuilder()
-        .where("id IN (:...locations)", { locations: locationArray })
+        .where("location_type='' AND is_active=true AND id IN (:...locations)", { locations: locationArray })
+        // .where("", )
         .getMany();
 
       hashTable = Object.create(null);
@@ -432,7 +440,7 @@ export class investorController {
       }
 
       if (request.query.location) {
-        campaignQueryBuilder.andWhere(` campaign.tax_location_id=:location`, {
+        campaignQueryBuilder.andWhere(` campaign.project_location_id=:location`, {
           location: request.query.location,
         });
       }
