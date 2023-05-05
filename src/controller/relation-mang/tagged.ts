@@ -406,8 +406,11 @@ export class TaggedController {
           "startup.company_name",
           "campaign.id",
           "campaign.files",
+          "city.name",
+          "city.state_code",
         ])
         .innerJoin("startup.tagged", "tagged")
+        .leftJoin("startup.city", "city")
         .where(
           "startup.id=:id AND tagged.rm_id = :userId AND tagged.is_active=true",
           {
