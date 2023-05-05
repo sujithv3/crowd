@@ -106,7 +106,13 @@ export class MydealsController {
           { id: user[0].id }
         )
         .where("myDeals.user_id = :id", { id: user[0].id })
-        .leftJoinAndSelect("campaign.user", "startup")
+        .leftJoin("campaign.user", "startup")
+        .addSelect([
+          'startup.id',
+          'startup.first_name',
+          'startup.last_name',
+          'startup.company_name',
+        ])
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .loadRelationCountAndMap("campaign.fund", "campaign.fund");
@@ -119,14 +125,14 @@ export class MydealsController {
       const total_count = await totalQuery.getCount();
 
       const campaign = await campaignQuery
-      .skip(
-        request.query.page
-          ? (Number(request.query.page) - 1) *
-              (request.query.limit ? Number(request.query.limit) : 10)
-          : 0
-      )
-      .take(request.query.limit ? Number(request.query.limit) : 10)
-      .getMany()
+        .skip(
+          request.query.page
+            ? (Number(request.query.page) - 1) *
+            (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .take(request.query.limit ? Number(request.query.limit) : 10)
+        .getMany()
 
       return responseMessage.responseWithData(
         true,
