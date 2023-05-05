@@ -24,6 +24,7 @@ export enum GROUP_STATUS {
 };
 import { ChatGroupMember } from "./chatGroupMembers";
 import { ChatMessage } from "./chatMessages";
+import { Campaigns } from './campaigns'
 
 @Entity()
 export class ChatGroup {
@@ -49,6 +50,10 @@ export class ChatGroup {
         default: GROUP_STATUS.ACTIVE,
     })
     status: string;
+
+    @ManyToOne((type) => Campaigns)
+    @JoinColumn({ name: "campaign_id", referencedColumnName: "id" })
+    campaign: Campaigns;
 
     @Column({
         type: "int",
