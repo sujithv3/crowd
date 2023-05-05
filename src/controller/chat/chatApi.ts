@@ -28,8 +28,9 @@ export class ChatApiController {
     private fundsRepository = AppDataSource.getRepository(Funds);
 
     async initConnection() {
-        const qos = 0;
-        const host = '127.0.0.1';
+        const qos = 1;
+        // const host = '127.0.0.1';
+        const host = '3.109.250.135';
         const clientId = 'AdecMqttserver';
         const port = 8083;
         const url = `ws://${host}:${port}/mqtt`;
@@ -883,14 +884,14 @@ export class ChatApiController {
             return responseMessage.responseWithData(
                 true,
                 200,
-                msg.userListSuccess
+                msg.chat_create_success
             );
         } catch (err) {
             console.log(err);
             return responseMessage.responseWithData(
                 false,
                 400,
-                msg.userListFailed,
+                msg.chat_create_failed,
                 err
             );
         }
