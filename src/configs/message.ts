@@ -25,8 +25,8 @@ module.exports = {
   changePasswordSuccess: "Change Password Success",
   forgetPasswordSuccess: "Forget password link sent your email",
   forgetPasswordFailed: "Forget Password Failed",
-  createPasswordFailed: "Create Password Failed",
-  createPasswordSuccess: "Create Password Success",
+  createPasswordFailed: "Created Password Failed",
+  createPasswordSuccess: "Created Password Success",
   createPasswordInvalidToken: "link has expired",
   verifySuccessfully: "Verify Successfully",
   verifyYourEmail: "Please check your email",
@@ -41,8 +41,8 @@ module.exports = {
   verifySuccess: "Successfully verified",
 
   // category
-  categoryCreateSuccess: "Category Create Success",
-  categoryCreateFailed: "Category Create Failed",
+  categoryCreateSuccess: "Category Created Success",
+  categoryCreateFailed: "Category Created Failed",
   categoryListFailed: "Category List Failed",
   categoryListSuccess: "Category List Success",
   categoryNotFound: "Category Not Found",
@@ -51,8 +51,8 @@ module.exports = {
   categoryDeleteSuccess: "Category Delete  Success",
   categoryDeleteFailed: "Category  Delete Failed",
   // location
-  locationCreateSuccess: "Location Create Success",
-  locationCreateFailed: "Location Create Failed",
+  locationCreateSuccess: "Location Created Success",
+  locationCreateFailed: "Location Created Failed",
   locationListFailed: "Location List Failed",
   locationListSuccess: "Location List Success",
   locationNotFound: "Location Not Found",
@@ -70,32 +70,32 @@ module.exports = {
   createStartCampaignFirst: "Create Start Campaign First",
 
   // start up for start up campaign
-  startCampaignCreateSuccess: "Start up  create successfully",
-  startCampaignCreateFailed: "Start up  create Failed",
+  startCampaignCreateSuccess: "Start up  created successfully",
+  startCampaignCreateFailed: "Start up  created Failed",
   startCampaignListSuccess: "Start up  list successfully",
   startCampaignListFailed: "Start up list Failed",
 
   // basic up for start up campaign
-  basicCampaignCreateSuccess: "Basic info  create successfully",
-  basicCampaignCreateFailed: "Basic info  create Failed",
+  basicCampaignCreateSuccess: "Basic info  created successfully",
+  basicCampaignCreateFailed: "Basic info  created Failed",
   basicCampaignListSuccess: "Basic info  list successfully",
   basicCampaignListFailed: "Basic info list Failed",
 
   // project detail for start up campaign
-  projectDetailsCampaignCreateSuccess: "Project detail  create successfully",
-  projectDetailsCampaignCreateFailed: "Project detail  create Failed",
+  projectDetailsCampaignCreateSuccess: "Project detail  created successfully",
+  projectDetailsCampaignCreateFailed: "Project detail  created Failed",
   projectDetailsCampaignListSuccess: "Project detail  list successfully",
   projectDetailsCampaignListFailed: "Project detail list Failed",
 
   // teams for start up campaign
-  teamsCampaignCreateSuccess: "Team  create successfully",
-  teamsCampaignCreateFailed: "Team  create Failed",
+  teamsCampaignCreateSuccess: "Team  created successfully",
+  teamsCampaignCreateFailed: "Team  created Failed",
   teamsCampaignListSuccess: "Team  list successfully",
   teamsCampaignListFailed: "Team list Failed",
 
   // funds for start up campaign
-  fundCampaignCreateSuccess: "Fund  create successfully",
-  fundCampaignCreateFailed: "Fund  create Failed",
+  fundCampaignCreateSuccess: "Fund  created successfully",
+  fundCampaignCreateFailed: "Fund  created Failed",
   fundCampaignListSuccess: "Fund  list successfully",
   fundCampaignListFailed: "Fund list Failed",
 
@@ -108,16 +108,16 @@ module.exports = {
   paymentVerificationCampaignListFailed: "Payment verification list Failed",
 
   // bank for start up campaign
-  banksCampaignCreateSuccess: "Bank  create successfully",
-  banksCampaignCreateFailed: "Bank  create Failed",
+  banksCampaignCreateSuccess: "Bank  created successfully",
+  banksCampaignCreateFailed: "Bank  created Failed",
   banksCampaignListSuccess: "Bank  list successfully",
   banksCampaignListFailed: "Bank list Failed",
   banksCampaignNotFound: "Campaign Not Found",
   completeAllStartUpModule: "Complete all start up module",
 
   // my deals
-  createMyDeals: "Create my deals success",
-  createMyDealFail: "Create my deals failed",
+  createMyDeals: "My deals created success",
+  createMyDealFail: " My deals created failed",
   RemoveMyDealSuccess: "Removed my deals success",
   RemoveMyDealFail: "Removed my deals failed",
   ListMyDealSuccess: "List my deals success",
