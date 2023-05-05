@@ -135,7 +135,9 @@ export class UserController {
       });
       // generate Unique code
 
-      await AppDataSource.query("UPDATE users SET user_code = case role_id when 1 then CONCAT('VKCF', LPAD(id,5,'0')) when 2 then CONCAT('VKCI', LPAD(id,5,'0')) end WHERE user_code is NULL");
+      await AppDataSource.query(
+        "UPDATE users SET user_code = case role_id when 1 then CONCAT('VKCF', LPAD(id,5,'0')) when 2 then CONCAT('VKCI', LPAD(id,5,'0')) end WHERE user_code is NULL"
+      );
 
       // console.log(users);
       const token = await this.forgetTokenRepository.save({
@@ -174,6 +176,7 @@ export class UserController {
   async verify(request: Request, response: Response, next: NextFunction) {
     const id = parseInt(request.params.id);
     const verify_token = request.params.token;
+
     // find user
     let user = await this.userRepository
       .createQueryBuilder()
@@ -185,6 +188,7 @@ export class UserController {
     //   id,
     //   is_active: true,
     // })
+
     if (!user) {
       return responseMessage.responseMessage(false, 400, msg.user_not_found);
     }
@@ -223,20 +227,30 @@ export class UserController {
         is_verify: true,
       }
     );
-    // delete token
+
+    const getUser = await this.userRepository
+      .createQueryBuilder()
+      .where("id=:id AND is_active=true", {
+        id,
+      })
+      .getRawOne();
+
+    // // delete token
     await this.forgetTokenRepository.remove(token);
     // send registeration complete mail
-    // console.log('user.id', user.Users_role_id);
-    if (user.Users_role_id === 1) {
-      await sendTemplate(user.Users_email_id, "startup-registration", {
-        startup_name: user.Users_first_name + " " + user.Users_last_name,
-        your_name: "VK INSVESTMENT",
-      });
-    } else if (user.Users_role_id === 2) {
-      await sendTemplate(user.Users_email_id, "investor-registration", {
-        investor_name: user.Users_first_name + " " + user.Users_last_name,
-        your_name: "VK INSVESTMENT",
-      });
+
+    if (user.Users_is_verify === 0) {
+      if (user.Users_role_id === 1) {
+        await sendTemplate(user.Users_email_id, "startup-registration", {
+          startup_name: user.Users_first_name + " " + user.Users_last_name,
+          your_name: "VK INSVESTMENT",
+        });
+      } else if (user.Users_role_id === 2) {
+        await sendTemplate(user.Users_email_id, "investor-registration", {
+          investor_name: user.Users_first_name + " " + user.Users_last_name,
+          your_name: "VK INSVESTMENT",
+        });
+      }
     }
 
     return responseMessage.responseMessage(true, 200, msg.verifySuccessfully);
@@ -319,9 +333,9 @@ export class UserController {
       const userData = Jwt.decode(token);
 
       const user = await this.userRepository
-        .createQueryBuilder('user')
-        .leftJoinAndSelect('user.city', 'city')
-        .leftJoinAndSelect('city.state_id', 'state')
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.city", "city")
+        .leftJoinAndSelect("city.state_id", "state")
         .where("user.id=:id", { id: userData[0].id })
         .getOne();
 

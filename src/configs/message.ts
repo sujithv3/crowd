@@ -35,10 +35,10 @@ module.exports = {
 
   otpSendYourMobile: "Verification OTP has been sent to your mobile",
   otpSendYourEmail: "Verification OTP has been sent to your email",
-  otpSendYourMobileFailed: "send OTP failed",
-  verifyOTPFailed: "verify OTP failed",
+  otpSendYourMobileFailed: "Send OTP failed",
+  verifyOTPFailed: "Verify OTP failed",
   invalidOTP: "Invalid OTP",
-  verifySuccess: "successfully verified",
+  verifySuccess: "Successfully verified",
 
   // category
   categoryCreateSuccess: "Category Create Success",
@@ -62,58 +62,58 @@ module.exports = {
   locationDeleteFailed: "Location  Delete Failed",
 
   // campaigns
-  campaignListSuccess: "campaign list successfully",
-  campaignDeleteSuccess: "campaign Deleted successfully",
-  campaignNotFound: "campaign Not Found",
-  campaignListFailed: "campaign list Failed",
-  campaignDeleteFailed: "campaign Delete Failed",
+  campaignListSuccess: "Campaign list successfully",
+  campaignDeleteSuccess: "Campaign Deleted successfully",
+  campaignNotFound: "Campaign Not Found",
+  campaignListFailed: "Campaign list Failed",
+  campaignDeleteFailed: "Campaign Delete Failed",
   createStartCampaignFirst: "Create Start Campaign First",
 
   // start up for start up campaign
-  startCampaignCreateSuccess: "start up  create successfully",
-  startCampaignCreateFailed: "start up  create Failed",
-  startCampaignListSuccess: "start up  list successfully",
-  startCampaignListFailed: "start up list Failed",
+  startCampaignCreateSuccess: "Start up  create successfully",
+  startCampaignCreateFailed: "Start up  create Failed",
+  startCampaignListSuccess: "Start up  list successfully",
+  startCampaignListFailed: "Start up list Failed",
 
   // basic up for start up campaign
-  basicCampaignCreateSuccess: "basic info  create successfully",
-  basicCampaignCreateFailed: "basic info  create Failed",
-  basicCampaignListSuccess: "basic info  list successfully",
-  basicCampaignListFailed: "basic info list Failed",
+  basicCampaignCreateSuccess: "Basic info  create successfully",
+  basicCampaignCreateFailed: "Basic info  create Failed",
+  basicCampaignListSuccess: "Basic info  list successfully",
+  basicCampaignListFailed: "Basic info list Failed",
 
   // project detail for start up campaign
-  projectDetailsCampaignCreateSuccess: "project detail  create successfully",
-  projectDetailsCampaignCreateFailed: "project detail  create Failed",
-  projectDetailsCampaignListSuccess: "project detail  list successfully",
-  projectDetailsCampaignListFailed: "project detail list Failed",
+  projectDetailsCampaignCreateSuccess: "Project detail  create successfully",
+  projectDetailsCampaignCreateFailed: "Project detail  create Failed",
+  projectDetailsCampaignListSuccess: "Project detail  list successfully",
+  projectDetailsCampaignListFailed: "Project detail list Failed",
 
   // teams for start up campaign
-  teamsCampaignCreateSuccess: "team  create successfully",
-  teamsCampaignCreateFailed: "team  create Failed",
-  teamsCampaignListSuccess: "team  list successfully",
-  teamsCampaignListFailed: "team list Failed",
+  teamsCampaignCreateSuccess: "Team  create successfully",
+  teamsCampaignCreateFailed: "Team  create Failed",
+  teamsCampaignListSuccess: "Team  list successfully",
+  teamsCampaignListFailed: "Team list Failed",
 
   // funds for start up campaign
-  fundCampaignCreateSuccess: "fund  create successfully",
-  fundCampaignCreateFailed: "fund  create Failed",
-  fundCampaignListSuccess: "fund  list successfully",
-  fundCampaignListFailed: "fund list Failed",
+  fundCampaignCreateSuccess: "Fund  create successfully",
+  fundCampaignCreateFailed: "Fund  create Failed",
+  fundCampaignListSuccess: "Fund  list successfully",
+  fundCampaignListFailed: "Fund list Failed",
 
   // payment verification for start up campaign
   paymentVerificationCampaignCreateSuccess:
-    "payment verification  successfully",
-  paymentVerificationCampaignCreateFailed: "payment verification  Failed",
+    "Payment verification  successfully",
+  paymentVerificationCampaignCreateFailed: "Payment verification  Failed",
   paymentVerificationCampaignListSuccess:
-    "payment verification  list successfully",
-  paymentVerificationCampaignListFailed: "payment verification list Failed",
+    "Payment verification  list successfully",
+  paymentVerificationCampaignListFailed: "Payment verification list Failed",
 
   // bank for start up campaign
-  banksCampaignCreateSuccess: "bank  create successfully",
-  banksCampaignCreateFailed: "bank  create Failed",
-  banksCampaignListSuccess: "bank  list successfully",
-  banksCampaignListFailed: "bank list Failed",
+  banksCampaignCreateSuccess: "Bank  create successfully",
+  banksCampaignCreateFailed: "Bank  create Failed",
+  banksCampaignListSuccess: "Bank  list successfully",
+  banksCampaignListFailed: "Bank list Failed",
   banksCampaignNotFound: "Campaign Not Found",
-  completeAllStartUpModule: "complete all start up module",
+  completeAllStartUpModule: "Complete all start up module",
 
   // my deals
   createMyDeals: "Create my deals success",
@@ -142,8 +142,8 @@ module.exports = {
 
   // admin
   // dashboard
-  listDashboard: "successfully listed",
-  listDashboardFailed: "dashboard list failed",
+  listDashboard: "Successfully listed",
+  listDashboardFailed: "Dashboard list failed",
 
   // startup
   listStartUp: "List Start Up Successfully",
@@ -168,5 +168,5 @@ module.exports = {
   profile_updated_failed: "Update Failed",
 
   // chat
-  chat_post_success: "chat saved successfully",
+  chat_post_success: "Chat saved successfully",
 };
