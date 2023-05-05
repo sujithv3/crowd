@@ -154,7 +154,7 @@ export class ChatApiController {
         }
     }
 
-    async getInvestorUsers(req: Request, res: Response, next: NextFunction) {
+    async getInvestorUsers(request: Request, res: Response, next: NextFunction) {
         try {
             // const client = this.initConnection();
             // client.publish(topic, payload, { qos }, (error: any) => {
@@ -162,10 +162,67 @@ export class ChatApiController {
             //         console.log('Publish error: ', error);
             //     }
             // });
+            let token: any;
+            if (
+                typeof request.cookies.token === "undefined" ||
+                request.cookies.token === null
+            ) {
+                token = request.headers.authorization.slice(7);
+            } else {
+                token = request.cookies.token;
+            }
+
+            const user = Jwt.decode(token);
+            console.log('user', user);
+            const members = await this.ChatGroupRepository
+                .createQueryBuilder("group")
+                .select([
+                    'group.id',
+                    'group.type',
+                    'group.status',
+                    'group.count',
+                    'group.title',
+                    'group.is_active',
+                    'group.is_deleted',
+                    'members.unread',
+                    'members.user_type',
+                    'user.id',
+                    'user.first_name',
+                    'user.last_name',
+                    'user.company_name',
+                    'user.profile',
+                    'executive.id',
+                    'executive.first_name',
+                    'executive.last_name',
+                    'executive.profile',
+                    'message.createdDate',
+                    'message.message',
+                    'message.message_type',
+                    'userOnline.user_type',
+                    'executiveOnline.user_type',
+                    'campaign.id',
+                    'campaign.project_image',
+                ])
+                .leftJoin('group.members', 'members')
+                .leftJoin('group.campaign', 'campaign')
+                // .addSelect('SELECT message from chat_message WHERE ')
+                .leftJoin('group.messages', 'message', 'message.latest=1')
+                .leftJoin('members.user', 'user')
+                .leftJoin("user.online", "userOnline")
+                .leftJoin("members.executive", "executive")
+                .leftJoin("executive.online", "executiveOnline")
+
+                .leftJoin('group.members', 'members2', 'members2.user_type="INVESTOR"')
+                // .leftJoin('members2.user', 'investor')
+                .where("members2.user_id=:id", {
+                    id: user[0].id,
+                })
+                .getMany();
             return responseMessage.responseWithData(
                 true,
                 200,
-                msg.chat_post_success
+                msg.chat_post_success,
+                members
             );
         } catch (error) {
             console.log(error);
@@ -198,18 +255,64 @@ export class ChatApiController {
 
             const user = Jwt.decode(token);
             // get all groups
+            // const members = await this.ChatGroupRepository
+            //     .createQueryBuilder("group")
+            //     .innerJoinAndSelect('group.members', 'members')
+            //     .innerJoinAndSelect('group.members', 'user')
+            //     .leftJoinAndSelect('group.messages', 'message', 'message.latest=1')
+            //     .leftJoinAndSelect('members.executive', 'executive')
+            //     .innerJoinAndSelect("executive.tagged", "tagged")
+            //     .leftJoinAndSelect("executive.online", "online")
+            //     .where("tagged.start_up_id = :id AND user.user_id = :id AND tagged.is_active=true", {
+            //         id: user[0].id,
+            //     })
+            //     .getRawMany();
+
             const members = await this.ChatGroupRepository
                 .createQueryBuilder("group")
-                .innerJoinAndSelect('group.members', 'members')
-                .innerJoinAndSelect('group.members', 'user')
-                .leftJoinAndSelect('group.messages', 'message', 'message.latest=1')
-                .leftJoinAndSelect('members.executive', 'executive')
-                .innerJoinAndSelect("executive.tagged", "tagged")
-                .leftJoinAndSelect("executive.online", "online")
-                .where("tagged.start_up_id = :id AND user.user_id = :id AND tagged.is_active=true", {
+                .select([
+                    'group.id',
+                    'group.type',
+                    'group.status',
+                    'group.count',
+                    'group.title',
+                    'group.is_active',
+                    'group.is_deleted',
+                    'members.unread',
+                    'members.user_type',
+                    'user.id',
+                    'user.first_name',
+                    'user.last_name',
+                    'user.company_name',
+                    'user.profile',
+                    'executive.id',
+                    'executive.first_name',
+                    'executive.last_name',
+                    'executive.profile',
+                    'message.createdDate',
+                    'message.message',
+                    'message.message_type',
+                    'userOnline.user_type',
+                    'executiveOnline.user_type',
+                    'campaign.id',
+                    'campaign.project_image',
+                ])
+                .leftJoin('group.members', 'members')
+                .leftJoin('group.campaign', 'campaign')
+                // .addSelect('SELECT message from chat_message WHERE ')
+                .leftJoin('group.messages', 'message', 'message.latest=1')
+                .leftJoin('members.user', 'user')
+                .leftJoin("user.online", "userOnline")
+                .leftJoin("members.executive", "executive")
+                .leftJoin("executive.online", "executiveOnline")
+
+                .leftJoin('group.members', 'members2', 'members2.user_type="STARTUP"')
+                .leftJoin('members2.user', 'startup', 'startup.role_id=1')
+                .innerJoin("startup.tagged", "tagged")
+                .where("tagged.start_up_id = :id AND tagged.is_active=true", {
                     id: user[0].id,
                 })
-                .getRawMany();
+                .getMany();
 
             console.log('members', members);
             return responseMessage.responseWithData(
