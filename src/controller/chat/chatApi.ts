@@ -330,7 +330,6 @@ export class ChatApiController {
             let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                 .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
                 .getOne();
-            console.log('current_member', current_member);
 
 
 
@@ -353,7 +352,7 @@ export class ChatApiController {
                     from: { id: current_member.id },
                     group: { id: group_id }
                 });
-                const client: any = await this.initConnection();
+
                 // if(current_member.user_type=='RM') {
                 // get all members belongs to this group
                 let members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
@@ -381,9 +380,9 @@ export class ChatApiController {
                 one_message.group_id = group_id;
                 one_message.type = 'chat';
 
+                const client: any = await this.initConnection();
                 for (let i = 0; i < members.length; i++) {
                     const activeMember = members[i];
-                    console.log('activeMember', activeMember);
                     let topic = '';
                     let profile = '';
                     if (activeMember.member_user_type == 'RM') {
