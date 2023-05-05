@@ -63,15 +63,7 @@ export class ChatApiController {
             //     }
             // });
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
-
+            token = request.headers.authorization.slice(7);
             const user = Jwt.decode(token);
             // get all groups
             const members = await this.ChatGroupRepository
@@ -114,7 +106,7 @@ export class ChatApiController {
                 .leftJoin('group.members', 'members2', 'members2.user_type="STARTUP"')
                 .leftJoin('members2.user', 'startup', 'startup.role_id=1')
                 .innerJoin("startup.tagged", "tagged")
-                .where("tagged.rm_id = :id AND tagged.is_active=true", {
+                .where("tagged.rm_id = :id AND tagged.is_active=true AND group.is_active=true", {
                     id: user[0].id,
                 })
                 .getMany();
@@ -163,14 +155,7 @@ export class ChatApiController {
             //     }
             // });
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
+            token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
             console.log('user', user);
@@ -214,7 +199,7 @@ export class ChatApiController {
 
                 .leftJoin('group.members', 'members2', 'members2.user_type="INVESTOR"')
                 // .leftJoin('members2.user', 'investor')
-                .where("members2.user_id=:id", {
+                .where("members2.user_id=:id AND group.is_active=true", {
                     id: user[0].id,
                 })
                 .getMany();
@@ -244,14 +229,7 @@ export class ChatApiController {
             //     }
             // });
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
+            token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
             // get all groups
@@ -309,7 +287,7 @@ export class ChatApiController {
                 .leftJoin('group.members', 'members2', 'members2.user_type="STARTUP"')
                 .leftJoin('members2.user', 'startup', 'startup.role_id=1')
                 .innerJoin("startup.tagged", "tagged")
-                .where("tagged.start_up_id = :id AND tagged.is_active=true", {
+                .where("tagged.start_up_id = :id AND tagged.is_active=true AND group.is_active=true", {
                     id: user[0].id,
                 })
                 .getMany();
@@ -336,14 +314,7 @@ export class ChatApiController {
         try {
 
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
+            token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
 
@@ -462,14 +433,7 @@ export class ChatApiController {
         try {
 
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
+            token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
 
@@ -592,14 +556,7 @@ export class ChatApiController {
             //     }
             // });
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
+            token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
 
@@ -642,14 +599,7 @@ export class ChatApiController {
     async getNotification(request) {
         try {
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
+            token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
             console.log('user', user[0]);
@@ -714,14 +664,7 @@ export class ChatApiController {
     async getInvestorList(request: Request, response: Response, next: NextFunction) {
         try {
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
+            token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
 
@@ -846,14 +789,7 @@ export class ChatApiController {
     async createGroup(request: Request, response: Response, next: NextFunction) {
         try {
             let token: any;
-            if (
-                typeof request.cookies.token === "undefined" ||
-                request.cookies.token === null
-            ) {
-                token = request.headers.authorization.slice(7);
-            } else {
-                token = request.cookies.token;
-            }
+            token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
 
@@ -905,7 +841,7 @@ export class ChatApiController {
                         type: GROUP_TYPE.GROUP,
                         count: 2,
                         campaign: { id: campaign_exists.id },
-                        title: 'Group user'
+                        title: ''
                     });
                     // copy existing group members (2 members)
                     for (let i = 0; i < all_members.length; ++i) {
@@ -943,6 +879,50 @@ export class ChatApiController {
 
 
 
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.userListSuccess
+            );
+        } catch (err) {
+            console.log(err);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.userListFailed,
+                err
+            );
+        }
+    }
+
+    async rename(request: Request, response: Response, next: NextFunction) {
+        try {
+            let token: any;
+            token = request.headers.authorization.slice(7);
+
+            const user = Jwt.decode(token);
+
+            const group_id = request.body.group_id;
+
+            const name = request.body.name;
+
+            // check provided group is valid
+            const group_exist = await this.ChatGroupRepository
+                .createQueryBuilder('chat')
+                .where('id=:id AND type=:type', {
+                    id: group_id,
+                    type: GROUP_TYPE.GROUP
+                }).getOne();
+            console.log('group_exist', group_exist);
+
+            if (group_exist) {
+                await this.ChatGroupRepository
+                    .createQueryBuilder('chat')
+                    .update().set({
+                        title: name
+                    }).where('group_id=:id', { id: group_id }).execute();
+            }
 
             return responseMessage.responseWithData(
                 true,
