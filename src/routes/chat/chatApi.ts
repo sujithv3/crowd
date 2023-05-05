@@ -79,6 +79,38 @@ export const Routes = [
     validationField: "",
     isLogin: true,
   },
+  {
+    method: "post",
+    route: "/rename",
+    controller: ChatApiController,
+    action: "rename",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "post",
+    route: "/deactivate",
+    controller: ChatApiController,
+    action: "deactivate",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "post",
+    route: "/delete",
+    controller: ChatApiController,
+    action: "delete",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "post",
+    route: "/activate",
+    controller: ChatApiController,
+    action: "activate",
+    validationField: "",
+    isLogin: true,
+  },
 ];
 
 // function routes
