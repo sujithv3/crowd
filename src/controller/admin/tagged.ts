@@ -38,7 +38,7 @@ export class TaggedRM {
         let group = await this.ChatGroupRepository.createQueryBuilder('group')
           .innerJoin('group.members', 'startup', 'startup.user_id=:startup_id', { startup_id: start_up[i] }) // find startup with members
           .innerJoin('group.members', 'user', 'user.execuive_id=:user_id', { user_id: start_up[i] }) // find investor with members
-          .where('group.type=:type', { type: GROUP_TYPE.STARTUP }).getOne();
+          .where('group.type=:type AND group.is_active=true', { type: GROUP_TYPE.STARTUP }).getOne();
         console.log('group_member', group);
 
         //if not create a group
@@ -104,7 +104,7 @@ export class TaggedRM {
 
         let group = await this.ChatGroupRepository.createQueryBuilder('group')
           .innerJoin('group.members', 'startup', 'startup.user_id=:startup_id', { startup_id: start_up[i] }) // find startup with members
-          .innerJoin('group.members', 'user', 'user.execuive_id=:user_id', { user_id: start_up[i] }) // find investor with members
+          .innerJoin('group.members', 'user', 'user.execuive_id=:user_id', { user_id: start_up[i] }) // find RM with members
           .where('group.type=:type', { type: GROUP_TYPE.STARTUP }).getOne();
         console.log('group_member', group);
 
