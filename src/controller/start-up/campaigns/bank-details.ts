@@ -24,7 +24,7 @@ export class bankController {
         account_number,
         swift,
         bank_location,
-        bank_address = null,
+        bank_address = "",
         is_active = true,
         is_deleted = false,
       } = req.body;
@@ -201,7 +201,12 @@ export class bankController {
         .getOne();
 
       if (!campaign) {
-        return responseMessage.responseMessage(false, 404, "No Data Found");
+        return responseMessage.responseWithData(
+          true,
+          200,
+          msg.banksCampaignListSuccess,
+          null
+        );
       }
 
       //   find bank
