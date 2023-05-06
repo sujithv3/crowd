@@ -20,8 +20,8 @@ const mqtt = require('mqtt');
 
 
 const qos = 1;
-// const host = '127.0.0.1';
-const host = '3.109.250.135';
+const host = '127.0.0.1';
+// const host = '3.109.250.135';
 const clientId = 'AdecMqttserver' + Math.random().toString(36).substring(2, 10);
 const port = 8083;
 const url = `ws://${host}:${port}/mqtt`;
@@ -918,13 +918,14 @@ export class ChatApiController {
                     id: group_id,
                     type: GROUP_TYPE.GROUP
                 }).getOne();
-            console.log('group_exist', group_exist);
 
             let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
-                .where('member.user_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
+                .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
                 .getOne();
 
+
             if (group_exist && current_member) {
+                console.log('rename works');
                 await this.ChatGroupRepository
                     .createQueryBuilder('chat')
                     .update().set({
@@ -1261,6 +1262,110 @@ export class ChatApiController {
                     //     userType: activeMember.member_user_type,
                     //     profile: profile
                     // };
+                    console.log('client?.publish', this.client?.publish);
+                    if (this.client?.publish) {
+                        // console.log('AdminChat/1' === topic)
+                        console.log('message publish', topic, one_message);
+
+                        this.client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
+                            if (error) {
+                                console.log('Publish error: ', error);
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.userListSuccess
+            );
+        } catch (err) {
+            console.log(err);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.userListFailed,
+                err
+            );
+        }
+    }
+
+    async postFile(request: any, response: Response, next: NextFunction) {
+        try {
+            let token: any;
+            token = request.headers.authorization.slice(7);
+
+            const user = Jwt.decode(token);
+
+            const group_id = request.body.group_id;
+
+            // console.log('req.files', request.files);
+            // console.log('req.body', request.body)
+
+
+            let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
+                .getOne();
+            console.log('current_member', current_member);
+
+            // check provided group is valid
+            const group_exist = await this.ChatGroupRepository
+                .createQueryBuilder('chat')
+                .where('id=:id AND type=:type', {
+                    id: group_id,
+                    type: GROUP_TYPE.GROUP
+                }).getOne();
+            console.log('group_exist', group_exist);
+
+            if (group_exist && current_member && request.files[0]) {
+                const file = request.files[0];
+                const file_value = [];;
+                file_value.push(file.location);
+                file_value.push(file.originalname);
+
+                let message_type = MESSAGE_TYPE.DOCUMENT;
+                if (file.mimetype.includes('image/')) {
+                    message_type = MESSAGE_TYPE.IMAGE;
+                }
+
+
+                const message = await this.ChatMessageRepository.save({
+                    message: file_value.join(','),
+                    message_type: message_type,
+                    from: { id: current_member.id },
+                    group: { id: group_id }
+                });
+
+                // get all members belongs to this group
+                let members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .where('member.group_id=:id', { id: group_id }) // find logged in user with members
+                    .getRawMany();
+
+                const one_message: any = await this.ChatMessageRepository.createQueryBuilder('message')
+                    .where('message.id=:id', { id: message.id })
+                    .innerJoinAndSelect('message.from', 'member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .getOne();
+                one_message.group_id = group_id;
+                one_message.type = 'chat';
+
+                for (let i = 0; i < members.length; i++) {
+                    const activeMember = members[i];
+                    let topic = '';
+                    let profile = '';
+                    if (activeMember.member_user_type == 'RM') {
+                        topic = 'AdminChat/' + activeMember.executive_id;
+                        profile = activeMember?.executive_profile
+                    } else {
+                        topic = 'chat/' + activeMember.user_id;
+                        profile = activeMember?.user_profile
+                    }
                     console.log('client?.publish', this.client?.publish);
                     if (this.client?.publish) {
                         // console.log('AdminChat/1' === topic)
