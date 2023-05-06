@@ -322,6 +322,8 @@ export class MeetingController {
           "meeting.user_id=:user_id AND EXTRACT(month FROM meeting.meeting_date) = :month OR EXTRACT(month FROM meeting.meeting_date) = :next_month",
           { user_id: user[0].id, month: month, next_month: month + 1 }
         )
+        .leftJoinAndSelect("meeting.campaign", "campaign")
+        .select(["meeting", "campaign.id", "campaign.title"])
         .getMany();
       // console.log();
       return responseMessage.responseWithData(
