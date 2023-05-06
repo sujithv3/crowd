@@ -12,11 +12,38 @@ import { Staging } from "../../entity/staging";
 import { ChatOnline, USER_TYPE } from "../../entity/chatOnline";
 import { Users } from "../../entity/Users";
 import { Funds } from "../../entity/funds";
-import { ChatGroup, GROUP_TYPE } from "../../entity/chatGroup";
-import { ChatMessage } from "../../entity/chatMessages";
+import { ChatGroup, GROUP_TYPE, GROUP_STATUS } from "../../entity/chatGroup";
+import { ChatMessage, MESSAGE_TYPE } from "../../entity/chatMessages";
 import { ChatGroupMember, MEMBER_TYPE } from "../../entity/chatGroupMembers";
 
 const mqtt = require('mqtt');
+
+
+const qos = 1;
+const host = '127.0.0.1';
+// const host = '3.109.250.135';
+const clientId = 'AdecMqttserver' + Math.random().toString(36).substring(2, 10);
+const port = 8083;
+const url = `ws://${host}:${port}/mqtt`;
+const mqttOptions = {
+    clientId: clientId,
+    username: 'admin',
+    password: 'Dairyarm@32',
+    keepalive: 0,
+    protocolId: 'MQTT',
+    protocolVersion: 4,
+    clean: true,
+    reconnectPeriod: 1000,
+    connectTimeout: 30 * 1000,
+    will: {
+        topic: 'WillMsg',
+        payload: 'Connection Closed abnormally..!',
+        qos: qos,
+        retain: false
+    },
+    rejectUnauthorized: false
+};
+const client = mqtt.connect(url, mqttOptions);
 
 export class ChatApiController {
     private userRepository = AppDataSource.getRepository(Users);
@@ -26,33 +53,10 @@ export class ChatApiController {
     private ChatGroupRepository = AppDataSource.getRepository(ChatGroup);
     private CampaignsRepository = AppDataSource.getRepository(Campaigns);
     private fundsRepository = AppDataSource.getRepository(Funds);
+    private client;
 
-    async initConnection() {
-        const qos = 1;
-        // const host = '127.0.0.1';
-        const host = '3.109.250.135';
-        const clientId = 'AdecMqttserver';
-        const port = 8083;
-        const url = `ws://${host}:${port}/mqtt`;
-        const mqttOptions = {
-            clientId: clientId,
-            username: 'admin',
-            password: 'Dairyarm@32',
-            keepalive: 0,
-            protocolId: 'MQTT',
-            protocolVersion: 4,
-            clean: true,
-            reconnectPeriod: 1000,
-            connectTimeout: 30 * 1000,
-            will: {
-                topic: 'WillMsg',
-                payload: 'Connection Closed abnormally..!',
-                qos: qos,
-                retain: false
-            },
-            rejectUnauthorized: false
-        };
-        return mqtt.connect(url, mqttOptions)
+    constructor() {
+        this.client = client;
     }
 
     async getRMusers(request: Request, res: Response, next: NextFunction) {
@@ -107,7 +111,7 @@ export class ChatApiController {
                 .leftJoin('group.members', 'members2', 'members2.user_type="STARTUP"')
                 .leftJoin('members2.user', 'startup', 'startup.role_id=1')
                 .innerJoin("startup.tagged", "tagged")
-                .where("tagged.rm_id = :id AND tagged.is_active=true AND group.is_active=true", {
+                .where("tagged.rm_id = :id AND tagged.is_active=true AND group.is_active=true AND group.is_deleted=false", {
                     id: user[0].id,
                 })
                 .getMany();
@@ -200,7 +204,7 @@ export class ChatApiController {
 
                 .leftJoin('group.members', 'members2', 'members2.user_type="INVESTOR"')
                 // .leftJoin('members2.user', 'investor')
-                .where("members2.user_id=:id AND group.is_active=true", {
+                .where("members2.user_id=:id AND group.is_active=true AND group.is_deleted=false", {
                     id: user[0].id,
                 })
                 .getMany();
@@ -288,7 +292,7 @@ export class ChatApiController {
                 .leftJoin('group.members', 'members2', 'members2.user_type="STARTUP"')
                 .leftJoin('members2.user', 'startup', 'startup.role_id=1')
                 .innerJoin("startup.tagged", "tagged")
-                .where("tagged.start_up_id = :id AND tagged.is_active=true AND group.is_active=true", {
+                .where("tagged.start_up_id = :id AND tagged.is_active=true AND group.is_active=true AND group.is_deleted=false", {
                     id: user[0].id,
                 })
                 .getMany();
@@ -380,7 +384,6 @@ export class ChatApiController {
                 one_message.group_id = group_id;
                 one_message.type = 'chat';
 
-                const client: any = await this.initConnection();
                 for (let i = 0; i < members.length; i++) {
                     const activeMember = members[i];
                     let topic = '';
@@ -398,12 +401,12 @@ export class ChatApiController {
                     //     userType: activeMember.member_user_type,
                     //     profile: profile
                     // };
-                    console.log('client?.publish', client?.publish);
-                    if (client?.publish) {
+                    console.log('client?.publish', this.client?.publish);
+                    if (this.client?.publish) {
                         // console.log('AdminChat/1' === topic)
                         console.log('message publish', topic, one_message);
 
-                        client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
+                        this.client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
                             if (error) {
                                 console.log('Publish error: ', error);
                             }
@@ -470,7 +473,7 @@ export class ChatApiController {
                     from: { id: current_member.id },
                     group: { id: group_id }
                 });
-                const client: any = await this.initConnection();
+                // const client: any = await this.initConnection();
                 // if(current_member.user_type=='RM') {
                 // get all members belongs to this group
                 let members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
@@ -516,12 +519,12 @@ export class ChatApiController {
                     //     userType: activeMember.member_user_type,
                     //     profile: profile
                     // };
-                    console.log('client?.publish', client?.publish);
-                    if (client?.publish) {
+                    console.log('client?.publish', this.client?.publish);
+                    if (this.client?.publish) {
                         // console.log('AdminChat/1' === topic)
                         console.log('message publish', topic, one_message);
 
-                        client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
+                        this.client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
                             if (error) {
                                 console.log('Publish error: ', error);
                             }
@@ -577,6 +580,7 @@ export class ChatApiController {
                 .innerJoinAndSelect('message.from', 'member')
                 .leftJoinAndSelect('member.executive', 'executive')
                 .leftJoinAndSelect('member.user', 'user')
+                .orderBy('message.id', 'ASC')
                 .getMany();
 
             return responseMessage.responseWithData(
@@ -916,12 +920,360 @@ export class ChatApiController {
                 }).getOne();
             console.log('group_exist', group_exist);
 
-            if (group_exist) {
+            let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                .where('member.user_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
+                .getOne();
+
+            if (group_exist && current_member) {
                 await this.ChatGroupRepository
                     .createQueryBuilder('chat')
                     .update().set({
                         title: name
-                    }).where('group_id=:id', { id: group_id }).execute();
+                    }).where('id=:id', { id: group_id }).execute();
+
+                // get all members belongs to this group
+                let members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .where('member.group_id=:id', { id: group_id }) // find logged in user with members
+                    .getRawMany();
+
+                const payload = {
+                    type: 'rename',
+                    id: group_id,
+                }
+
+                for (let i = 0; i < members.length; i++) {
+                    const activeMember = members[i];
+                    let topic = '';
+                    let profile = '';
+                    if (activeMember.member_user_type == 'RM') {
+                        topic = 'AdminChat/' + activeMember.executive_id;
+                        profile = activeMember?.executive_profile
+                    } else {
+                        topic = 'chat/' + activeMember.user_id;
+                        profile = activeMember?.user_profile
+                    }
+                    // let payload = {
+                    //     type: 'chat',
+                    //     message: request.body.message,
+                    //     userType: activeMember.member_user_type,
+                    //     profile: profile
+                    // };
+                    console.log('client?.publish', this.client?.publish);
+                    if (this.client?.publish) {
+                        // console.log('AdminChat/1' === topic)
+                        console.log('message publish', topic, payload);
+
+                        this.client.publish(topic, JSON.stringify(payload), { qos: 0 }, (error: any) => {
+                            if (error) {
+                                console.log('Publish error: ', error);
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.userListSuccess
+            );
+        } catch (err) {
+            console.log(err);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.userListFailed,
+                err
+            );
+        }
+    }
+
+    async delete(request: Request, response: Response, next: NextFunction) {
+        try {
+            let token: any;
+            token = request.headers.authorization.slice(7);
+
+            const user = Jwt.decode(token);
+
+            const group_id = request.body.group_id;
+
+
+            let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
+                .getOne();
+            console.log('current_member', current_member);
+
+            // check provided group is valid
+            const group_exist = await this.ChatGroupRepository
+                .createQueryBuilder('chat')
+                .where('id=:id AND type=:type', {
+                    id: group_id,
+                    type: GROUP_TYPE.GROUP
+                }).getOne();
+            console.log('group_exist', group_exist);
+
+            if (group_exist && current_member) {
+
+                // delete chat
+                await this.ChatGroupRepository
+                    .createQueryBuilder('chat')
+                    .update().set({
+                        is_deleted: true
+                    }).where('id=:id', { id: group_id }).execute();
+
+                // get all members belongs to this group
+                let members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .where('member.group_id=:id', { id: group_id }) // find logged in user with members
+                    .getRawMany();
+
+                const payload = {
+                    type: 'delete',
+                    id: group_id,
+                }
+
+                for (let i = 0; i < members.length; i++) {
+                    const activeMember = members[i];
+                    let topic = '';
+                    let profile = '';
+                    if (activeMember.member_user_type == 'RM') {
+                        topic = 'AdminChat/' + activeMember.executive_id;
+                        profile = activeMember?.executive_profile
+                    } else {
+                        topic = 'chat/' + activeMember.user_id;
+                        profile = activeMember?.user_profile
+                    }
+                    // let payload = {
+                    //     type: 'chat',
+                    //     message: request.body.message,
+                    //     userType: activeMember.member_user_type,
+                    //     profile: profile
+                    // };
+                    console.log('client?.publish', this.client?.publish);
+                    if (this.client?.publish) {
+                        // console.log('AdminChat/1' === topic)
+                        console.log('message publish', topic, payload);
+
+                        this.client.publish(topic, JSON.stringify(payload), { qos: 0 }, (error: any) => {
+                            if (error) {
+                                console.log('Publish error: ', error);
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.userListSuccess
+            );
+        } catch (err) {
+            console.log(err);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.userListFailed,
+                err
+            );
+        }
+    }
+
+    async activate(request: Request, response: Response, next: NextFunction) {
+        try {
+            let token: any;
+            token = request.headers.authorization.slice(7);
+
+            const user = Jwt.decode(token);
+
+            const group_id = request.body.group_id;
+
+
+            let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
+                .getOne();
+            console.log('current_member', current_member);
+
+            // check provided group is valid
+            const group_exist = await this.ChatGroupRepository
+                .createQueryBuilder('chat')
+                .where('id=:id AND type=:type', {
+                    id: group_id,
+                    type: GROUP_TYPE.GROUP
+                }).getOne();
+            console.log('group_exist', group_exist);
+
+            if (group_exist && current_member) {
+
+                // Activate chat
+                await this.ChatGroupRepository
+                    .createQueryBuilder('chat')
+                    .update().set({
+                        status: GROUP_STATUS.ACTIVE
+                    }).where('id=:id', { id: group_id }).execute();
+
+                const message = await this.ChatMessageRepository.save({
+                    message: 'Group is activated!',
+                    message_type: MESSAGE_TYPE.ACTIVATE,
+                    from: { id: current_member.id },
+                    group: { id: group_id }
+                });
+
+                // get all members belongs to this group
+                let members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .where('member.group_id=:id', { id: group_id }) // find logged in user with members
+                    .getRawMany();
+
+                const one_message: any = await this.ChatMessageRepository.createQueryBuilder('message')
+                    .where('message.id=:id', { id: message.id })
+                    .innerJoinAndSelect('message.from', 'member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .getOne();
+                one_message.group_id = group_id;
+                one_message.type = 'chat';
+
+                for (let i = 0; i < members.length; i++) {
+                    const activeMember = members[i];
+                    let topic = '';
+                    let profile = '';
+                    if (activeMember.member_user_type == 'RM') {
+                        topic = 'AdminChat/' + activeMember.executive_id;
+                        profile = activeMember?.executive_profile
+                    } else {
+                        topic = 'chat/' + activeMember.user_id;
+                        profile = activeMember?.user_profile
+                    }
+                    // let payload = {
+                    //     type: 'chat',
+                    //     message: request.body.message,
+                    //     userType: activeMember.member_user_type,
+                    //     profile: profile
+                    // };
+                    console.log('client?.publish', this.client?.publish);
+                    if (this.client?.publish) {
+                        // console.log('AdminChat/1' === topic)
+                        console.log('message publish', topic, one_message);
+
+                        this.client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
+                            if (error) {
+                                console.log('Publish error: ', error);
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            return responseMessage.responseWithData(
+                true,
+                200,
+                msg.userListSuccess
+            );
+        } catch (err) {
+            console.log(err);
+            return responseMessage.responseWithData(
+                false,
+                400,
+                msg.userListFailed,
+                err
+            );
+        }
+    }
+
+    async deactivate(request: Request, response: Response, next: NextFunction) {
+        try {
+            let token: any;
+            token = request.headers.authorization.slice(7);
+
+            const user = Jwt.decode(token);
+
+            const group_id = request.body.group_id;
+
+
+            let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
+                .getOne();
+            console.log('current_member', current_member);
+
+            // check provided group is valid
+            const group_exist = await this.ChatGroupRepository
+                .createQueryBuilder('chat')
+                .where('id=:id AND type=:type', {
+                    id: group_id,
+                    type: GROUP_TYPE.GROUP
+                }).getOne();
+            console.log('group_exist', group_exist);
+
+            if (group_exist && current_member) {
+
+                // Activate chat
+                await this.ChatGroupRepository
+                    .createQueryBuilder('chat')
+                    .update().set({
+                        status: GROUP_STATUS.INACTIVE
+                    }).where('id=:id', { id: group_id }).execute();
+
+                const message = await this.ChatMessageRepository.save({
+                    message: 'Group is DeActivated!',
+                    message_type: MESSAGE_TYPE.DEACTIVATE,
+                    from: { id: current_member.id },
+                    group: { id: group_id }
+                });
+
+                // get all members belongs to this group
+                let members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .where('member.group_id=:id', { id: group_id }) // find logged in user with members
+                    .getRawMany();
+
+                const one_message: any = await this.ChatMessageRepository.createQueryBuilder('message')
+                    .where('message.id=:id', { id: message.id })
+                    .innerJoinAndSelect('message.from', 'member')
+                    .leftJoinAndSelect('member.executive', 'executive')
+                    .leftJoinAndSelect('member.user', 'user')
+                    .getOne();
+                one_message.group_id = group_id;
+                one_message.type = 'chat';
+
+                for (let i = 0; i < members.length; i++) {
+                    const activeMember = members[i];
+                    let topic = '';
+                    let profile = '';
+                    if (activeMember.member_user_type == 'RM') {
+                        topic = 'AdminChat/' + activeMember.executive_id;
+                        profile = activeMember?.executive_profile
+                    } else {
+                        topic = 'chat/' + activeMember.user_id;
+                        profile = activeMember?.user_profile
+                    }
+                    // let payload = {
+                    //     type: 'chat',
+                    //     message: request.body.message,
+                    //     userType: activeMember.member_user_type,
+                    //     profile: profile
+                    // };
+                    console.log('client?.publish', this.client?.publish);
+                    if (this.client?.publish) {
+                        // console.log('AdminChat/1' === topic)
+                        console.log('message publish', topic, one_message);
+
+                        this.client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
+                            if (error) {
+                                console.log('Publish error: ', error);
+                            }
+                        });
+                    }
+                }
+
             }
 
             return responseMessage.responseWithData(
