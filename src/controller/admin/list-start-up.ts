@@ -94,9 +94,14 @@ export class ListStartUp {
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .getManyAndCount();
 
+        const data = await startUpList[0].map((e: any) => {
+        e.city_name = e.city ? `${e.city.name}` : null
+        return e;
+      });
+
       return responseMessage.responseWithData(true, 200, msg.listStartUp, {
         total_count: startUpList[1],
-        data: startUpList[0],
+        data,
       });
     } catch (err) {
       console.log(err);
