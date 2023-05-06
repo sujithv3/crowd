@@ -20,8 +20,8 @@ const mqtt = require('mqtt');
 
 
 const qos = 1;
-const host = '127.0.0.1';
-// const host = '3.109.250.135';
+// const host = '127.0.0.1';
+const host = '3.109.250.135';
 const clientId = 'AdecMqttserver' + Math.random().toString(36).substring(2, 10);
 const port = 8083;
 const url = `ws://${host}:${port}/mqtt`;
