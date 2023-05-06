@@ -152,7 +152,7 @@ export class UserController {
       const link = `${process.env.BASE_URL_CREATE_PASSWORD}/?id=${users.id}&token=${token.token}`;
 
       await sendTemplate(email_id, "verify-email", {
-        name: first_name + "" + last_name,
+        name: first_name + " " + last_name,
         verify_link: link,
       });
 
