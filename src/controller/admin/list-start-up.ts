@@ -96,7 +96,7 @@ export class ListStartUp {
         .getManyAndCount();
 
       const data = await startUpList[0].map((e: any) => {
-        e.city_state = e.city ? `${e.city.name}` : null;
+        e.city_state = e.city ? `${e.city.name}, ${e.city.state_code}` : null;
         return e;
       });
 
