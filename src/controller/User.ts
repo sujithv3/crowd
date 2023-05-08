@@ -239,7 +239,7 @@ export class UserController {
     await this.forgetTokenRepository.remove(token);
     // send registeration complete mail
 
-    if (getUser.Users_is_verify === 0) {
+    if (getUser.Users_is_verify === 1 && user.Users_is_verify === 0) {
       if (user.Users_role_id === 1) {
         await sendTemplate(user.Users_email_id, "startup-registration", {
           startup_name: user.Users_first_name + " " + user.Users_last_name,
