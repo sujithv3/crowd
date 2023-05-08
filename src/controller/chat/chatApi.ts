@@ -163,7 +163,7 @@ export class ChatApiController {
             token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
-            console.log('user', user);
+            // console.log('user', user);
             const members = await this.ChatGroupRepository
                 .createQueryBuilder("group")
                 .select([
@@ -319,6 +319,7 @@ export class ChatApiController {
         try {
 
             let token: any;
+            // console.log('request.headers.authorization', request.headers.authorization)
             token = request.headers.authorization.slice(7);
 
             const user = Jwt.decode(token);
@@ -330,6 +331,7 @@ export class ChatApiController {
             const group_id = request.body.group_id;
 
             // find group Member id
+            console.log('user.....', user);
 
             let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                 .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
@@ -401,10 +403,10 @@ export class ChatApiController {
                     //     userType: activeMember.member_user_type,
                     //     profile: profile
                     // };
-                    console.log('client?.publish', this.client?.publish);
+                    // console.log('client?.publish', this.client?.publish);
                     if (this.client?.publish) {
                         // console.log('AdminChat/1' === topic)
-                        console.log('message publish', topic, one_message);
+                        // console.log('message publish', topic, one_message);
 
                         this.client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
                             if (error) {
@@ -614,7 +616,7 @@ export class ChatApiController {
             };
             if (user[0] && user[0].role) {
                 console.log('user[0].role.name', user[0].role.name);
-                if (user[0].role.name === 'start-up') {
+                if (user[0].role.name === 'start-up' || user[0].role.name === 'invester') {
 
                     if (request.query.group_id && request.query.group_id > 0) {
 
