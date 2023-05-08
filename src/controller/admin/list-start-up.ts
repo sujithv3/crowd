@@ -183,12 +183,17 @@ export class ListStartUp {
       const tagged = await this.taggedRepository
         .createQueryBuilder("tagged")
 
-        .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+        .leftJoinAndSelect(
+          "tagged.RelationManager",
+          "RelationManager",
+          "RelationManager.is_active=true AND RelationManager.is_deleted=false"
+        )
+        .andWhere("RelationManager.id IS NOT NULL")
         .loadRelationCountAndMap(
           "RelationManager.rm_tagged_count",
           "RelationManager.tagged",
           "tagged",
-          (qb) => qb.andWhere("tagged.is_active=true")
+          (qb) => qb.andWhere("tagged.is_active=true ")
         )
         .orderBy("tagged.updatedDate", "DESC")
         .limit(3)
