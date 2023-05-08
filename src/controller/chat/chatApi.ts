@@ -613,13 +613,19 @@ export class ChatApiController {
                 data: {}
             };
             if (user[0] && user[0].role) {
+                console.log('user[0].role.name', user[0].role.name);
                 if (user[0].role.name === 'start-up') {
 
-                    // if(request.query.group_id && request.query.group_id>0) {
-                    //     await this.ChatGroupMemberRepository.createQueryBuilder().update().set({
-                    //         unread: 0
-                    //     }).where('group_id=:id AND id=:member_id', { id: request.query.group_id, member_id: current_member.id }).execute();
-                    // }
+                    if (request.query.group_id && request.query.group_id > 0) {
+
+                        let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                            .where('member.user_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: request.query.group_id }) // find logged in user with members
+                            .getOne();
+
+                        await this.ChatGroupMemberRepository.createQueryBuilder().update().set({
+                            unread: 0
+                        }).where('group_id=:id AND id=:member_id', { id: request.query.group_id, member_id: current_member.id }).execute();
+                    }
 
                     const unreadData = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                         .select(['member.group_id', 'member.unread'])
@@ -632,6 +638,18 @@ export class ChatApiController {
                         })
                     }
                 } else {
+
+                    if (request.query.group_id && request.query.group_id > 0) {
+
+                        let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                            .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: request.query.group_id }) // find logged in user with members
+                            .getOne();
+
+                        await this.ChatGroupMemberRepository.createQueryBuilder().update().set({
+                            unread: 0
+                        }).where('group_id=:id AND id=:member_id', { id: request.query.group_id, member_id: current_member.id }).execute();
+                    }
+
                     const unreadData = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                         .select(['member.group_id', 'member.unread'])
                         .innerJoin('member.executive', 'user')
@@ -686,7 +704,7 @@ export class ChatApiController {
             //     .innerJoin("user.city", "city")
             //     .where('campaign.is_deleted=false AND campaign.is_published=true AND campaign.user_id=:id', { id: startup.user_id });
 
-            const campaign = await this.fundsRepository
+            const campaign = this.fundsRepository
                 .createQueryBuilder("fund")
                 .innerJoinAndSelect("fund.investor", "investor")
                 .leftJoinAndSelect("investor.city", "city")
@@ -730,8 +748,8 @@ export class ChatApiController {
             //         : 0
             // )
             //     .limit(request.query.limit ? Number(request.query.limit) : 10).getRawMany();
-            // const totalQuery = campaign.clone();
-            // const total_count = await totalQuery.select('COUNT(DISTINCT investor.id, campaign.id) as cnt').getRawOne();
+            const totalQuery = campaign.clone();
+            const total_count = await totalQuery.select('COUNT(DISTINCT investor.id, campaign.id) as cnt').getRawOne();
 
             campaign.select([
                 "investor.id",
@@ -751,12 +769,12 @@ export class ChatApiController {
                 "location.name",
                 "location.country",
                 "fund.fund_amount",
-            ]);
-            // .groupBy('investor.id')
-            // .addGroupBy('campaign.id');
+            ])
+                .groupBy('investor.id')
+                .addGroupBy('campaign.id');
 
-            const totalQuery = campaign.clone();
-            const total_count = await totalQuery.getCount();
+            // const totalQuery = campaign.clone();
+            // const total_count = await totalQuery.getCount();
             if (request.query.page && request.query.limit) {
                 campaign
                     .offset(
@@ -775,7 +793,7 @@ export class ChatApiController {
                 200,
                 msg.userListSuccess,
                 {
-                    total_count: total_count,
+                    total_count: total_count.cnt,
                     data: data
                 }
             );

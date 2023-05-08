@@ -57,7 +57,7 @@ export class RelationManager {
         let data = await startUpCounts[0].map((temp:any) => {
           let res = {
             ...temp,
-            city_name: temp.city ? `${temp.city.name},${temp.city.state_code}` : null
+            city_state: temp.city ? `${temp.city.name}, ${temp.city.state_code}` : null
           }
           return res;
         })
