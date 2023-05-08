@@ -152,7 +152,7 @@ export class UserController {
       const link = `${process.env.BASE_URL_CREATE_PASSWORD}/?id=${users.id}&token=${token.token}`;
 
       await sendTemplate(email_id, "verify-email", {
-        name: first_name + "" + last_name,
+        name: first_name + " " + last_name,
         verify_link: link,
       });
 
@@ -235,12 +235,12 @@ export class UserController {
     if (user.Users_role_id === 1) {
       await sendTemplate(user.Users_email_id, "startup-registration", {
         startup_name: user.Users_first_name + " " + user.Users_last_name,
-        your_name: "VK INSVESTMENT",
+        your_name: "VK INVESTMENT",
       });
     } else if (user.Users_role_id === 2) {
       await sendTemplate(user.Users_email_id, "investor-registration", {
         investor_name: user.Users_first_name + " " + user.Users_last_name,
-        your_name: "VK INSVESTMENT",
+        your_name: "VK INVESTMENT",
       });
     }
 
