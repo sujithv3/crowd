@@ -46,6 +46,15 @@ export class InvestorController {
 
       const investorListQuery = await this.userRepository
         .createQueryBuilder("investor")
+        .select([
+          "investor.id",
+          "investor.first_name",
+          "investor.last_name",
+          "investor.country",
+          "investor.sector",
+          "investor.is_active",
+          "investor.created_date"
+        ])
         .leftJoinAndSelect("investor.city", "city")
         .where("investor.is_deleted=false AND investor.role_id=2");
 
