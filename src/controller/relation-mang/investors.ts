@@ -204,7 +204,8 @@ export class InvestorController {
         .addSelect(
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.investorId=user.id)",
           "fund_amount"
-        );
+        )
+        .addSelect("CONCAT(city.name, ', ', city.state_code)", "city_state");
 
       if (request.query.page && request.query.limit) {
         campaign
@@ -288,7 +289,8 @@ export class InvestorController {
           "location.name",
           "location.country",
           "fund.fund_amount",
-        ]);
+        ])
+        .addSelect("CONCAT(city.name, ', ', city.state_code)", "city_state");
       if (request.query.stage && request.query.stage !== "all") {
         console.log(request.query.stage);
         campaign.andWhere("startup.stage_of_business=:stage", {
