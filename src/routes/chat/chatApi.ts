@@ -5,6 +5,7 @@ import { Request, Response } from "express";
 const validationResult = require("../../utils/validations/validation-error");
 // const roleValidation = require("../../utils/validations/roles/role-validation");
 const JWT = require("../../utils/jsonwebtoken");
+const { upload } = require("../../utils/file-upload");
 
 export const Routes = [
   {
@@ -14,6 +15,7 @@ export const Routes = [
     action: "postTextMessage",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -22,6 +24,25 @@ export const Routes = [
     action: "postStartupMessage",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "post",
+    route: "/postFile",
+    controller: ChatApiController,
+    action: "postFile",
+    validationField: "",
+    isLogin: true,
+    fileUpload: true,
+  },
+  {
+    method: "post",
+    route: "/postStartupFile",
+    controller: ChatApiController,
+    action: "postStartupFile",
+    validationField: "",
+    isLogin: true,
+    fileUpload: true,
   },
   {
     method: "get",
@@ -30,6 +51,7 @@ export const Routes = [
     action: "getMessages",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "get",
@@ -38,6 +60,7 @@ export const Routes = [
     action: "getRMusers",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "get",
@@ -46,6 +69,7 @@ export const Routes = [
     action: "getInvestorUsers",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "get",
@@ -54,6 +78,7 @@ export const Routes = [
     action: "getStartupUsers",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "get",
@@ -62,6 +87,7 @@ export const Routes = [
     action: "getNotification",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "get",
@@ -70,6 +96,7 @@ export const Routes = [
     action: "getInvestorList",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -78,6 +105,7 @@ export const Routes = [
     action: "createGroup",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -86,6 +114,7 @@ export const Routes = [
     action: "rename",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -94,6 +123,7 @@ export const Routes = [
     action: "deactivate",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -102,6 +132,7 @@ export const Routes = [
     action: "delete",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
@@ -110,6 +141,7 @@ export const Routes = [
     action: "activate",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
 ];
 
@@ -119,6 +151,11 @@ Routes.forEach((route) => {
     route.route,
     route.isLogin
       ? JWT.verify
+      : (req: Request, res: Response, next: Function) => {
+        return next();
+      },
+    route.fileUpload
+      ? upload.any()
       : (req: Request, res: Response, next: Function) => {
         return next();
       },

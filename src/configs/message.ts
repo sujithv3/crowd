@@ -169,4 +169,6 @@ module.exports = {
 
   // chat
   chat_post_success: "Chat saved successfully",
+  chat_create_success: "Chat Group created successfully",
+  chat_create_failed: "Chat Group created Failed!",
 };

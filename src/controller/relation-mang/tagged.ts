@@ -39,6 +39,7 @@ export class TaggedController {
         .createQueryBuilder("startup")
         .leftJoinAndSelect("startup.city", "city")
         .innerJoinAndSelect("startup.tagged", "tagged", "tagged.is_active=true")
+        .addSelect("CONCAT(city.name, ', ', city.state_code)", "city_state")
         .where("tagged.rm_id = :id", {
           id: user[0].id,
         });
@@ -169,6 +170,7 @@ export class TaggedController {
           "(SELECT COUNT(*) FROM funds WHERE funds.campaignId=campaign.id)",
           "fund_count"
         )
+        .addSelect("CONCAT(city.name, ', ', city.state_code)", "city_state")
         .where("tagged.rm_id = :id AND tagged.is_active=true AND campaign.is_deleted=false AND campaign.is_published=true", {
           id: user[0].id,
         });
@@ -406,8 +408,11 @@ export class TaggedController {
           "startup.company_name",
           "campaign.id",
           "campaign.files",
+          "city.name",
+          "city.state_code",
         ])
         .innerJoin("startup.tagged", "tagged")
+        .leftJoin("startup.city", "city")
         .where(
           "startup.id=:id AND tagged.rm_id = :userId AND tagged.is_active=true",
           {

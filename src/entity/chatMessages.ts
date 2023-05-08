@@ -8,14 +8,6 @@ import {
     JoinColumn
 } from "typeorm";
 
-export enum TYPE {
-    MAIL = "MAIL",
-    CONTENT = "CONTENT",
-    MAIL_TEMPLATE = "MAIL TEMPLATE",
-    HOME_PAGE = "HOME Page",
-    FOOTER = "FOOTER",
-}
-
 export enum USER_TYPE {
     STARTUP = "STARTUP",
     INVESTOR = "INVESTOR",
@@ -32,6 +24,9 @@ export enum MESSAGE_TYPE {
     IMAGE = "IMAGE",
     VIDEO = "VIDEO",
     DOCUMENT = "DOCUMENT",
+    DEACTIVATE = "DEACTIVATE",
+    ACTIVATE = "ACTIVATE",
+    DEAL_CLOSED = "DEAL_CLOSED",
 };
 
 @Entity()

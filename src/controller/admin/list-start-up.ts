@@ -52,7 +52,7 @@ export class ListStartUp {
       const startUpListRepository = await this.userRepository
         .createQueryBuilder("startUp")
         .where("startUp.is_active=true AND startUp.role_id=1")
-        .leftJoinAndSelect("startUp.city", 'city')
+        .leftJoinAndSelect("startUp.city", "city")
         .leftJoinAndSelect("startUp.campaign", "campaign")
         .loadRelationCountAndMap(
           "campaign.fund_count",
@@ -67,7 +67,8 @@ export class ListStartUp {
 
       if (request.query.status) {
         startUpListRepository.andWhere(
-          `tagged.id IS ${request.query.status === "tagged" ? "NOT NULL" : "NULL"
+          `tagged.id IS ${
+            request.query.status === "tagged" ? "NOT NULL" : "NULL"
           }`
         );
       }
@@ -88,15 +89,20 @@ export class ListStartUp {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .getManyAndCount();
 
+      const data = await startUpList[0].map((e: any) => {
+        e.city_state = e.city ? `${e.city.name}, ${e.city.state_code}` : null;
+        return e;
+      });
+
       return responseMessage.responseWithData(true, 200, msg.listStartUp, {
         total_count: startUpList[1],
-        data: startUpList[0],
+        data,
       });
     } catch (err) {
       console.log(err);
@@ -120,7 +126,7 @@ export class ListStartUp {
       const campaign = await this.campaignRepository
         .createQueryBuilder("campaign")
         .where(
-          "campaign.is_active=true AND campaign.is_published=true AND campaign.user=:id",
+          "campaign.is_active=true AND campaign.is_deleted=false AND campaign.is_published=true AND campaign.user=:id",
           {
             id: request.params.id,
           }
@@ -140,7 +146,7 @@ export class ListStartUp {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -177,12 +183,17 @@ export class ListStartUp {
       const tagged = await this.taggedRepository
         .createQueryBuilder("tagged")
 
-        .leftJoinAndSelect("tagged.RelationManager", "RelationManager")
+        .leftJoinAndSelect(
+          "tagged.RelationManager",
+          "RelationManager",
+          "RelationManager.is_active=true AND RelationManager.is_deleted=false"
+        )
+        .andWhere("RelationManager.id IS NOT NULL")
         .loadRelationCountAndMap(
           "RelationManager.rm_tagged_count",
           "RelationManager.tagged",
           "tagged",
-          (qb) => qb.andWhere("tagged.is_active=true")
+          (qb) => qb.andWhere("tagged.is_active=true ")
         )
         .orderBy("tagged.updatedDate", "DESC")
         .limit(3)
@@ -263,7 +274,7 @@ export class ListStartUp {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-            (request.query.limit ? Number(request.query.limit) : 10)
+                (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -340,7 +351,7 @@ export class ListStartUp {
           .skip(
             request.query.page
               ? Number(request.query.page) *
-              (request.query.limit ? Number(request.query.limit) : 10)
+                  (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .take(request.query.limit ? Number(request.query.limit) : 10);

@@ -102,7 +102,7 @@ export class ListInvestor {
           }
         });
         e.current_invest_count = current_invest_count;
-        e.city_name = e.city ? `${e.city.name},${e.city.state_code}` : null
+        e.city_state = e.city ? `${e.city.name}, ${e.city.state_code}` : null
         delete e.fund;
         return e;
       });

@@ -24,7 +24,7 @@ export class bankController {
         account_number,
         swift,
         bank_location,
-        bank_address,
+        bank_address = "",
         is_active = true,
         is_deleted = false,
       } = req.body;
@@ -191,14 +191,22 @@ export class bankController {
 
       const campaign = await this.campaignRepository
         .createQueryBuilder("campaign")
-        .leftJoinAndSelect('campaign.bank_location', 'bank_location')
-        .where("campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false", {
-          id: user[0].id,
-        })
+        .leftJoinAndSelect("campaign.bank_location", "bank_location")
+        .where(
+          "campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false",
+          {
+            id: user[0].id,
+          }
+        )
         .getOne();
 
       if (!campaign) {
-        return responseMessage.responseMessage(false, 404, "No Data Found");
+        return responseMessage.responseWithData(
+          true,
+          200,
+          msg.banksCampaignListSuccess,
+          null
+        );
       }
 
       //   find bank
@@ -207,12 +215,15 @@ export class bankController {
         .leftJoinAndSelect("bank.bank_location", "Location")
         .where("bank.campaign = :id", { id: campaign.id })
         .getOne();
-      console.log('campaign?.bank_location', campaign?.bank_location);
-      if (!basicCampaigns && campaign?.bank_location && campaign?.bank_location?.country) {
-
+      console.log("campaign?.bank_location", campaign?.bank_location);
+      if (
+        !basicCampaigns &&
+        campaign?.bank_location &&
+        campaign?.bank_location?.country
+      ) {
         basicCampaigns = {
-          bank_location: campaign?.bank_location
-        }
+          bank_location: campaign?.bank_location,
+        };
       }
 
       return responseMessage.responseWithData(
