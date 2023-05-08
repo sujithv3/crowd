@@ -613,13 +613,19 @@ export class ChatApiController {
                 data: {}
             };
             if (user[0] && user[0].role) {
+                console.log('user[0].role.name', user[0].role.name);
                 if (user[0].role.name === 'start-up') {
 
-                    // if(request.query.group_id && request.query.group_id>0) {
-                    //     await this.ChatGroupMemberRepository.createQueryBuilder().update().set({
-                    //         unread: 0
-                    //     }).where('group_id=:id AND id=:member_id', { id: request.query.group_id, member_id: current_member.id }).execute();
-                    // }
+                    if (request.query.group_id && request.query.group_id > 0) {
+
+                        let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                            .where('member.user_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: request.query.group_id }) // find logged in user with members
+                            .getOne();
+
+                        await this.ChatGroupMemberRepository.createQueryBuilder().update().set({
+                            unread: 0
+                        }).where('group_id=:id AND id=:member_id', { id: request.query.group_id, member_id: current_member.id }).execute();
+                    }
 
                     const unreadData = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                         .select(['member.group_id', 'member.unread'])
@@ -632,6 +638,18 @@ export class ChatApiController {
                         })
                     }
                 } else {
+
+                    if (request.query.group_id && request.query.group_id > 0) {
+
+                        let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                            .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: request.query.group_id }) // find logged in user with members
+                            .getOne();
+
+                        await this.ChatGroupMemberRepository.createQueryBuilder().update().set({
+                            unread: 0
+                        }).where('group_id=:id AND id=:member_id', { id: request.query.group_id, member_id: current_member.id }).execute();
+                    }
+
                     const unreadData = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                         .select(['member.group_id', 'member.unread'])
                         .innerJoin('member.executive', 'user')
