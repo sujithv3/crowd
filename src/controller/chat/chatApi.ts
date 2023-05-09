@@ -114,6 +114,7 @@ export class ChatApiController {
                 .where("tagged.rm_id = :id AND tagged.is_active=true AND group.is_active=true AND group.is_deleted=false", {
                     id: user[0].id,
                 })
+                .orderBy('group.updatedDate', 'DESC')
                 .getMany();
 
             console.log('members', members);
@@ -207,6 +208,7 @@ export class ChatApiController {
                 .where("members2.user_id=:id AND group.is_active=true AND group.is_deleted=false", {
                     id: user[0].id,
                 })
+                .orderBy('group.updatedDate', 'DESC')
                 .getMany();
             return responseMessage.responseWithData(
                 true,
@@ -295,6 +297,7 @@ export class ChatApiController {
                 .where("tagged.start_up_id = :id AND tagged.is_active=true AND group.is_active=true AND group.is_deleted=false", {
                     id: user[0].id,
                 })
+                .orderBy('group.updatedDate', 'DESC')
                 .getMany();
 
             console.log('members', members);
@@ -383,7 +386,7 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
-                one_message.group_id = group_id;
+                one_message.group_id = parseInt(group_id);
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
@@ -500,7 +503,7 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
-                one_message.group_id = group_id;
+                one_message.group_id = parseInt(group_id);
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
@@ -619,7 +622,7 @@ export class ChatApiController {
                 if (user[0].role.name === 'start-up' || user[0].role.name === 'invester') {
 
                     if (request.query.group_id && request.query.group_id > 0) {
-
+                        //reset count for the selected group
                         let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                             .where('member.user_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: request.query.group_id }) // find logged in user with members
                             .getOne();
@@ -632,7 +635,8 @@ export class ChatApiController {
                     const unreadData = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                         .select(['member.group_id', 'member.unread'])
                         .innerJoin('member.user', 'user')
-                        .where('user.id=:id AND member.unread>0', { id: user[0].id }).getRawMany();
+                        .innerJoin('member.group', 'group')
+                        .where('user.id=:id AND member.unread>0 AND group.is_active=true AND group.is_deleted=false', { id: user[0].id }).getRawMany();
                     if (unreadData && Array.isArray(unreadData)) {
                         unreadData.forEach((item: any) => {
                             message.unreadCount += item.member_unread;
@@ -655,7 +659,8 @@ export class ChatApiController {
                     const unreadData = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                         .select(['member.group_id', 'member.unread'])
                         .innerJoin('member.executive', 'user')
-                        .where('user.id=:id AND member.unread>0', { id: user[0].id }).getRawMany();
+                        .innerJoin('member.group', 'group')
+                        .where('user.id=:id AND member.unread>0 AND group.is_active=true AND group.is_deleted=false', { id: user[0].id }).getRawMany();
                     if (unreadData && Array.isArray(unreadData)) {
                         unreadData.forEach((item: any) => {
                             message.unreadCount += item.member_unread;
@@ -818,90 +823,98 @@ export class ChatApiController {
             const user = Jwt.decode(token);
 
             const group_id = request.body.group_id;
-            const investor_id = request.body.investor_id;
-            const campaign_id = request.body.campaign_id;
+            const investor_ids = request.body.investor_id;
+            const campaign_ids = request.body.campaign_id;
+            if (investor_ids.length === campaign_ids.length) {
+                for (let i = 0; i < investor_ids.length; i++) {
 
-            // check provided group is valid
-            const group_exist = await this.ChatGroupRepository
-                .createQueryBuilder('chat')
-                .where('id=:id AND type=:type', {
-                    id: group_id,
-                    type: GROUP_TYPE.STARTUP
-                }).getOne();
-            console.log('group_exist', group_exist);
+                    const investor_id = investor_ids[i];
+                    const campaign_id = campaign_ids[i];
+                    // console.log('investor_id', investor_id);
+                    // console.log('campaign_id', campaign_id);
 
-            const investor_exist = await this.userRepository
-                .createQueryBuilder('user')
-                .select([
-                    'id',
-                ])
-                .where({
-                    id: investor_id,
-                }).getRawOne();
+                    // check provided group is valid
+                    const group_exist = await this.ChatGroupRepository
+                        .createQueryBuilder('chat')
+                        .where('id=:id AND type=:type', {
+                            id: group_id,
+                            type: GROUP_TYPE.STARTUP
+                        }).getOne();
+                    console.log('group_exist', group_exist);
 
-            const campaign_exists = await this.CampaignsRepository
-                .createQueryBuilder('campaign')
-                .select([
-                    'campaign.id',
-                ])
-                .where({
-                    id: campaign_id,
-                }).getOne();
-            console.log('campaign_exists', campaign_exists);
+                    const investor_exist = await this.userRepository
+                        .createQueryBuilder('user')
+                        .select([
+                            'id',
+                        ])
+                        .where({
+                            id: investor_id,
+                        }).getRawOne();
 
-            if (group_exist && investor_exist && campaign_exists) {
-                // get all members
-                const all_members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
-                    .where('group_id=:id', { id: group_exist.id })
-                    .getRawMany();
-                if (all_members && all_members.length > 0) {
-                    console.log('all_members', all_members);
-                    // get investor
+                    const campaign_exists = await this.CampaignsRepository
+                        .createQueryBuilder('campaign')
+                        .select([
+                            'campaign.id',
+                        ])
+                        .where({
+                            id: campaign_id,
+                        }).getOne();
+                    console.log('campaign_exists', campaign_exists);
+
+                    if (group_exist && investor_exist && campaign_exists) {
+                        // get all members
+                        const all_members = await this.ChatGroupMemberRepository.createQueryBuilder('member')
+                            .where('group_id=:id', { id: group_exist.id })
+                            .getRawMany();
+                        if (all_members && all_members.length > 0) {
+                            console.log('all_members', all_members);
+                            // get investor
 
 
-                    // create Group Id
+                            // create Group Id
 
-                    const group = await this.ChatGroupRepository.save({
-                        type: GROUP_TYPE.GROUP,
-                        count: 2,
-                        campaign: { id: campaign_exists.id },
-                        title: ''
-                    });
-                    // copy existing group members (2 members)
-                    for (let i = 0; i < all_members.length; ++i) {
-                        const current_member = all_members[i];
-                        await this.ChatGroupMemberRepository.save({
-                            user_type: current_member.member_user_type,
-                            group: {
-                                id: group.id,
-                            },
-                            user: {
-                                id: current_member.member_user_id,
-                            },
-                            executive: {
-                                id: current_member.member_execuive_id,
+                            const group = await this.ChatGroupRepository.save({
+                                type: GROUP_TYPE.GROUP,
+                                count: 2,
+                                campaign: { id: campaign_exists.id },
+                                title: ''
+                            });
+                            // copy existing group members (2 members)
+                            for (let i = 0; i < all_members.length; ++i) {
+                                const current_member = all_members[i];
+                                await this.ChatGroupMemberRepository.save({
+                                    user_type: current_member.member_user_type,
+                                    group: {
+                                        id: group.id,
+                                    },
+                                    user: {
+                                        id: current_member.member_user_id,
+                                    },
+                                    executive: {
+                                        id: current_member.member_execuive_id,
+                                    }
+                                })
                             }
-                        })
+
+                            await this.ChatGroupMemberRepository.save({
+                                user_type: MEMBER_TYPE.INVESTOR,
+                                group: {
+                                    id: group.id,
+                                },
+                                user: {
+                                    id: investor_exist.id,
+                                }
+                            })
+
+
+                            // add new memeber investor as 3 man group
+
+                        }
+
                     }
 
-                    await this.ChatGroupMemberRepository.save({
-                        user_type: MEMBER_TYPE.INVESTOR,
-                        group: {
-                            id: group.id,
-                        },
-                        user: {
-                            id: investor_exist.id,
-                        }
-                    })
-
-
-                    // add new memeber investor as 3 man group
-
                 }
-
             }
-
-
 
 
             return responseMessage.responseWithData(
@@ -1158,7 +1171,7 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
-                one_message.group_id = group_id;
+                one_message.group_id = parseInt(group_id);
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
@@ -1262,7 +1275,7 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
-                one_message.group_id = group_id;
+                one_message.group_id = parseInt(group_id);
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
@@ -1371,7 +1384,7 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
-                one_message.group_id = group_id;
+                one_message.group_id = parseInt(group_id);
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
@@ -1474,7 +1487,7 @@ export class ChatApiController {
                     .leftJoinAndSelect('member.executive', 'executive')
                     .leftJoinAndSelect('member.user', 'user')
                     .getOne();
-                one_message.group_id = group_id;
+                one_message.group_id = parseInt(group_id);
                 one_message.type = 'chat';
 
                 for (let i = 0; i < members.length; i++) {
