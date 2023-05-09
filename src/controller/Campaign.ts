@@ -205,16 +205,17 @@ export class CampaignController {
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
-         
+         AND campaign.status=:status
          `,
           {
+            status: CAMPAIGN_STATUS.Approved,
             published: true,
             is_deleted: false,
             is_active: true,
           }
         )
-        .skip(0)
-        .take(20)
+        .offset(0)
+        .limit(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .leftJoinAndSelect("campaign.location", "location")
@@ -227,16 +228,17 @@ export class CampaignController {
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
-         
+         AND campaign.status=:status
          `,
           {
+            status: CAMPAIGN_STATUS.Approved,
             published: true,
             is_deleted: false,
             is_active: true,
           }
         )
-        .skip(0)
-        .take(20)
+        .offset(0)
+        .limit(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .leftJoinAndSelect("campaign.location", "location")
@@ -249,16 +251,17 @@ export class CampaignController {
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
-         
+         AND campaign.status=:status
          `,
           {
+            status: CAMPAIGN_STATUS.Approved,
             published: true,
             is_deleted: false,
             is_active: true,
           }
         )
-        .skip(0)
-        .take(20)
+        .offset(0)
+        .limit(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .leftJoinAndSelect("campaign.location", "location")
@@ -271,16 +274,17 @@ export class CampaignController {
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
          AND campaign.is_active=:is_active
-         
+         AND campaign.status=:status
          `,
           {
+            status: CAMPAIGN_STATUS.Approved,
             published: true,
             is_deleted: false,
             is_active: true,
           }
         )
-        .skip(0)
-        .take(20)
+        .offset(0)
+        .limit(20)
         .leftJoinAndSelect("campaign.category", "category")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .leftJoinAndSelect("campaign.location", "location")
