@@ -48,14 +48,13 @@ export class SeedController {
 
       const data = [
         {
-          name: "TECH & INNOVATION",
+          name: "Tech & Innovation",
           children: [
             { name: "Audio" },
             { name: "Camera Gear" },
             { name: "Education" },
             { name: "Energy & Green Tech" },
             { name: "Fashion & Wearables" },
-            { name: "Food & Beverages" },
             { name: "Health & Fitness" },
             { name: "Home" },
             { name: "Phones & Accessories" },
@@ -65,7 +64,7 @@ export class SeedController {
           ]
         },
         {
-          name: "CREATIVE WORKS",
+          name: "Creative Works",
           children: [
             { name: "Art" },
             { name: "Comics" },
@@ -81,7 +80,7 @@ export class SeedController {
           ]
         },
         {
-          name: "COMMUNITY PROJECTS",
+          name: "Community Projects",
           children: [
             { name: "Culture" },
             { name: "Environment" },
@@ -92,11 +91,11 @@ export class SeedController {
         },
 
         {
-          name: "Information and cultural industries",
+          name: "Information and Cultural industries",
           children: [
-            { name: "Newspaper, periodical, book and directory publishers" },
-            { name: "Software publishers" },
-            { name: "Motion picture and sound recording industries" },
+            { name: "Newspaper, Periodical book and directory publishers" },
+            { name: "Software Publishers" },
+            { name: "Motion picture and Sound recording industries" },
             { name: "Broadcasting (except Internet)" },
             { name: "Telecommunications" },
             { name: "Data processing, hosting, and related services" },
@@ -109,7 +108,7 @@ export class SeedController {
           children: [
             { name: "AI" },
             { name: "Software " },
-            { name: "apparel" },
+            { name: "Apparel" },
             { name: "Care" },
             { name: "Fintech" },
           ]
@@ -118,17 +117,17 @@ export class SeedController {
           name: "Technology",
           children: [
             { name: "Application Software" },
-            { name: "Consumer Internet," },
+            { name: "Consumer Internet" },
             { name: "Mobile Tech" },
             { name: "Fintech" },
-            { name: "Edu tech" },
-            { name: "Health tech" },
+            { name: "Edu Tech" },
+            { name: "Health Tech" },
             { name: "IOT" },
             { name: "Big data" },
             { name: "Enterprise application" },
             { name: "Cyber Security" },
             { name: "Automotive Industry" },
-            { name: "Consumer technology" },
+            { name: "Consumer Technology" },
           ]
         },
         {
@@ -145,8 +144,8 @@ export class SeedController {
         {
           name: "E-commerce",
           children: [
-            { name: "Retail tech" },
-            { name: "Market place" },
+            { name: "Retail Tech" },
+            { name: "Market Place" },
             { name: "SaaS" },
             { name: "Media" },
             { name: "Life Style" },
@@ -159,14 +158,14 @@ export class SeedController {
             { name: "Food, Automobile" },
             { name: "Juice Factory" },
             { name: "Bear Industry" },
-            { name: "Food tech" },
-            { name: "Hotels and restrauant" },
+            { name: "Food Tech" },
+            { name: "Hotels and Restaurants" },
           ]
         },
         {
           name: "Travel & Tourism",
           children: [
-            { name: "Travel tech" },
+            { name: "Travel Tech" },
             { name: "Hospitality" },
             { name: "Logistics" },
             { name: "Resort & Hotel" },
