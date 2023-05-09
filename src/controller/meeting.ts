@@ -88,11 +88,29 @@ export class MeetingController {
           // console.log(getRmCalendlyUrl.data.resource.scheduling_url);
         }
       }
-      console.log(campaignData);
+
+      // get meeting details
+
+      const MeetingExist = await this.MeetingRepository.createQueryBuilder(
+        "meeting"
+      )
+        .where(
+          "meeting.user_id=:user_id AND meeting.rm_id=:rm_id AND meeting.campaign_id=:campaign_id AND meeting.meeting_date > :meeting_date",
+          {
+            user_id: user[0].id,
+            rm_id: campaignData.rm_id,
+            campaign_id: campaignData.campaign_id,
+            meeting_date: new Date(),
+          }
+        )
+        .getOne();
+
+      console.log(Meeting);
 
       const data = {
         meetingData,
         campaignData,
+        MeetingExist,
       };
 
       return responseMessage.responseWithData(
@@ -304,6 +322,8 @@ export class MeetingController {
           "meeting.user_id=:user_id AND EXTRACT(month FROM meeting.meeting_date) = :month OR EXTRACT(month FROM meeting.meeting_date) = :next_month",
           { user_id: user[0].id, month: month, next_month: month + 1 }
         )
+        .leftJoinAndSelect("meeting.campaign", "campaign")
+        .select(["meeting", "campaign.id", "campaign.title"])
         .getMany();
       // console.log();
       return responseMessage.responseWithData(

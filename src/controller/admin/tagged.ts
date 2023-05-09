@@ -37,12 +37,14 @@ export class TaggedRM {
         // find group exists
         let group = await this.ChatGroupRepository.createQueryBuilder('group')
           .innerJoin('group.members', 'startup', 'startup.user_id=:startup_id', { startup_id: start_up[i] }) // find startup with members
-          .innerJoin('group.members', 'user', 'user.execuive_id=:user_id', { user_id: start_up[i] }) // find investor with members
+          .innerJoin('group.members', 'user', 'user.execuive_id=:user_id', { user_id: rm_id }) // find investor with members
           .where('group.type=:type', { type: GROUP_TYPE.STARTUP }).getOne();
+
         console.log('group_member', group);
 
         //if not create a group
         if (!group) { // create group
+          console.log('create group');
           // create group
           group = await this.ChatGroupRepository.save({
             type: GROUP_TYPE.STARTUP,
@@ -63,15 +65,16 @@ export class TaggedRM {
             executive: { id: rm_id },
             group: { id: group.id }
           });
-        }
-
-        if (group && group.id > 0) { // post message
+        } else {
+          console.log('update group');
           // update group to active
-          await this.ChatGroupRepository.createQueryBuilder('group').
-            update().
-            set({ is_active: true })
-            .where('id="id', { id: group.id })
-
+          let group = await AppDataSource.query('UPDATE chat_group AS a INNER JOIN chat_group_member AS b ON a.id=b.group_id INNER JOIN chat_group_member AS c ON a.id=c.group_id SET a.is_active=true WHERE b.user_id=? AND c.execuive_id=?', [start_up[i], rm_id
+          ]);
+          // await this.ChatGroupRepository.createQueryBuilder('group')
+          //   .innerJoin('group.members', 'startup', 'startup.user_id=:startup_id', { startup_id: start_up[i] }) // find startup with members
+          //   .innerJoin('group.members', 'user', 'user.execuive_id=:user_id', { user_id: rm_id }) // find investor with members
+          //   .update()
+          //   .set({ is_active: true }).execute();
         }
 
         this.taggedRepository.save({
@@ -100,22 +103,20 @@ export class TaggedRM {
       const { start_up } = request.body;
 
       for (let i = 0; i < start_up.length; i++) {
-        // disable groups
 
-        let group = await this.ChatGroupRepository.createQueryBuilder('group')
-          .innerJoin('group.members', 'startup', 'startup.user_id=:startup_id', { startup_id: start_up[i] }) // find startup with members
-          .innerJoin('group.members', 'user', 'user.execuive_id=:user_id', { user_id: start_up[i] }) // find investor with members
-          .where('group.type=:type', { type: GROUP_TYPE.STARTUP }).getOne();
+        // disable all groups
+        let group = await AppDataSource.query('UPDATE chat_group AS a INNER JOIN chat_group_member AS b ON a.id=b.group_id SET a.is_active=false WHERE b.user_id=?', [start_up[i]
+        ]);
         console.log('group_member', group);
 
-        if (group && group.id > 0) { // post message
-          // update group to active
-          await this.ChatGroupRepository.createQueryBuilder('group').
-            update().
-            set({ is_active: false })
-            .where('id="id', { id: group.id })
+        // if (group && group.id > 0) { // post message
+        //   // update group to active
+        //   await this.ChatGroupRepository.createQueryBuilder('group').
+        //     update().
+        //     set({ is_active: false })
+        //     .where('id="id', { id: group.id })
 
-        }
+        // }
 
         this.taggedRepository
           .createQueryBuilder()

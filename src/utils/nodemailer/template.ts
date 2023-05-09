@@ -3,7 +3,12 @@ const Handlebar = require("handlebars");
 import { Cms } from "../../entity/cms";
 import { AppDataSource } from "../../data-source";
 
-const emailTemplate = async (email: string, content_template: string, payload: any, mail_template: string = 'mail_template1') => {
+const emailTemplate = async (
+  email: string,
+  content_template: string,
+  payload: any,
+  mail_template: string = "mail_template1"
+) => {
   try {
     const cmsRepository = AppDataSource.getRepository(Cms);
     // const source = emailFs.readFileSync(
@@ -13,9 +18,9 @@ const emailTemplate = async (email: string, content_template: string, payload: a
 
     const mailTemplate = await cmsRepository
       .createQueryBuilder()
-      .select('content')
+      .select("content")
       .where("tag=:template AND type='MAIL TEMPLATE'", {
-        template: mail_template
+        template: mail_template,
       })
       .getRawOne();
 
@@ -25,9 +30,9 @@ const emailTemplate = async (email: string, content_template: string, payload: a
 
     const contentTemplate = await cmsRepository
       .createQueryBuilder()
-      .select(['content', 'title'])
+      .select(["content", "title"])
       .where("tag=:template AND type='MAIL'", {
-        template: content_template
+        template: content_template,
       })
       .getRawOne();
     const subject = contentTemplate.title;
@@ -38,10 +43,7 @@ const emailTemplate = async (email: string, content_template: string, payload: a
     //   template_content = '<div style="white-space: break-spaces;">' + template_content + '</div>';
     // }
 
-
     const htmlTemplate = template({ content: template_content, html: true });
-
-
 
     // console.log("HTML TEMPLATES", htmlTemplate);
 
@@ -72,6 +74,7 @@ const emailTemplate = async (email: string, content_template: string, payload: a
       subject: subject,
       html: mailContent,
     };
+    console.log("email sent success");
     let result = await transporter.sendMail(option);
   } catch (error) {
     console.log(error);

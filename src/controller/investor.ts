@@ -407,6 +407,7 @@ export class investorController {
       const user = Jwt.decode(token);
       const campaignQueryBuilder = this.campaignRepository
         .createQueryBuilder("campaign")
+        .leftJoin("campaign.user", "user")
         .where(
           `campaign.is_published=:published
          AND campaign.is_deleted=:is_deleted
@@ -423,7 +424,7 @@ export class investorController {
 
       if (request.query.search) {
         campaignQueryBuilder.andWhere(
-          ` (campaign.title LIKE :search OR campaign.description LIKE :search OR campaign.tag_line LIKE :search OR campaign.tag LIKE :search)`,
+          ` (campaign.title LIKE :search OR campaign.description LIKE :search OR campaign.tag_line LIKE :search OR campaign.tag LIKE :search OR user.company_name LIKE :search)`,
           {
             search: "%" + request.query.search + "%",
           }
@@ -483,7 +484,6 @@ export class investorController {
         .take(request.query.limit ? Number(request.query.limit) : 10)
         .leftJoinAndSelect("campaign.tax_location", "tax_location")
         .leftJoinAndSelect("campaign.category", "Category")
-        .leftJoin("campaign.user", "user")
         .leftJoinAndSelect("campaign.subcategory", "subcategory")
         .leftJoinAndSelect(
           "campaign.myDeals",
