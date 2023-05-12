@@ -125,7 +125,7 @@ module.exports = {
 
   // meeting
   createMeeting: "Meeting Request success",
-  reScheduleMeeting: "Meeting Re-schedule Request success",
+  reScheduleMeeting: "Meeting Request success",
   meetingPastDate: "Meeting Date cannot be past",
   meetingEndTime: "End Time Should be greater than start time",
   createMeetingFail: "Meeting Request failed",
