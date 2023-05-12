@@ -56,6 +56,9 @@ export class ChatGroupMember {
     })
     unread: number;
 
+    @Column("boolean", { default: true })
+    is_active: boolean = true;
+
     @CreateDateColumn({
         type: "timestamp",
         default: () => "CURRENT_TIMESTAMP(6)",

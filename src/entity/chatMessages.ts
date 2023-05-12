@@ -73,6 +73,9 @@ export class ChatMessage {
     })
     createdDate: Date;
 
+    @Column("boolean", { default: false })
+    is_deleted: boolean = false;
+
     @UpdateDateColumn({
         type: "timestamp",
         default: () => "CURRENT_TIMESTAMP(6)",
