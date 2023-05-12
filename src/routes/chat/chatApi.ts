@@ -109,6 +109,15 @@ export const Routes = [
   },
   {
     method: "post",
+    route: "/changeInvestor",
+    controller: ChatApiController,
+    action: "changeInvestor",
+    validationField: "",
+    isLogin: true,
+    fileUpload: false,
+  },
+  {
+    method: "post",
     route: "/rename",
     controller: ChatApiController,
     action: "rename",

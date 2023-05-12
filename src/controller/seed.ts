@@ -48,134 +48,131 @@ export class SeedController {
 
       const data = [
         {
+          name: "Tech & Innovation",
+          children: [
+            { name: "Audio" },
+            { name: "Camera Gear" },
+            { name: "Education" },
+            { name: "Energy & Green Tech" },
+            { name: "Fashion & Wearables" },
+            { name: "Health & Fitness" },
+            { name: "Home" },
+            { name: "Phones & Accessories" },
+            { name: "Productivity" },
+            { name: "Transportation" },
+            { name: "Travel & Outdoors" },
+          ]
+        },
+        {
+          name: "Creative Works",
+          children: [
+            { name: "Art" },
+            { name: "Comics" },
+            { name: "Dance & Theater" },
+            { name: "Film" },
+            { name: "Music" },
+            { name: "Photography" },
+            { name: "Podcasts, Blogs & Vlogs" },
+            { name: "Tabletop Games" },
+            { name: "Video Games" },
+            { name: "Web Series & TV Shows" },
+            { name: "Writing & Publishing" },
+          ]
+        },
+        {
+          name: "Community Projects",
+          children: [
+            { name: "Culture" },
+            { name: "Environment" },
+            { name: "Human Rights" },
+            { name: "Local Businesses" },
+            { name: "Wellness" },
+          ]
+        },
+
+        {
+          name: "Information and Cultural industries",
+          children: [
+            { name: "Newspaper, Periodical book and directory publishers" },
+            { name: "Software Publishers" },
+            { name: "Motion picture and Sound recording industries" },
+            { name: "Broadcasting (except Internet)" },
+            { name: "Telecommunications" },
+            { name: "Data processing, hosting, and related services" },
+            { name: "Other information services" },
+
+          ]
+        },
+        {
+          name: "Tech and Non Tech",
+          children: [
+            { name: "AI" },
+            { name: "Software " },
+            { name: "Apparel" },
+            { name: "Care" },
+            { name: "Fintech" },
+          ]
+        },
+        {
           name: "Technology",
           children: [
-            { name: "IT (Information Technology)" },
-            { name: "AI (Artificial Intelligence)" },
-            { name: "IoT (Internet of Thigs)" },
-            { name: "BlockChain" },
-            { name: "Cybersecurity" },
-            { name: "VR (Virtual Reality)" },
-            { name: "Robotics" },
-            { name: "Cloud Computing" },
-            { name: "Bio Technology" },
+            { name: "Application Software" },
+            { name: "Consumer Internet" },
+            { name: "Mobile Tech" },
+            { name: "Fintech" },
+            { name: "Edu Tech" },
+            { name: "Health Tech" },
+            { name: "IOT" },
+            { name: "Big data" },
+            { name: "Enterprise application" },
+            { name: "Cyber Security" },
+            { name: "Automotive Industry" },
+            { name: "Consumer Technology" },
           ]
         },
         {
-          name: "Consumer",
+          name: "Software",
           children: [
-            { name: "E-commerce" },
-            { name: "Food and Beverage" },
-            { name: "Fashion and Apparel" },
-            { name: "Personal Care and Beauty" },
-            { name: "Home Goods and Furniture" },
-            { name: "Transportation and Mobility" },
-            { name: "Education and Training" },
-            { name: "Entertainment and Media" },
+            { name: "Consumer and Enterprise Software" },
+            { name: "Supply chain software, SaaS" },
+            { name: "Augmented reality" },
+            { name: "AR" },
+            { name: "VR" },
+            { name: "Mobility" },
           ]
         },
         {
-          name: "Service",
+          name: "E-commerce",
           children: [
-            { name: "Consulting" },
-            { name: "Marketing" },
-            { name: "Financial Services" },
-            { name: "Legal Services" },
-            { name: "Human Resources" },
-            { name: "Translation and Localization" },
-            { name: "Real Estate" },
-            { name: "Health and Wellness" },
-            { name: "Home Services" },
-            { name: "Travel and Hospitality" },
+            { name: "Retail Tech" },
+            { name: "Market Place" },
+            { name: "SaaS" },
+            { name: "Media" },
+            { name: "Life Style" },
+            { name: "Networking" },
           ]
         },
         {
-          name: "Social Enterprise",
+          name: "Food & Baverages",
           children: [
-            { name: "Environmental Sustainability" },
-            { name: "Education" },
-            { name: "Healthcare" },
-            { name: "Poverty Alleviation" },
-            { name: "Fair Trade" },
-            { name: "Community Development" },
-            { name: "Arts and Culture" },
-            { name: "Social Innovation" },
+            { name: "Food, Automobile" },
+            { name: "Juice Factory" },
+            { name: "Bear Industry" },
+            { name: "Food Tech" },
+            { name: "Hotels and Restaurants" },
           ]
         },
         {
-          name: "Lifestyle",
+          name: "Travel & Tourism",
           children: [
-            { name: "Health and Wellness" },
-            { name: "Food and Nutrition" },
-            { name: "Beauty and Personal Care" },
-            { name: "Fashion and Apparel" },
-            { name: "Travel and Leisure" },
-            { name: "Home and Decor" },
-            { name: "Pet Care" },
-            { name: "Personal Development" },
-            { name: "Green Living" },
-            { name: "Social Networking" },
+            { name: "Travel Tech" },
+            { name: "Hospitality" },
+            { name: "Logistics" },
+            { name: "Resort & Hotel" },
+            { name: "Automobile" },
+            { name: "Aeronautics" },
           ]
         },
-        {
-          name: "BioTech",
-          children: [
-            { name: "Pharmaceutical" },
-            { name: "Medical Devices" },
-            { name: "Biotech Services" },
-            { name: "Agricultural Biotech" },
-            { name: "Synthetic Biology" },
-            { name: "Biomedical Engineering" },
-            { name: "Diagnostics and Personalized Medicine" },
-            { name: "Digital Health" },
-            { name: "Biodefense and Biosecurity" },
-            { name: "Neuroscience" },
-          ]
-        },
-        {
-          name: "Healthcare",
-          children: [
-            { name: "Hospitals and Health Systems" },
-            { name: "Health Insurance" },
-            { name: "Medical Devices" },
-            { name: "Pharmaceuticals" },
-            { name: "Telemedicine" },
-            { name: "Healthtech" },
-            { name: "Home Healthcare" },
-            { name: "Health and Wellness" },
-            { name: "Behavioral Health" },
-            { name: "Long-Term Care" },
-          ]
-        },
-        {
-          name: "Manufaturing",
-          children: [
-            { name: "3D Printing/Additive Manufacturing" },
-            { name: "Robotics and Automation" },
-            { name: "Advanced Materials:" },
-            { name: "Clean Technology" },
-            { name: "Consumer Goods" },
-            { name: "Food and Beverage" },
-            { name: "Medical Devices" },
-            { name: "Electronics and Hardware" },
-            { name: "Transportation" },
-            { name: "Industrial Manufacturing" },
-          ]
-        },
-        {
-          name: "Fintech",
-          children: [
-            { name: "Payments and Transfers" },
-            { name: "Online Lending" },
-            { name: "Digital Banks" },
-            { name: "Personal Finance Managemen" },
-            { name: "Cryptocurrencies and Blockchain" },
-            { name: "Insurance Technology" },
-            { name: "Wealth Management" },
-            { name: "Financial Infrastructure" },
-            { name: "Regulatory Technology" },
-          ]
-        }
       ];
 
       for (let i = 0; i < data.length; i++) {
