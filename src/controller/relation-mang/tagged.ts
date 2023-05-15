@@ -294,6 +294,7 @@ export class TaggedController {
         .select([
           "startup.first_name",
           "startup.last_name",
+          "startup.user_code",
           "startup.company_name",
           "startup.stage_of_business",
           "startup.sector",
@@ -402,6 +403,7 @@ export class TaggedController {
           "startup.last_name",
           "startup.city",
           "startup.sector",
+          "startup.user_code",
           "startup.stage_of_business",
           "startup.country",
           "startup.created_date",
@@ -421,8 +423,8 @@ export class TaggedController {
           }
         )
         .leftJoin("startup.campaign", "campaign")
-        .leftJoin("campaign.fund", "fund")
-        .leftJoin("fund.investor", "investor")
+        // .leftJoin("campaign.fund", "fund")
+        // .leftJoin("fund.investor", "investor")
         .getOne();
 
       const investor = await this.userRepository
@@ -434,6 +436,7 @@ export class TaggedController {
           // "fund.fund_amount",
           // "fund.investor",
           "investor.id",
+          "investor.user_code",
           "investor.first_name",
           "investor.last_name",
           "investor.city",
@@ -441,8 +444,10 @@ export class TaggedController {
           "investor.is_active",
           "investor.created_date",
         ])
-        .innerJoin("investor.fund", "fund")
-        .innerJoin("fund.campaign", "campaign")
+        // .innerJoin("investor.fund", "fund")
+        // .innerJoin("fund.campaign", "campaign")
+        .innerJoin("investor.interested", "interested")
+        .innerJoin("interested.campaign", "campaign")
         .innerJoin("campaign.user", "campaignowner")
         .innerJoin("campaignowner.tagged", "tagged")
         .where(
