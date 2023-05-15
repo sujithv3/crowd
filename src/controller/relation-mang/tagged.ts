@@ -319,7 +319,7 @@ export class TaggedController {
         )
 
         .where(
-          "campaign.id = :id AND tagged.rm_id = :userId AND tagged.is_active=true",
+          "campaign.id = :id AND tagged.rm_id = :userId AND tagged.is_active=true AND campaign.is_deleted=false AND campaign.is_published=true",
           {
             id: id,
             userId: user[0].id,
@@ -422,7 +422,7 @@ export class TaggedController {
             userId: user[0].id,
           }
         )
-        .leftJoin("startup.campaign", "campaign")
+        .leftJoin("startup.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true")
         // .leftJoin("campaign.fund", "fund")
         // .leftJoin("fund.investor", "investor")
         .getOne();
@@ -447,7 +447,7 @@ export class TaggedController {
         // .innerJoin("investor.fund", "fund")
         // .innerJoin("fund.campaign", "campaign")
         .innerJoin("investor.interested", "interested")
-        .innerJoin("interested.campaign", "campaign")
+        .innerJoin("interested.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true")
         .innerJoin("campaign.user", "campaignowner")
         .innerJoin("campaignowner.tagged", "tagged")
         .where(
