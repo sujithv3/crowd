@@ -38,6 +38,7 @@ const SalesList = require("./routes/sales/salesList");
 const SalesTagged = require("./routes/sales/tagged");
 const SalesStartup = require("./routes/sales/startUp");
 const SalesStartupTag = require("./routes/relation-mang/salesAssignTag");
+const HomePageEditTemplates = require('./routes/homePageTemplates')
 const payment = require("./routes/payment");
 const data = require("./routes/payment");
 const chat = require("./routes/chat/chatApi");
@@ -105,6 +106,8 @@ app.use("/api/sales", Sales);
 app.use("/api/sales-list", SalesList);
 app.use("/api/sales/tag", SalesTagged);
 app.use("/api/sales/startup", SalesStartup);
+app.use("/api/sales/startup-tag",SalesStartupTag);
+app.use("/api/homepage",HomePageEditTemplates);
 app.use("/api/sales/startup-tag", SalesStartupTag);
 app.use("/api/chat", chat);
 app.use("/api/chat-hooks", chatHook);
