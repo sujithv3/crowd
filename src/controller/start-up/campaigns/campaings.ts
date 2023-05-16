@@ -133,7 +133,8 @@ export class CampaignController {
         .createQueryBuilder("campaign")
         .select([
           'campaign.id',
-          'campaign.title'
+          'campaign.title',
+          'campaign.goal_amount',
         ])
         .where('id=:id AND user_id=:userId', {
           id: id,
