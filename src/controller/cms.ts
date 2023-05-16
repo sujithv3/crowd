@@ -32,6 +32,28 @@ export class cmsController {
     }
   }
 
+  async getOne(request: Request, response: Response, next: NextFunction) {
+    try {
+      const HomePageData = await this.cmsRepository
+        .createQueryBuilder("cms")
+        .where('id=:id', { id: request.params.id })
+        .getRawOne();
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.homepage_templates_list_success,
+        HomePageData
+      );
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.homepage_templates_list_failed,
+        err
+      );
+    }
+  }
+
   async save(request: Request, response: Response, next: NextFunction) {
     try {
 
