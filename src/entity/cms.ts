@@ -27,6 +27,13 @@ export class Cms {
   title: string;
 
   @Column({
+    length: 150,
+    type: "varchar",
+    default: null,
+  })
+  page: string;
+
+  @Column({
     length: 70,
     type: "varchar",
     default: null,

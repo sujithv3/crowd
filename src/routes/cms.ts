@@ -1,4 +1,4 @@
-const { homePageTemplateController } = require("../controller/homePageTemplate");
+const { cmsController } = require("../controller/cms");
 const express = require("express");
 const app = express();
 import { Request, Response } from "express";
@@ -9,9 +9,25 @@ const JWT = require("../utils/jsonwebtoken");
 export const Routes = [
   {
     method: "get",
-    route: "/getHomePageTemplate",
-    controller: homePageTemplateController,
+    route: "/list",
+    controller: cmsController,
     action: "all",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "get",
+    route: "/get/:id",
+    controller: cmsController,
+    action: "getOne",
+    validationField: "",
+    isLogin: true,
+  },
+  {
+    method: "post",
+    route: "/save/:id",
+    controller: cmsController,
+    action: "save",
     validationField: "",
     isLogin: true,
   },
@@ -24,13 +40,13 @@ Routes.forEach((route) => {
     route.isLogin
       ? JWT.verify
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     route.validationField
       ? validationResult(route.validationField)
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     (req: Request, res: Response, next: Function) => {
       const result = new (route.controller as any)()[route.action](
         req,
@@ -38,7 +54,7 @@ Routes.forEach((route) => {
         next
       );
       if (result instanceof Promise) {
-        result.then((result) =>  
+        result.then((result) =>
           result !== null && result !== undefined ? res.send(result) : undefined
         );
       } else if (result !== null && result !== undefined) {
