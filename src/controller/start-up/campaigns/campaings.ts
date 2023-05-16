@@ -1,11 +1,13 @@
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
+import { Funds } from "../../../entity/funds";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
 export class CampaignController {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
+  private fundsRepository = AppDataSource.getRepository(Funds);
 
   //   list user bashed campaign
   async all(request: Request, response: Response, next: NextFunction) {
@@ -50,7 +52,10 @@ export class CampaignController {
             is_active: true,
           }
         )
-        .leftJoinAndSelect("campaign.tax_location", "tax_location")
+        .addSelect(
+          "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.campaignId=campaign.id)",
+          "fund_amount"
+        )
         .leftJoinAndSelect("campaign.bank_location", "bank_location")
         .leftJoinAndSelect("campaign.location", "location")
         .leftJoinAndSelect("campaign.category", "Category")
@@ -71,7 +76,7 @@ export class CampaignController {
         .offset(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -83,6 +88,105 @@ export class CampaignController {
         200,
         msg.campaignListSuccess,
         { total_count, data }
+      );
+    } catch (err) {
+      console.log("err", err);
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.campaignListFailed,
+        err
+      );
+    }
+  }
+
+  async getInvestors(request: Request, response: Response, next: NextFunction) {
+    try {
+      // find user
+      let token: any;
+      if (
+        typeof request.cookies.token === "undefined" ||
+        request.cookies.token === null
+      ) {
+        if (!request.headers.authorization) {
+          return res
+            .status(412)
+            .send(
+              responseMessage.responseMessage(
+                false,
+                402,
+                msg.user_login_required
+              )
+            );
+        } else {
+          token = request.headers.authorization.slice(7);
+        }
+      } else {
+        token = request.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
+      const id = request.params.id;
+      console.log(user[0].id);
+      // check if campaign exists for given user id
+      const campaignExists = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .select([
+          'campaign.id',
+          'campaign.title'
+        ])
+        .where('id=:id AND user_id=:userId', {
+          id: id,
+          userId: user[0].id,
+        }).getOne();
+
+      if (!campaignExists) {
+        return responseMessage.responseWithData(
+          false,
+          400,
+          msg.campaignListFailed,
+        );
+      }
+      const dataQuery = this.fundsRepository
+        .createQueryBuilder("fund")
+        .addSelect([
+          'investor.first_name',
+          'investor.last_name',
+          'investor.profile',
+          'investor.country',
+        ])
+        .leftJoin("fund.investor", "investor")
+        .where('fund.campaignId=:id', {
+          id: campaignExists.id
+        })
+
+      if (request.query.search) {
+        dataQuery.andWhere(
+          "(investor.first_name LIKE :q OR investor.last_name LIKE :q)",
+          {
+            q: "%" + request.query.search + "%",
+          }
+        );
+      }
+
+      const total_count = await dataQuery.getCount();
+
+      dataQuery
+        .offset(
+          request.query.page
+            ? Number(request.query.page) *
+            (request.query.limit ? Number(request.query.limit) : 10)
+            : 0
+        )
+        .limit(request.query.limit ? Number(request.query.limit) : 10);
+
+      const data = await dataQuery.getRawMany();
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.campaignListSuccess,
+        { campaign: campaignExists, total_count, data }
       );
     } catch (err) {
       console.log("err", err);

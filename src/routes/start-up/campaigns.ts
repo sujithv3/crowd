@@ -26,6 +26,14 @@ export const Routes = [
     isLogin: false,
   },
   {
+    method: "get",
+    route: "/investors/:id",
+    controller: CampaignController,
+    action: "getInvestors",
+    validationField: "",
+    isLogin: false,
+  },
+  {
     method: "delete",
     route: "/delete/:id",
     controller: CampaignController,
@@ -42,13 +50,13 @@ Routes.forEach((route) => {
     route.isLogin
       ? JWT.verify
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     route.validationField
       ? validationResult(route.validationField)
       : (req: Request, res: Response, next: Function) => {
-          return next();
-        },
+        return next();
+      },
     (req: Request, res: Response, next: Function) => {
       const result = new (route.controller as any)()[route.action](
         req,

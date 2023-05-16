@@ -27,6 +27,13 @@ export class Cms {
   title: string;
 
   @Column({
+    length: 150,
+    type: "varchar",
+    default: null,
+  })
+  page: string;
+
+  @Column({
     length: 70,
     type: "varchar",
     default: null,
@@ -39,7 +46,7 @@ export class Cms {
     default: null,
     nullable: true,
   })
-  params: Array<{ name: string; content: string }>;
+  params: Array<any>;
 
   @Column({
     type: "text",
