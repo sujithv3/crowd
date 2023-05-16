@@ -147,6 +147,16 @@ export class CampaignController {
           msg.campaignListFailed,
         );
       }
+
+      const sumAMount = await this.fundsRepository
+        .createQueryBuilder("fund")
+        .select(['SUM(fund.fund_amount) as total'])
+        .leftJoin("fund.investor", "investor")
+        .where('fund.campaignId=:id', {
+          id: campaignExists.id
+        }).groupBy('fund.campaignId').getRawOne();
+
+
       const dataQuery = this.fundsRepository
         .createQueryBuilder("fund")
         .addSelect([
@@ -186,7 +196,7 @@ export class CampaignController {
         true,
         200,
         msg.campaignListSuccess,
-        { campaign: campaignExists, total_count, data }
+        { campaign: campaignExists, total_count, total_fund: sumAMount?.total || 0, data }
       );
     } catch (err) {
       console.log("err", err);
