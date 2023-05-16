@@ -29,6 +29,7 @@ import { ChatGroup } from "./entity/chatGroup";
 import { ChatGroupMember } from "./entity/chatGroupMembers";
 import { ChatMessage } from "./entity/chatMessages";
 import { ChatOnline } from "./entity/chatOnline";
+import { botChat } from "./entity/botChat";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -70,6 +71,7 @@ export const AppDataSource = new DataSource({
     ChatGroupMember,
     ChatMessage,
     ChatOnline,
+    botChat
   ],
   migrations: ["migration/*.ts"],
   subscribers: [],
