@@ -6,6 +6,8 @@ const validationResult = require("../utils/validations/validation-error");
 // const categoryCreateValidation = require("../utils/validations/category/create");
 // const categoryUpdateValidationEdit = require("../utils/validations/category/update");
 const JWT = require("../utils/jsonwebtoken");
+const { upload } = require("../utils/file-upload");
+
 export const Routes = [
   {
     method: "get",
@@ -14,6 +16,7 @@ export const Routes = [
     action: "all",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "get",
@@ -22,14 +25,25 @@ export const Routes = [
     action: "getOne",
     validationField: "",
     isLogin: true,
+    fileUpload: false,
   },
   {
     method: "post",
-    route: "/save/:id",
+    route: "/save",
     controller: cmsController,
     action: "save",
     validationField: "",
     isLogin: true,
+    fileUpload: true
+  },
+  {
+    method: "post",
+    route: "/getBytag",
+    controller: cmsController,
+    action: "getByTag",
+    validationField: "",
+    isLogin: false,
+    fileUpload: false
   },
 ];
 
@@ -39,6 +53,11 @@ Routes.forEach((route) => {
     route.route,
     route.isLogin
       ? JWT.verify
+      : (req: Request, res: Response, next: Function) => {
+        return next();
+      },
+    route.fileUpload
+      ? upload.any()
       : (req: Request, res: Response, next: Function) => {
         return next();
       },

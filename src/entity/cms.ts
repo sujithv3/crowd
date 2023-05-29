@@ -10,8 +10,7 @@ export enum TYPE {
   MAIL = "MAIL",
   CONTENT = "CONTENT",
   MAIL_TEMPLATE = "MAIL TEMPLATE",
-  HOME_PAGE = "HOME Page",
-  FOOTER = "FOOTER",
+  PAGE = "PAGE",
 }
 
 @Entity()
@@ -46,6 +45,13 @@ export class Cms {
     default: null,
     nullable: true,
   })
+  form: Array<any>;
+
+  @Column({
+    type: "json",
+    default: null,
+    nullable: true,
+  })
   params: Array<any>;
 
   @Column({
@@ -66,6 +72,11 @@ export class Cms {
     default: TYPE.CONTENT,
   })
   type: TYPE;
+
+  @Column({
+    default: true,
+  })
+  is_active: boolean;
 
   @CreateDateColumn({
     type: "timestamp",
