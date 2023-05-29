@@ -38,10 +38,12 @@ const SalesList = require("./routes/sales/salesList");
 const SalesTagged = require("./routes/sales/tagged");
 const SalesStartup = require("./routes/sales/startUp");
 const SalesStartupTag = require("./routes/relation-mang/salesAssignTag");
+const CMS = require('./routes/cms')
 const payment = require("./routes/payment");
 const data = require("./routes/payment");
 const chat = require("./routes/chat/chatApi");
 const chatHook = require("./routes/chat/chatHooks");
+const botchat = require("./routes/botchat");
 import "./cron";
 
 // mysql database connection initialize
@@ -106,8 +108,11 @@ app.use("/api/sales-list", SalesList);
 app.use("/api/sales/tag", SalesTagged);
 app.use("/api/sales/startup", SalesStartup);
 app.use("/api/sales/startup-tag", SalesStartupTag);
+app.use("/api/cms", CMS);
+app.use("/api/sales/startup-tag", SalesStartupTag);
 app.use("/api/chat", chat);
 app.use("/api/chat-hooks", chatHook);
+app.use("/api/botchat", botchat);
 
 // payment webhooks
 const Stripe = require("stripe");

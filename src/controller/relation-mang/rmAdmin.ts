@@ -113,7 +113,7 @@ export class UserController {
       // console.log(token);
 
       // send email
-      const link = `${process.env.BASE_URL_CREATE_PASSWORD}/`;
+      const link = `${process.env.BASE_URL_RMADMIN_CREATE_PASSWORD}/`;
 
       await sendEmail(
         email_id,

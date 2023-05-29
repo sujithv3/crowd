@@ -10,8 +10,7 @@ export enum TYPE {
   MAIL = "MAIL",
   CONTENT = "CONTENT",
   MAIL_TEMPLATE = "MAIL TEMPLATE",
-  HOME_PAGE = "HOME Page",
-  FOOTER = "FOOTER",
+  PAGE = "PAGE",
 }
 
 @Entity()
@@ -27,6 +26,13 @@ export class Cms {
   title: string;
 
   @Column({
+    length: 150,
+    type: "varchar",
+    default: null,
+  })
+  page: string;
+
+  @Column({
     length: 70,
     type: "varchar",
     default: null,
@@ -39,7 +45,14 @@ export class Cms {
     default: null,
     nullable: true,
   })
-  params: Array<{ name: string; content: string }>;
+  form: Array<any>;
+
+  @Column({
+    type: "json",
+    default: null,
+    nullable: true,
+  })
+  params: Array<any>;
 
   @Column({
     type: "text",
@@ -59,6 +72,11 @@ export class Cms {
     default: TYPE.CONTENT,
   })
   type: TYPE;
+
+  @Column({
+    default: true,
+  })
+  is_active: boolean;
 
   @CreateDateColumn({
     type: "timestamp",

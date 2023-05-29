@@ -753,7 +753,7 @@ export class ChatApiController {
 
 
 
-            if (request.query.country && request.query.country !== "all") {
+            if (request.query.country && request.query.country !== "all" && request.query.country !== "") {
                 campaign.andWhere("investor.country=:country", {
                     country: request.query.country,
                 });

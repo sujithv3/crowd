@@ -105,7 +105,12 @@ export class MydealsController {
           "meeting.campaign_id=campaign.id AND meeting.user_id=:id AND meeting.is_active=true",
           { id: user[0].id }
         )
-        .where("myDeals.user_id = :id", { id: user[0].id })
+        .where(`myDeals.user_id = :id AND campaign.is_published=:published
+        AND campaign.is_deleted=:is_deleted`, {
+          id: user[0].id,
+          published: true,
+          is_deleted: false
+        })
         .leftJoin("campaign.user", "startup")
         .addSelect([
           'startup.id',

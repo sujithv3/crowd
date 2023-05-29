@@ -377,7 +377,7 @@ export class UserController {
         you_tube,
         website,
         extra_links = [],
-        ...NonChangedFiles
+        files
       } = request.body;
 
       // get user
@@ -394,34 +394,55 @@ export class UserController {
       let profile_image = profile;
       let company_image = company_logo;
 
-      const FundFiles: any = request.files
-        .filter((e: any) => {
-          if (e.fieldname === "profile") {
-            profile_image = e.location;
-          } else if (e.fieldname === "company_logo") {
-            company_image = e.location;
-          } else {
-            return e;
+      // const FundFiles: any = request.files
+      //   .filter((e: any) => {
+      //     if (e.fieldname === "profile") {
+      //       profile_image = e.location;
+      //     } else if (e.fieldname === "company_logo") {
+      //       company_image = e.location;
+      //     } else {
+      //       return e;
+      //     }
+      //   })
+      //   .map((e: any) => {
+      //     return {
+      //       name: e.fieldname,
+      //       value: e.location,
+      //     };
+      //   });
+      const FundFiles: any = [];
+      console.log('NonChangedFiles', files);
+      if (Array.isArray(files)) {
+        for (let i = 0; i < files.length; ++i) {
+          const val = files[i];
+          if (val.value) {
+            FundFiles.push({
+              name: val.name,
+              value: val.value,
+            });
+          } else if (val.name) {
+            const file_val = 'files[' + i + '][value]';
+            const file_url = request.files.find((item: any) => item.fieldname === file_val); //check upload exists
+            if (file_url && file_url.location) {
+              FundFiles.push({
+                name: val.name,
+                value: file_url.location,
+              });
+            }
           }
-        })
-        .map((e: any) => {
-          return {
-            name: e.fieldname,
-            value: e.location,
-          };
-        });
-
-      for (var prop in NonChangedFiles) {
-        if (NonChangedFiles.hasOwnProperty(prop)) {
-          var innerObj = {};
-          innerObj[prop] = NonChangedFiles[prop];
-          const getKey = Object.keys(innerObj)[0];
-          FundFiles.push({
-            name: getKey,
-            value: innerObj[getKey],
-          });
         }
       }
+      // for (var prop in NonChangedFiles) {
+      //   if (NonChangedFiles.hasOwnProperty(prop)) {
+      //     var innerObj = {};
+      //     innerObj[prop] = NonChangedFiles[prop];
+      //     const getKey = Object.keys(innerObj)[0];
+      //     FundFiles.push({
+      //       name: getKey,
+      //       value: innerObj[getKey],
+      //     });
+      //   }
+      // }
 
       const user = Jwt.decode(token);
       console.log(user[0].id);
@@ -431,7 +452,21 @@ export class UserController {
         .where("id=:id", { id: user[0].id })
         .getOne();
 
-      console.log(FundFiles);
+      if (Array.isArray(getProfile.files)) {
+        for (let i = 0; i < getProfile.files.length; ++i) {
+          const item = getProfile.files[i];
+          const isFileExists = files.find((sub: any) => sub.value === item.value);
+          if (!isFileExists) { //delete file
+            const getKey = item.value.split("/");
+            const key = getKey[getKey.length - 1];
+            await deleteS3BucketValues(key);
+          }
+        }
+      }
+
+
+
+      // console.log(FundFiles);
       // delete s3 image
 
       if (getProfile.profile) {
@@ -448,7 +483,7 @@ export class UserController {
           await deleteS3BucketValues(key);
         }
       }
-      console.log(company_name);
+      // console.log(company_name);
 
       // update user
       await this.userRepository
