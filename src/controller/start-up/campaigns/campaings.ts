@@ -5,10 +5,13 @@ import { Funds } from "../../../entity/funds";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
+import { Teams } from "../../../entity/teams";
+import { BankInfo } from "../../../entity/bankinfo";
 export class CampaignController {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
   private fundsRepository = AppDataSource.getRepository(Funds);
-
+  private teamRepository = AppDataSource.getRepository(Teams);
+  private bankRepository = AppDataSource.getRepository(BankInfo);
   //   list user bashed campaign
   async all(request: Request, response: Response, next: NextFunction) {
     try {
@@ -205,6 +208,106 @@ export class CampaignController {
         false,
         400,
         msg.campaignListFailed,
+        err
+      );
+    }
+  }
+
+  async getCompleteStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      let token: any;
+      if (
+        typeof req.cookies.token === "undefined" ||
+        req.cookies.token === null
+      ) {
+        token = req.headers.authorization.slice(7);
+      } else {
+        token = req.cookies.token;
+      }
+
+      const user = Jwt.decode(token);
+      //   find startUp
+      const startCampaigns = await this.campaignRepository
+        .createQueryBuilder("campaign")
+        .where(
+          "campaign.user_id=:id AND campaign.is_active=true AND campaign.is_published=false",
+          {
+            id: user[0].id,
+          }
+        )
+        .leftJoinAndSelect("campaign.tax_location", "tax_location")
+        .leftJoinAndSelect("campaign.bank_location", "bank_location")
+        .leftJoinAndSelect("campaign.category", "category")
+        .leftJoinAndSelect("campaign.subcategory", "subcategory")
+        .leftJoinAndSelect("campaign.staging", "staging")
+        .getOne();
+
+      console.log('startCampaigns', startCampaigns);
+      let start_campaign = false;
+      let basic_info = false;
+      let project_detail = false;
+      let team = false;
+      let funding = false;
+      let payment = false;
+      let bank = false;
+      if (startCampaigns?.category?.id && startCampaigns?.subcategory?.id) {
+        start_campaign = true;
+      }
+
+      if (startCampaigns?.title && startCampaigns?.tag_line && startCampaigns?.project_image) {
+        basic_info = true;
+      }
+
+      if (startCampaigns?.description && startCampaigns?.challenges) {
+        project_detail = true;
+      }
+
+      const teams = await this.teamRepository
+        .createQueryBuilder("team")
+        .where("team.campaign = :id", { id: startCampaigns.id })
+        .getMany();
+
+      console.log('teams', teams);
+
+      if (teams && teams.length > 0) {
+        team = true;
+      }
+
+      if (startCampaigns?.contact_email_id && startCampaigns?.citizen_status) {
+        payment = true;
+      }
+
+      const bank_data = await this.bankRepository
+        .createQueryBuilder("bank")
+        .where("bank.campaign = :id", { id: startCampaigns.id })
+        .getOne();
+
+      if (bank_data) {
+        bank = true;
+      }
+
+      const completed: any = {
+        start_campaign,
+        basic_info,
+        project_detail,
+        team,
+        funding,
+        payment,
+        bank
+      };
+
+
+      return responseMessage.responseWithData(
+        true,
+        200,
+        msg.startCampaignListSuccess,
+        completed
+      );
+    } catch (err) {
+      return responseMessage.responseWithData(
+        false,
+        400,
+        msg.startCampaignListFailed,
         err
       );
     }

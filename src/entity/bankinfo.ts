@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import { Campaigns } from "./campaigns";
 import { Location } from "./locations";
+import { Countries } from "./countries";
 
 @Entity()
 export class BankInfo {
@@ -50,6 +51,10 @@ export class BankInfo {
   @ManyToOne((type) => Location)
   @JoinColumn({ name: "bank_location_id", referencedColumnName: "id" })
   bank_location: Location;
+
+  @ManyToOne((type) => Countries)
+  @JoinColumn({ name: "bank_country_id", referencedColumnName: "id" })
+  bank_country: Countries;
 
   @Column({
     length: 100,

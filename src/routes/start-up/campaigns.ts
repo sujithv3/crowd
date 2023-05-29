@@ -19,6 +19,14 @@ export const Routes = [
   },
   {
     method: "get",
+    route: "/complete-status",
+    controller: CampaignController,
+    action: "getCompleteStatus",
+    validationField: "",
+    isLogin: false,
+  },
+  {
+    method: "get",
     route: "/list/:id",
     controller: CampaignController,
     action: "getOne",

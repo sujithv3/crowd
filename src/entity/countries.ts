@@ -159,6 +159,11 @@ export class Countries {
     })
     created_at: Date;
 
+    @Column({
+        default: false,
+    })
+    is_active: boolean;
+
     @UpdateDateColumn({
         type: "timestamp",
         default: () => "CURRENT_TIMESTAMP(6)",

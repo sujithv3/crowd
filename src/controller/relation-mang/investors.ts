@@ -85,7 +85,7 @@ export class InvestorController {
         .skip(
           request.query.page
             ? Number(request.query.page) *
-                (request.query.limit ? Number(request.query.limit) : 10)
+            (request.query.limit ? Number(request.query.limit) : 10)
             : 0
         )
         .take(request.query.limit ? Number(request.query.limit) : 10)
@@ -221,7 +221,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -334,7 +334,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -385,14 +385,19 @@ export class InvestorController {
         .createQueryBuilder("campaign")
         .innerJoinAndSelect("campaign.fund", "fund")
         .innerJoinAndSelect("campaign.location", "location")
+        .leftJoin("campaign.user", "user")
+        .innerJoin("user.city", "city")
         .where("fund.investorId = :id", {
           id: id,
         })
         .select([
           "campaign.title",
+          "city.name",
+          "city.state_code",
           "location.name",
           "location.country",
           "fund.fund_amount as fund_amount",
+          "user.sector"
         ]);
       const total_count = await campaign.getCount();
       if (request.query.page && request.query.limit) {
@@ -400,7 +405,7 @@ export class InvestorController {
           .offset(
             request.query.page
               ? Number(request.query.page) *
-                  (request.query.limit ? Number(request.query.limit) : 10)
+              (request.query.limit ? Number(request.query.limit) : 10)
               : 0
           )
           .limit(request.query.limit ? Number(request.query.limit) : 10);
@@ -503,10 +508,10 @@ export class InvestorController {
       // list schedule events in calendly
       const getRmDetails = await axios.get(
         process.env.CALENDLY_BASE_URL +
-          "/organizations/" +
-          process.env.ORGANIZATION_ID +
-          "/invitations?email=" +
-          user[0].email_id,
+        "/organizations/" +
+        process.env.ORGANIZATION_ID +
+        "/invitations?email=" +
+        user[0].email_id,
         {
           headers: { Authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
         }

@@ -54,13 +54,13 @@ export class RelationManager {
         .getManyAndCount();
 
 
-        let data = await startUpCounts[0].map((temp:any) => {
-          let res = {
-            ...temp,
-            city_state: temp.city ? `${temp.city.name}, ${temp.city.state_code}` : null
-          }
-          return res;
-        })
+      let data = await startUpCounts[0].map((temp: any) => {
+        let res = {
+          ...temp,
+          city_state: temp.city ? `${temp.city.name}, ${temp.city.state_code}` : null
+        }
+        return res;
+      })
 
       return responseMessage.responseWithData(true, 200, msg.list_success, {
         total_count: startUpCounts[1],
@@ -147,6 +147,7 @@ export class RelationManager {
           id,
         })
         .leftJoinAndSelect("user.tagged", "tagged", "tagged.is_active=true")
+        .leftJoinAndSelect("user.city", "city")
         .leftJoinAndSelect("tagged.StartUp", "startUp")
         .loadRelationCountAndMap(
           "user.tagged_count",
