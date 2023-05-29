@@ -439,7 +439,10 @@ export class TaggedController {
           "investor.user_code",
           "investor.first_name",
           "investor.last_name",
-          "investor.city",
+          "city.name",
+          "city.state_code",
+          "city.country_code",
+          "investor.sector",
           "investor.country",
           "investor.is_active",
           "investor.created_date",
@@ -447,6 +450,7 @@ export class TaggedController {
         // .innerJoin("investor.fund", "fund")
         // .innerJoin("fund.campaign", "campaign")
         .innerJoin("investor.interested", "interested")
+        .innerJoin("investor.city", "city")
         .innerJoin("interested.campaign", "campaign", "campaign.is_deleted=false AND campaign.is_published=true")
         .innerJoin("campaign.user", "campaignowner")
         .innerJoin("campaignowner.tagged", "tagged")

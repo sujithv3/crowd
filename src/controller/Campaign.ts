@@ -670,13 +670,33 @@ export class CampaignController {
       );
     }
   }
-
+  // get stages that are only saved in Campaign
   async getStages(req: Request, res: Response, next: NextFunction) {
     try {
       const stages = await this.StagingRepository.createQueryBuilder()
         .where(
           "id IN (SELECT `campaign`.`staging_id` FROM `campaigns` `campaign` WHERE `campaign`.`is_deleted`=0 AND `campaign`.`is_active`=1 GROUP BY `campaign`.`staging_id`)"
         )
+        .getMany();
+
+      const stageDropDown = stages.map((stage) => ({
+        id: stage.name,
+        name: stage.name,
+      }));
+      return responseMessage.responseWithData(true, 200, msg.stageSuccess, {
+        stages: stages,
+        stageDropDown: stageDropDown,
+      });
+    } catch (error) {
+      console.log(error);
+      return responseMessage.responseWithData(false, 400, msg.stageFail, error);
+    }
+  }
+
+  // get all stages
+  async getAllStages(req: Request, res: Response, next: NextFunction) {
+    try {
+      const stages = await this.StagingRepository.createQueryBuilder()
         .getMany();
 
       const stageDropDown = stages.map((stage) => ({
