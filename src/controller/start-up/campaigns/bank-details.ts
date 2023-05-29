@@ -24,6 +24,7 @@ export class bankController {
         account_number,
         swift,
         bank_location,
+        bank_country,
         bank_address = "",
         is_active = true,
         is_deleted = false,
@@ -103,6 +104,7 @@ export class bankController {
             account_number,
             swift,
             bank_location,
+            bank_country,
             campaign,
             bank_address,
             updatedDate: new Date(),
@@ -120,6 +122,7 @@ export class bankController {
           account_number,
           swift,
           bank_location,
+          bank_country,
           campaign,
           bank_address,
           createdDate: new Date(),
@@ -128,15 +131,17 @@ export class bankController {
           is_deleted,
         });
       }
-
+      const updateData: any = {
+        is_published: true,
+      };
+      if (bank_location) {
+        updateData.bank_location = bank_location;
+      }
       // update campaign
       await this.campaignRepository
         .createQueryBuilder()
         .update(Campaigns)
-        .set({
-          is_published: true,
-          bank_location: bank_location,
-        })
+        .set(updateData)
         .where("id=:id", { id: campaign.id })
         .execute();
 
@@ -185,7 +190,7 @@ export class bankController {
       const user = Jwt.decode(token);
       delete user.role;
 
-      console.log(user[0].id);
+      // console.log(user[0].id);
 
       // find campaign
 
@@ -210,18 +215,20 @@ export class bankController {
       }
 
       //   find bank
-      let basicCampaigns: any = await this.bankRepository
+      let bankInfo: any = await this.bankRepository
         .createQueryBuilder("bank")
         .leftJoinAndSelect("bank.bank_location", "Location")
+        .leftJoinAndSelect("bank.bank_country", "country")
         .where("bank.campaign = :id", { id: campaign.id })
         .getOne();
       console.log("campaign?.bank_location", campaign?.bank_location);
       if (
-        !basicCampaigns &&
+        !bankInfo &&
         campaign?.bank_location &&
         campaign?.bank_location?.country
       ) {
-        basicCampaigns = {
+        bankInfo = {
+          bank: bankInfo,
           bank_location: campaign?.bank_location,
         };
       }
@@ -230,7 +237,7 @@ export class bankController {
         true,
         200,
         msg.banksCampaignListSuccess,
-        basicCampaigns
+        bankInfo
       );
     } catch (err) {
       console.log(err);
