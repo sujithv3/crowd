@@ -466,7 +466,7 @@ export class UserController {
 
 
 
-      console.log(FundFiles);
+      // console.log(FundFiles);
       // delete s3 image
 
       if (getProfile.profile) {
@@ -483,7 +483,7 @@ export class UserController {
           await deleteS3BucketValues(key);
         }
       }
-      console.log(company_name);
+      // console.log(company_name);
 
       // update user
       await this.userRepository
