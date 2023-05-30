@@ -156,6 +156,7 @@ export class TaggedController {
           "campaign.deal_size",
           'city.name',
           'city.state_code',
+          "city.country_code",
         ])
         .leftJoin("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
@@ -304,9 +305,13 @@ export class TaggedController {
           "campaign.goal_amount",
           "campaign.start_date",
           "campaign.deal_size",
+          'city.name',
+          'city.state_code',
+          'city.country_code',
         ])
         .leftJoin("campaign.location", "location")
         .innerJoin("campaign.user", "startup")
+        .leftJoin("startup.city", "city")
         .leftJoin("campaign.fund", "fund")
         .innerJoin("startup.tagged", "tagged")
         .addSelect(
@@ -412,6 +417,7 @@ export class TaggedController {
           "campaign.files",
           "city.name",
           "city.state_code",
+          'city.country_code',
         ])
         .innerJoin("startup.tagged", "tagged")
         .leftJoin("startup.city", "city")
