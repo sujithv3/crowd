@@ -86,8 +86,17 @@ export class locationController {
   // get all countries
   async countries(request: Request, response: Response, next: NextFunction) {
     try {
-      const locationData = await this.countryRepositor.createQueryBuilder('country')
-        .orderBy('country.name', 'ASC')
+
+      const locationQuery = this.countryRepositor.createQueryBuilder('country')
+        .where('1=1');
+
+      if (request.query.filter !== 'all') {
+        locationQuery.andWhere(
+          'is_active=:active', { active: true }
+        );
+      }
+
+      const locationData = await locationQuery.orderBy('country.name', 'ASC')
         .getMany();
       //   check location exist
       if (locationData.length === 0) {
