@@ -209,6 +209,7 @@ export class InvestorController {
           "user.country",
           "city.name",
           "city.state_code",
+          "city.country_code",
         ])
         .addSelect(
           "(SELECT SUM(funds.fund_amount) FROM funds WHERE funds.investorId=user.id)",
@@ -289,6 +290,7 @@ export class InvestorController {
           // "investor.city",
           "city.name",
           "city.state_code",
+          "city.country_code",
           "startupCity.name",
           "startupCity.state_code",
           "investor.country",
@@ -394,6 +396,7 @@ export class InvestorController {
           "campaign.title",
           "city.name",
           "city.state_code",
+          "city.country_code",
           "location.name",
           "location.country",
           "fund.fund_amount as fund_amount",
