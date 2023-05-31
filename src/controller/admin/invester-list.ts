@@ -80,6 +80,7 @@ export class ListInvestor {
           "investors.country",
           "city.name",
           "city.state_code",
+          "city.country_code",
           "fund",
           "campaign",
         ])

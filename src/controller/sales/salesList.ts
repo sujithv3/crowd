@@ -45,6 +45,7 @@ export class ListSales {
           "user.sector",
           "city.name",
           "city.state_code",
+          "city.country_code",
           "taggedsales.id",
           "RelationManager.id",
           "RelationManager.first_name",

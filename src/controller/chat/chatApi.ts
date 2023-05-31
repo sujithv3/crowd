@@ -791,6 +791,7 @@ export class ChatApiController {
                 // "investor.city",
                 "city.name",
                 "city.state_code",
+                "city.country_code",
                 //   "startupCity.name",
                 //   "startupCity.state_code",
                 "investor.country",
