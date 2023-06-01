@@ -242,7 +242,6 @@ export class CampaignController {
         .leftJoinAndSelect("campaign.staging", "staging")
         .getOne();
 
-      console.log('startCampaigns', startCampaigns);
       let start_campaign = false;
       let basic_info = false;
       let project_detail = false;
@@ -258,6 +257,10 @@ export class CampaignController {
         basic_info = true;
       }
 
+      if (startCampaigns?.goal_amount && startCampaigns?.deal_size && startCampaigns?.start_date) {
+        funding = true;
+      }
+
       if (startCampaigns?.description && startCampaigns?.challenges) {
         project_detail = true;
       }
@@ -267,13 +270,12 @@ export class CampaignController {
         .where("team.campaign = :id", { id: startCampaigns.id })
         .getMany();
 
-      console.log('teams', teams);
 
       if (teams && teams.length > 0) {
         team = true;
       }
 
-      if (startCampaigns?.contact_email_id && startCampaigns?.citizen_status) {
+      if (startCampaigns?.payment_contact_email_id && startCampaigns?.citizen_status) {
         payment = true;
       }
 
