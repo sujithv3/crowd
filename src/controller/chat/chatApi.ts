@@ -339,7 +339,7 @@ export class ChatApiController {
             const group_id = request.body.group_id;
 
             // find group Member id
-            console.log('user.....', user);
+            // console.log('user.....', user);
 
             let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
                 .where('member.execuive_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: group_id }) // find logged in user with members
@@ -412,10 +412,11 @@ export class ChatApiController {
                     //     profile: profile
                     // };
                     // console.log('client?.publish', this.client?.publish);
+                    console.log('this.client?.publish', this.client?.publish);
                     if (this.client?.publish) {
                         // console.log('AdminChat/1' === topic)
                         // console.log('message publish', topic, one_message);
-
+                        console.log('publish to topic', topic);
                         this.client.publish(topic, JSON.stringify(one_message), { qos: 0 }, (error: any) => {
                             if (error) {
                                 console.log('Publish error: ', error);

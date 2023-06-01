@@ -5,14 +5,16 @@ import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
 import { BankInfo } from "../../../entity/bankinfo";
+import { isDataFilled } from "../../../utils/campaignFill";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
+import { Teams } from "../../../entity/teams";
 
 export class bankController {
   private campaignRepository = AppDataSource.getRepository(Campaigns);
   private bankRepository = AppDataSource.getRepository(BankInfo);
-
+  private teamRepository = AppDataSource.getRepository(Teams);  //   create funds
   //   create project details
   async create(req: any, res: Response, next: NextFunction) {
     try {
@@ -57,27 +59,36 @@ export class bankController {
 
       // find campaign
 
-      const campaign = await this.campaignRepository
-        .createQueryBuilder("")
-        .where("user_id=:id AND is_active=true AND is_published=false", {
-          id: user[0].id,
-        })
-        .getOne();
+      // const campaigns = await this.campaignRepository
+      //   .createQueryBuilder("")
+      //   .where("user_id=:id AND is_active=true AND is_published=false", {
+      //     id: user[0].id,
+      //   })
+      //   .getOne();
 
-      if (!campaign) {
+      // if (!campaigns) {
+      //   return responseMessage.responseMessage(
+      //     false,
+      //     400,
+      //     msg.createStartCampaignFirst
+      //   );
+      // }
+
+      const { campaigns, filled, message } = await isDataFilled('bank', user[0].id, this.campaignRepository, this.teamRepository);
+      if (filled === false) {
         return responseMessage.responseMessage(
           false,
           400,
-          msg.createStartCampaignFirst
+          message
         );
       }
 
       // all module complete check
       const checked =
-        campaign.title &&
-        campaign.currency &&
-        campaign.description &&
-        campaign.goal_amount;
+        campaigns.title &&
+        campaigns.currency &&
+        campaigns.description &&
+        campaigns.goal_amount;
       if (!checked) {
         return responseMessage.responseMessage(
           false,
@@ -89,7 +100,7 @@ export class bankController {
       //   find tames
       const bank = await this.bankRepository
         .createQueryBuilder("bank")
-        .where("bank.campaign = :id", { id: campaign.id })
+        .where("bank.campaign = :id", { id: campaigns.id })
         .getOne();
 
       if (bank) {
@@ -105,7 +116,7 @@ export class bankController {
             swift,
             bank_location,
             bank_country,
-            campaign,
+            campaign: campaigns,
             bank_address,
             updatedDate: new Date(),
             is_active,
@@ -123,7 +134,7 @@ export class bankController {
           swift,
           bank_location,
           bank_country,
-          campaign,
+          campaign: campaigns,
           bank_address,
           createdDate: new Date(),
           updatedDate: new Date(),
@@ -142,7 +153,7 @@ export class bankController {
         .createQueryBuilder()
         .update(Campaigns)
         .set(updateData)
-        .where("id=:id", { id: campaign.id })
+        .where("id=:id", { id: campaigns.id })
         .execute();
 
       return responseMessage.responseMessage(

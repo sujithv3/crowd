@@ -5,6 +5,7 @@ import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
 import { Teams } from "../../../entity/teams";
+import { isDataFilled } from "../../../utils/campaignFill";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
@@ -32,18 +33,27 @@ export class teamController {
 
       // find campaign
 
-      const campaigns = await this.campaignRepository
-        .createQueryBuilder()
-        .where("user_id=:id AND is_active=true AND is_published=false", {
-          id: user[0].id,
-        })
-        .getOne();
+      // const campaigns = await this.campaignRepository
+      //   .createQueryBuilder()
+      //   .where("user_id=:id AND is_active=true AND is_published=false", {
+      //     id: user[0].id,
+      //   })
+      //   .getOne();
 
-      if (!campaigns) {
+      // if (!campaigns) {
+      //   return responseMessage.responseMessage(
+      //     false,
+      //     400,
+      //     msg.createStartCampaignFirst
+      //   );
+      // }
+
+      const { campaigns, filled, message } = await isDataFilled('teams', user[0].id, this.campaignRepository, null)
+      if (filled === false) {
         return responseMessage.responseMessage(
           false,
           400,
-          msg.createStartCampaignFirst
+          message
         );
       }
 
