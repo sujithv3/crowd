@@ -5,14 +5,15 @@ import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
 import { deleteS3BucketValues } from "../../../utils/file-upload";
+import { isDataFilled } from "../../../utils/campaignFill";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
+import { Teams } from "../../../entity/teams";
 
 export class fundsController {
   private fundsRepository = AppDataSource.getRepository(Campaigns);
-
-  //   create funds
+  private teamRepository = AppDataSource.getRepository(Teams);  //   create funds
   async create(req: any, res: Response, next: NextFunction) {
     try {
       const {
@@ -66,18 +67,27 @@ export class fundsController {
 
       // find campaign
 
-      const campaigns = await this.fundsRepository
-        .createQueryBuilder()
-        .where("user_id=:id AND is_active=true AND is_published=false", {
-          id: user[0].id,
-        })
-        .getOne();
+      // const campaigns = await this.fundsRepository
+      //   .createQueryBuilder()
+      //   .where("user_id=:id AND is_active=true AND is_published=false", {
+      //     id: user[0].id,
+      //   })
+      //   .getOne();
 
-      if (!campaigns) {
+      // if (!campaigns) {
+      //   return responseMessage.responseMessage(
+      //     false,
+      //     400,
+      //     msg.createStartCampaignFirst
+      //   );
+      // }
+
+      const { campaigns, filled, message } = await isDataFilled('funding', user[0].id, this.fundsRepository, this.teamRepository);
+      if (filled === false) {
         return responseMessage.responseMessage(
           false,
           400,
-          msg.createStartCampaignFirst
+          message
         );
       }
 

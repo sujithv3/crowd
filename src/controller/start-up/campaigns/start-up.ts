@@ -8,6 +8,7 @@ const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 import { Category } from "../../../entity/category";
 const Jwt = require("../../../utils/jsonwebtoken");
+import { isDataFilled } from "../../../utils/campaignFill";
 
 export class startUpController {
   private startUpRepository = AppDataSource.getRepository(Campaigns);
@@ -42,12 +43,13 @@ export class startUpController {
 
       // find campaign start up
       console.log(user[0].id);
-      const campaigns = await this.startUpRepository
-        .createQueryBuilder()
-        .where("user_id=:id AND is_active=true AND is_published=false", {
-          id: user[0].id,
-        })
-        .getOne();
+      // const campaigns = await this.startUpRepository
+      //   .createQueryBuilder()
+      //   .where("user_id=:id AND is_active=true AND is_published=false", {
+      //     id: user[0].id,
+      //   })
+      //   .getOne();
+      const { campaigns } = await isDataFilled('startup', user[0].id, this.startUpRepository, null)
       if (campaigns) {
         await this.startUpRepository
           .createQueryBuilder()

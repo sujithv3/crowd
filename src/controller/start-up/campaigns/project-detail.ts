@@ -4,6 +4,7 @@
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
+import { isDataFilled } from "../../../utils/campaignFill";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
@@ -32,18 +33,27 @@ export class projectDetailController {
       console.log(faq);
       // find campaign
 
-      const campaigns = await this.projectDetailRepository
-        .createQueryBuilder()
-        .where("user_id=:id AND is_active=true AND is_published=false", {
-          id: user[0].id,
-        })
-        .getOne();
+      // const campaigns = await this.projectDetailRepository
+      //   .createQueryBuilder()
+      //   .where("user_id=:id AND is_active=true AND is_published=false", {
+      //     id: user[0].id,
+      //   })
+      //   .getOne();
 
-      if (!campaigns) {
+      // if (!campaigns) {
+      //   return responseMessage.responseMessage(
+      //     false,
+      //     400,
+      //     msg.createStartCampaignFirst
+      //   );
+      // }
+
+      const { campaigns, filled, message } = await isDataFilled('project', user[0].id, this.projectDetailRepository, null)
+      if (filled === false) {
         return responseMessage.responseMessage(
           false,
           400,
-          msg.createStartCampaignFirst
+          message
         );
       }
 

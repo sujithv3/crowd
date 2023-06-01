@@ -68,6 +68,11 @@ module.exports = {
   campaignListFailed: "Campaign list Failed",
   campaignDeleteFailed: "Campaign Delete Failed",
   createStartCampaignFirst: "Create Start Campaign First",
+  fillBasicInfo: "Please Fill Basic Info First.",
+  fillProjectDetail: "Please Fill Project Details First.",
+  fillTeam: "Please Fill Team Details First.",
+  fillFunding: "Please Fill Funding Details First.",
+  fillPayment: "Please Fill Payment Verification Details First.",
 
   // start up for start up campaign
   startCampaignCreateSuccess: "Start up  created successfully",
@@ -168,8 +173,8 @@ module.exports = {
   profile_updated_failed: "Update Failed",
 
   //HomePage Edit Templates
-  homepage_templates_list_success : 'HomePage List Success',
-  homepage_templates_list_failed : 'HomePage List failed',
+  homepage_templates_list_success: 'HomePage List Success',
+  homepage_templates_list_failed: 'HomePage List failed',
   // chat
   chat_post_success: "Chat saved successfully",
   chat_create_success: "Chat Group created successfully",

@@ -4,6 +4,7 @@
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
+import { isDataFilled } from "../../../utils/campaignFill";
 import { deleteS3BucketValues } from "../../../utils/file-upload";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
@@ -54,18 +55,27 @@ export class basicInfoController {
 
       // find campaign basic info
 
-      const campaigns = await this.basicInfoRepository
-        .createQueryBuilder()
-        .where("user_id=:id AND is_active=true AND is_published=false", {
-          id: user[0].id,
-        })
-        .getOne();
+      // const campaigns = await this.basicInfoRepository
+      //   .createQueryBuilder()
+      //   .where("user_id=:id AND is_active=true AND is_published=false", {
+      //     id: user[0].id,
+      //   })
+      //   .getOne();
 
-      if (!campaigns) {
+      // if (!campaigns) {
+      //   return responseMessage.responseMessage(
+      //     false,
+      //     400,
+      //     msg.createStartCampaignFirst
+      //   );
+      // }
+
+      const { campaigns, filled, message } = await isDataFilled('basicInfo', user[0].id, this.basicInfoRepository, null)
+      if (filled === false) {
         return responseMessage.responseMessage(
           false,
           400,
-          msg.createStartCampaignFirst
+          message
         );
       }
 
