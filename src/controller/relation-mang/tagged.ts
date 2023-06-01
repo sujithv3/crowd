@@ -245,6 +245,7 @@ export class TaggedController {
       // .getRawMany();
       const totalQuery = campaignQuery.clone();
       const data = await campaignQuery
+        .orderBy('campaign.id', 'DESC')
         .offset(
           request.query.page
             ? Number(request.query.page) *
