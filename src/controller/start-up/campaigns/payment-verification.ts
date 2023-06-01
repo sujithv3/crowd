@@ -4,14 +4,16 @@
 import { AppDataSource } from "../../../data-source";
 import { NextFunction, Request, Response } from "express";
 import { Campaigns } from "../../../entity/campaigns";
+import { isDataFilled } from "../../../utils/campaignFill";
 const responseMessage = require("../../../configs/response");
 const msg = require("../../../configs/message");
 const Jwt = require("../../../utils/jsonwebtoken");
+import { Teams } from "../../../entity/teams";
 
 export class paymentVerificationController {
   private paymentVerificationRepository =
     AppDataSource.getRepository(Campaigns);
-
+  private teamRepository = AppDataSource.getRepository(Teams);  //   create funds
   //   create paymentVerification
   async create(req: any, res: Response, next: NextFunction) {
     try {
@@ -45,18 +47,27 @@ export class paymentVerificationController {
 
       // find campaign
 
-      const campaigns = await this.paymentVerificationRepository
-        .createQueryBuilder()
-        .where("user_id=:id AND is_active=true AND is_published=false", {
-          id: user[0].id,
-        })
-        .getOne();
+      // const campaigns = await this.paymentVerificationRepository
+      //   .createQueryBuilder()
+      //   .where("user_id=:id AND is_active=true AND is_published=false", {
+      //     id: user[0].id,
+      //   })
+      //   .getOne();
 
-      if (!campaigns) {
+      // if (!campaigns) {
+      //   return responseMessage.responseMessage(
+      //     false,
+      //     400,
+      //     msg.createStartCampaignFirst
+      //   );
+      // }
+
+      const { campaigns, filled, message } = await isDataFilled('payment', user[0].id, this.paymentVerificationRepository, this.teamRepository);
+      if (filled === false) {
         return responseMessage.responseMessage(
           false,
           400,
-          msg.createStartCampaignFirst
+          message
         );
       }
 
