@@ -7,7 +7,6 @@ import { Campaigns, CAMPAIGN_STATUS } from "../../entity/campaigns";
 const responseMessage = require("../../configs/response");
 const msg = require("../../configs/message");
 const Jwt = require("./../../utils/jsonwebtoken");
-import { Staging } from "../../entity/staging";
 
 import { ChatOnline, USER_TYPE } from "../../entity/chatOnline";
 import { Users } from "../../entity/Users";
@@ -628,10 +627,13 @@ export class ChatApiController {
                 console.log('user[0].role.name', user[0].role.name);
                 if (user[0].role.name === 'start-up' || user[0].role.name === 'invester') {
 
+                    let member_user_type = 'STARTUP';
+                    if (user[0].role.name === 'invester')
+                        member_user_type = 'INVESTOR';
                     if (request.query.group_id && request.query.group_id > 0) {
                         //reset count for the selected group
                         let current_member = await this.ChatGroupMemberRepository.createQueryBuilder('member')
-                            .where('member.user_id=:user_id AND member.group_id=:id', { user_id: user[0].id, id: request.query.group_id }) // find logged in user with members
+                            .where('member.user_id=:user_id AND member.group_id=:id AND member.user_type=:user_type', { user_id: user[0].id, id: request.query.group_id, user_type: member_user_type }) // find logged in user with members
                             .getOne();
 
                         await this.ChatGroupMemberRepository.createQueryBuilder().update().set({
@@ -643,7 +645,7 @@ export class ChatApiController {
                         .select(['member.group_id', 'member.unread'])
                         .innerJoin('member.user', 'user')
                         .innerJoin('member.group', 'group')
-                        .where('user.id=:id AND member.unread>0 AND group.is_active=true AND group.is_deleted=false', { id: user[0].id }).getRawMany();
+                        .where('user.id=:id AND member.unread>0 AND group.is_active=true AND group.is_deleted=false  AND member.user_type=:user_type', { id: user[0].id, user_type: member_user_type }).getRawMany();
                     if (unreadData && Array.isArray(unreadData)) {
                         unreadData.forEach((item: any) => {
                             message.unreadCount += item.member_unread;
@@ -1085,6 +1087,13 @@ export class ChatApiController {
             const group_id = request.body.group_id;
 
             const name = request.body.name;
+            if (name.trim() == '') {
+                return responseMessage.responseMessage(
+                    false,
+                    400,
+                    'Please provide name for the group'
+                );
+            }
 
             // check provided group is valid
             const group_exist = await this.ChatGroupRepository
