@@ -52,7 +52,7 @@ export class TaggedRM {
             title: 'individual user'
           });
 
-          // create 2 members for this group
+          // create 2 members for this group startup user
           console.log('result', group);
           const member1 = await this.ChatGroupMemberRepository.save({
             user_type: MEMBER_TYPE.STARTUP,
@@ -60,6 +60,7 @@ export class TaggedRM {
             group: { id: group.id }
           });
 
+          // RM user
           const member2 = await this.ChatGroupMemberRepository.save({
             user_type: MEMBER_TYPE.RM,
             executive: { id: rm_id },
